@@ -7,8 +7,19 @@
   "language": "python",
   "phase_completed": {
     "1": {
-      "sha": "87e20977396c6a4f006341df75439e7c69621f76",
-      "timestamp": "2026-08-24T07:34:41.201345+00:00"
+      "sha": "ba165bd8bc061e63512e6ed43762df5e4da01efc",
+      "timestamp": "2026-08-24T07:36:50.902726+00:00",
+      "enforcer_sha": "b03b9f753510c4167c084103b15a4da52fdf8b08",
+      "enforcer_surface": {
+        "core/quality_gate": "175b5ec151c9eebc0a2ffe48233e5a39ef4d5950",
+        "harness/harness_bridge.py": "699b72ebc056ae2529151f487a857bc953e78c29",
+        "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+      },
+      "delivered_tree_sha256": "13201bbb70a1525bc9842a2d1aacb3c3e4abd6fd607859b18273efb94a8e6e55"
+    },
+    "2": {
+      "sha": "ba165bd8bc061e63512e6ed43762df5e4da01efc",
+      "timestamp": "2026-08-24T08:41:57.177744+00:00"
     }
   },
   "test_inventory_checksum": "3cbdddd8fb2cddd672adb527f77f9fda653b1bd79ea1f916dd0ba34fdb19bca4",

@@ -6,6 +6,84 @@
 # Sources: 01-requirements/SRS.md §3-§4 ; 01-requirements/TRACEABILITY_MATRIX.md §1-§4.
 format_version: "1.2"
 
+# ----------------------------------------------------------------------------
+# fr_tests: top-level per-FR / per-layer test name registry required by
+# validate-handoff P1→P2. Aggregated from the tests[] entries below; one test
+# per FR is sufficient to satisfy "P1 deliverable must name at least one test
+# per FR". Each FR is a mapping from layer to a list of authoritative test
+# function names (mirrors the `function:` field on each tc below).
+# ----------------------------------------------------------------------------
+fr_tests:
+  FR-01:
+    unit:
+      - test_create_task_valid
+      - test_post_invalid_body_returns_422
+      - test_get_unknown_returns_404
+      - test_list_uses_cursor_pagination
+      - test_limit_default_and_upper_bound
+      - test_delete_removes_task_and_results_in_tx
+  FR-02:
+    unit:
+      - test_run_returns_202_with_run_id
+      - test_subprocess_uses_exec_no_shell_true
+      - test_per_task_timeout_equals_task_timeout
+      - test_state_machine_pending_running_done_failed_timeout
+      - test_results_written_to_task_results_table
+      - test_list_runs_newest_to_oldest
+  FR-03:
+    unit:
+      - test_missing_or_invalid_api_key_returns_401
+      - test_keys_stored_as_sha256_hash
+      - test_compare_uses_hmac_compare_digest
+      - test_key_create_prints_plaintext_exactly_once
+      - test_revoked_key_treated_as_invalid
+      - test_healthz_and_readyz_require_no_auth
+  FR-04:
+    unit:
+      - test_scope_hierarchy_read_lt_write_lt_admin
+      - test_insufficient_scope_returns_403_without_leak
+      - test_single_fastapi_dependency_for_authz
+  FR-05:
+    unit:
+      - test_token_bucket_capacity_and_refill_rate
+      - test_exceed_bucket_returns_429_with_retry_after
+      - test_bucket_update_uses_row_level_lock
+      - test_healthz_and_readyz_not_rate_limited
+  FR-06:
+    unit:
+      - test_all_data_access_via_repository_layer
+      - test_one_session_per_request_with_context_manager
+      - test_no_string_concat_sql_uses_orm_or_param
+      - test_selectinload_or_joinedload_constant_sql_count
+      - test_pool_size_and_pool_pre_ping
+  FR-07:
+    integration:
+      - test_upgrade_head_succeeds_against_real_sqlite
+      - test_downgrade_base_no_residual_tables
+      - test_round_trip_reversibility_v3_data_move
+      - test_no_destructive_shortcuts_in_downgrade
+      - test_each_migration_covered_by_offline_sql_assert
+  FR-08:
+    unit:
+      - test_background_uses_asyncio_task_group
+      - test_drain_waits_for_inflight_with_budget
+      - test_concurrency_cap_queues_surplus
+      - test_wait_for_kills_child_no_orphan
+      - test_cancelled_error_propagates_not_swallowed
+  FR-09:
+    integration:
+      - test_healthz_returns_200_ok
+      - test_readyz_checks_db_and_migration_head
+      - test_readyz_fails_closed_on_old_migration
+      - test_metrics_requires_admin_scope
+  FR-10:
+    unit:
+      - test_non_2xx_content_type_problem_json
+      - test_problem_body_has_required_fields
+      - test_detail_never_contains_internal_structure
+      - test_correlation_id_in_header_and_log
+      - test_error_code_mapping_matches_spec
+
 test_inventory:
   # ----------------------------------------------------------------------------
   # tests: enumerated test-case contract items.
