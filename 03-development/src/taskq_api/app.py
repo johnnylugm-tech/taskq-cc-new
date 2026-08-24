@@ -17,6 +17,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 
 from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_UNAUTHENTICATED
+from taskq_api.api.metrics import router as metrics_router
 from taskq_api.api.tasks import router as tasks_router
 
 
@@ -72,6 +73,9 @@ def create_app() -> FastAPI:
 
     # FR-01 — `/v1/tasks` CRUD.
     app.include_router(tasks_router)
+
+    # FR-04 — `/v1/metrics` (admin-only); FR-09 replaces the stub body.
+    app.include_router(metrics_router)
 
     # FR-03 — `/healthz` and `/readyz` are exempt from auth (AC-3.6).
     # Stub bodies return 200 OK with a static text payload; FR-09

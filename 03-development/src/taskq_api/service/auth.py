@@ -1,9 +1,13 @@
 """API-key hashing + constant-time comparison service.
 
-[FR-03, NFR-02, NFR-04]
+[FR-03, FR-04, NFR-02, NFR-04]
 Citations:
   - FR-03 §3 (SPEC.md): API keys are stored as SHA-256 hashes;
     comparison MUST use ``hmac.compare_digest`` (constant-time).
+  - FR-04 §3 (SPEC.md): scope hierarchy ``read`` < ``write`` < ``admin``
+    (inclusive). The comparator lives here so the runtime / spec-level
+    single source of truth is the same module (``taskq_api.service.auth``)
+    that owns credential primitives.
   - NFR-02 (security): the only comparison primitive authorised for
     credential matching is ``hmac.compare_digest``; a naive ``==`` on
     key material is forbidden.
@@ -14,6 +18,29 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+
+
+# Scope rank — higher rank satisfies a lower one. Defined at module
+# import so ``scope_satisfies`` does no allocation per call.
+_SCOPE_RANK: dict[str, int] = {"read": 0, "write": 1, "admin": 2}
+
+
+def scope_satisfies(granted: str, required: str) -> bool:
+    """Return True iff ``granted`` outranks or equals ``required``.
+
+    [FR-04, NFR-02]
+    Citations:
+      - FR-04 §3 AC-4.1: ``admin`` ⊇ ``write`` ⊇ ``read``. The
+        inclusive hierarchy is implemented as rank ≥ comparison.
+      - NFR-02 (security): deny-by-default — any unknown scope
+        (typo, empty string, future scope not yet ranked) returns
+        ``False`` so a malformed principal can never bypass authz.
+    """
+    granted_rank = _SCOPE_RANK.get(granted, -1)
+    required_rank = _SCOPE_RANK.get(required, -1)
+    if granted_rank < 0 or required_rank < 0:
+        return False
+    return granted_rank >= required_rank
 
 
 def hash_key(plaintext: str) -> str:

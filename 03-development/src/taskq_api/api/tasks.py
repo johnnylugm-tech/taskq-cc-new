@@ -32,10 +32,11 @@ router = APIRouter(prefix="/v1/tasks", tags=["tasks"])
 
 # Scope dependency callables — bind the scope string at handler decoration
 # time so FastAPI resolves the inner `Depends(require_api_key)` recursively.
-# Returning a callable from a wrapper (e.g. `def _require_write(): return
-# deps.require_scope("write")`) does NOT work — FastAPI treats the wrapper
-# as a leaf dependency and skips introspecting the returned function's
-# own `Depends(...)` declarations.
+# The returned object is a `_ScopeDep` (a FastAPI `Depends`-shaped wrapper
+# that also exposes `.callable`) — it can be passed directly to the
+# router's `dependencies=[...]` argument (no outer `Depends(...)`)
+# because `_ScopeDep` already carries the `dependency` attribute
+# FastAPI's resolver reads.
 _require_write = deps.require_scope("write")
 _require_read = deps.require_scope("read")
 _require_admin = deps.require_scope("admin")
@@ -45,16 +46,18 @@ _require_admin = deps.require_scope("admin")
     "",
     status_code=status.HTTP_201_CREATED,
     response_model=TaskOut,
+    dependencies=[_require_write],
 )
 def create_task(
     body: TaskCreate,
-    _principal: dict = Depends(_require_write),
 ) -> TaskOut:
     """Create a task. AC-1.1 / AC-1.2.
 
     [FR-01]
     Citations:
       - FR-01: POST /v1/tasks handler.
+      - FR-04: ``dependencies=[_require_write]`` enforces the single
+        authz decision point (SPEC.md §6 / FR-04 AC-4.3).
       - FR-06: delegates to `task_repo.task_repo.create`.
     """
     try:
@@ -75,16 +78,17 @@ def create_task(
 @router.get(
     "/{task_id}",
     response_model=TaskOut,
+    dependencies=[_require_read],
 )
 def read_task(
     task_id: UUID,
-    _principal: dict = Depends(_require_read),
 ) -> TaskOut:
     """Fetch a single task by id. AC-1.3.
 
     [FR-01]
     Citations:
       - FR-01: GET /v1/tasks/{id} handler.
+      - FR-04: read scope via ``dependencies=[_require_read]``.
       - FR-06: delegates to `task_repo.task_repo.get`.
     """
     row = task_repo_mod.task_repo.get(str(task_id))
@@ -99,12 +103,12 @@ def read_task(
 @router.get(
     "",
     response_model=TaskList,
+    dependencies=[_require_read],
 )
 def list_tasks(
     status_filter: str | None = Query(default=None, alias="status"),
     cursor: str | None = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
-    _principal: dict = Depends(_require_read),
 ) -> TaskList:
     """Cursor-paginated list. AC-1.4 / AC-1.5.
 
@@ -112,6 +116,7 @@ def list_tasks(
     Citations:
       - FR-01: cursor-based pagination only (no offset parameter);
         default `limit=50`, upper bound `200`, exceeded -> 422.
+      - FR-04: read scope via ``dependencies=[_require_read]``.
       - FR-06: delegates to `task_repo.task_repo.list`.
     """
     items, next_cursor = task_repo_mod.task_repo.list(
@@ -130,16 +135,17 @@ def list_tasks(
     "/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     response_class=Response,
+    dependencies=[_require_admin],
 )
 def delete_task(
     task_id: UUID,
-    _principal: dict = Depends(_require_admin),
 ) -> Response:
     """Delete a task and its result rows in one tx. AC-1.6.
 
     [FR-01]
     Citations:
       - FR-01: DELETE /v1/tasks/{id} handler — task + results in single tx.
+      - FR-04: admin scope via ``dependencies=[_require_admin]``.
       - FR-06: delegates to `task_repo.task_repo.delete_with_results`.
     """
     task_repo_mod.task_repo.delete_with_results(str(task_id))
@@ -180,11 +186,11 @@ async def _execute_and_record(task_id: str, command: str, run_id: str) -> None:
 @router.post(
     "/{task_id}/run",
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[_require_write],
 )
 async def run_task_endpoint(
     task_id: UUID,
     background_tasks: BackgroundTasks,
-    _principal: dict = Depends(_require_write),
 ) -> dict[str, str]:
     """Trigger task execution. AC-2.1.
 
@@ -196,6 +202,7 @@ async def run_task_endpoint(
     Citations:
       - FR-02 §3 AC-2.1: returns HTTP 202 + ``run_id``.
       - FR-02 §3: schedules `run_task` from the FR-02 service module.
+      - FR-04: write scope via ``dependencies=[_require_write]``.
       - FR-06: delegates `get` / persistence to `task_repo`.
     """
     row = task_repo_mod.task_repo.get(str(task_id))
@@ -217,16 +224,17 @@ async def run_task_endpoint(
 @router.get(
     "/{task_id}/runs",
     response_model=RunList,
+    dependencies=[_require_read],
 )
 def list_runs_endpoint(
     task_id: UUID,
-    _principal: dict = Depends(_require_read),
 ) -> RunList:
     """List execution history for a task. AC-2.6.
 
     [FR-02]
     Citations:
       - FR-02 §3 AC-2.6: returns rows newest-to-oldest by `finished_at`.
+      - FR-04: read scope via ``dependencies=[_require_read]``.
       - FR-06: delegates to `task_repo.task_repo.list_runs`.
     """
     items = task_repo_mod.task_repo.list_runs(str(task_id))
