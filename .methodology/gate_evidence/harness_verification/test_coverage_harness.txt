@@ -1,8 +1,8 @@
 # Harness-executed: pytest-cov
-# returncode: 0
+# returncode: 1
 # agent_score: 100.0 | threshold: 80.0
 
-.........................................                                [100%]
+FFFFFFFFF.......FFFFFFFFF.........................                       [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:10
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:10: PendingDeprecationWarning: Please use `import python_multipart` instead.
@@ -10,6 +10,7 @@
 
 03-development/tests/test_fr01.py: 8 warnings
 03-development/tests/test_fr02.py: 11 warnings
+03-development/tests/test_fr03.py: 3 warnings
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/httpx/_client.py:690: DeprecationWarning: The 'app' shortcut is now deprecated. Use the explicit style 'transport=WSGITransport(app=...)' instead.
     warnings.warn(message, DeprecationWarning)
 
@@ -20,16 +21,38 @@ ______________ coverage: platform darwin, python 3.11.15-final-0 _______________
 Name                                                   Stmts   Miss  Cover   Missing
 ------------------------------------------------------------------------------------
 03-development/src/taskq_api/__init__.py                   0      0   100%
+03-development/src/taskq_api/__main__.py                  24     24     0%   17-69
 03-development/src/taskq_api/api/__init__.py               0      0   100%
-03-development/src/taskq_api/api/deps.py                   7      1    86%   55
-03-development/src/taskq_api/api/tasks.py                 57      0   100%
-03-development/src/taskq_api/app.py                       25      0   100%
+03-development/src/taskq_api/api/deps.py                  36      0   100%
+03-development/src/taskq_api/api/tasks.py                 53     23    57%   60-72, 90-96, 117-122, 145-146, 173-177, 201-214, 232-233
+03-development/src/taskq_api/app.py                       33      1    97%   120
 03-development/src/taskq_api/models/__init__.py            0      0   100%
-03-development/src/taskq_api/models/schemas.py            39      1    97%   40
+03-development/src/taskq_api/models/schemas.py            39      4    90%   38-43
 03-development/src/taskq_api/repository/__init__.py        0      0   100%
+03-development/src/taskq_api/repository/key_repo.py       17      7    59%   47-55, 75-77
 03-development/src/taskq_api/repository/task_repo.py      52     38    27%   36-50, 53, 61-66, 69-77, 84-86, 90-99, 112-119
 03-development/src/taskq_api/service/__init__.py           0      0   100%
+03-development/src/taskq_api/service/auth.py               9      1    89%   44
 03-development/src/taskq_api/service/runner.py           110      0   100%
 ------------------------------------------------------------------------------------
-TOTAL                                                    290     40    86%
-41 passed, 20 warnings in 2.66s
+TOTAL                                                    373     98    74%
+=========================== short test summary info ============================
+FAILED 03-development/tests/test_fr01.py::test_create_task_valid - AssertionE...
+FAILED 03-development/tests/test_fr01.py::test_post_invalid_body_returns_422
+FAILED 03-development/tests/test_fr01.py::test_get_unknown_returns_404 - Asse...
+FAILED 03-development/tests/test_fr01.py::test_list_uses_cursor_pagination - ...
+FAILED 03-development/tests/test_fr01.py::test_limit_default_and_upper_bound
+FAILED 03-development/tests/test_fr01.py::test_delete_removes_task_and_results_in_tx
+FAILED 03-development/tests/test_fr01.py::test_create_duplicate_name_returns_422
+FAILED 03-development/tests/test_fr01.py::test_get_existing_task_returns_200
+FAILED 03-development/tests/test_fr02.py::test_run_returns_202_with_run_id - ...
+FAILED 03-development/tests/test_fr02.py::test_results_written_to_task_results_table
+FAILED 03-development/tests/test_fr02.py::test_list_runs_newest_to_oldest - A...
+FAILED 03-development/tests/test_fr02.py::test_run_unknown_task_returns_404
+FAILED 03-development/tests/test_fr02.py::test_create_task_duplicate_name_returns_422
+FAILED 03-development/tests/test_fr02.py::test_get_unknown_task_returns_404
+FAILED 03-development/tests/test_fr02.py::test_get_known_task_returns_200 - A...
+FAILED 03-development/tests/test_fr02.py::test_list_tasks_returns_paginated_items
+FAILED 03-development/tests/test_fr02.py::test_delete_task_returns_204_and_invokes_admin_scope
+FAILED 03-development/tests/test_fr02.py::test_execute_and_record_swallows_non_cancel_exception
+18 failed, 32 passed, 23 warnings in 2.84s
