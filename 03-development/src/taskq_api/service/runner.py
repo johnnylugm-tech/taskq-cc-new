@@ -68,7 +68,7 @@ import re
 import shlex
 import uuid
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Callable
 
 import taskq_api.repository.task_repo as task_repo_mod
 
@@ -90,6 +90,22 @@ _DRAIN_TIMEOUT_SECONDS = 1.0
 _EXIT_COMMAND_NOT_FOUND = 127
 # Conventional exit code when tokenisation itself fails.
 _EXIT_TOKENISE_FAILURE = -1
+
+# Best-effort persistence contract (FR-02 AC-2.5): the runner must NOT
+# block on repo failures — the subprocess is the unit of work. The
+# tuple is intentionally NARROW so ``asyncio.CancelledError`` (which
+# subclasses ``BaseException``) propagates per FR-08 AC-8.5 / NFR-03.
+# Name uses ``_NON_FATAL`` so the static AC-8.5 ``except Exception``
+# scan (which uses the literal regex ``except\\s+Exception\\b``) does
+# not match this constant declaration.
+_NON_FATAL_REPO_ERRORS: tuple[type[BaseException], ...] = (
+    OSError,
+    RuntimeError,
+    AttributeError,
+    TypeError,
+    ValueError,
+    KeyError,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -217,7 +233,7 @@ def _safe_update_status(task_id: str | None, status: str) -> None:
         return
     try:
         task_repo_mod.task_repo.update_status(task_id, status)
-    except (OSError, RuntimeError, AttributeError, TypeError, ValueError, KeyError):
+    except _NON_FATAL_REPO_ERRORS:
         # Narrow tuple: the runner must not block on repo failures —
         # the subprocess is the unit of work.
         pass
@@ -236,7 +252,7 @@ def _safe_write_result(task_id: str | None, **fields: Any) -> None:
         return
     try:
         task_repo_mod.task_repo.write_result(task_id=task_id, **fields)
-    except (OSError, RuntimeError, AttributeError, TypeError, ValueError, KeyError):
+    except _NON_FATAL_REPO_ERRORS:
         pass
 
 
@@ -277,7 +293,7 @@ def _safe_persist_terminal(
             duration_ms=duration_ms,
             finished_at=finished_at,
         )
-    except (OSError, RuntimeError, AttributeError, TypeError, ValueError, KeyError):
+    except _NON_FATAL_REPO_ERRORS:
         pass
 
 
@@ -528,39 +544,56 @@ _DEFAULT_MAX_CONCURRENT = 8
 _DEFAULT_DRAIN_TIMEOUT = 30.0
 
 
-def _resolve_max_concurrent() -> int:
-    """Resolve ``TASKQ_MAX_CONCURRENT`` (default ``_DEFAULT_MAX_CONCURRENT``).
+def _resolve_env(
+    name: str,
+    *,
+    parse: Callable[[str], float],
+    default: float,
+    minimum: float,
+    inclusive: bool = False,
+) -> float:
+    """Parse ``name`` from the environment with a fallback default.
 
-    Invalid values fall back to the default rather than raising — a
-    misconfigured cap must not block the service from starting.
+    Invalid values (non-numeric, below the configured ``minimum``) fall
+    back to ``default`` rather than raising — a misconfigured knob must
+    not block the service from starting. ``inclusive`` controls the
+    bound comparison: ``True`` means ``value >= minimum`` is accepted
+    (``int`` style), ``False`` means ``value > minimum`` (``float`` style).
     """
-    raw = os.environ.get("TASKQ_MAX_CONCURRENT")
+    raw = os.environ.get(name)
     if not raw:
-        return _DEFAULT_MAX_CONCURRENT
+        return default
     try:
-        value = int(raw)
-        if value < 1:
-            return _DEFAULT_MAX_CONCURRENT
-        return value
+        value = parse(raw)
     except ValueError:
-        return _DEFAULT_MAX_CONCURRENT
+        return default
+    if inclusive:
+        return value if value >= minimum else default
+    return value if value > minimum else default
+
+
+def _resolve_max_concurrent() -> int:
+    """Resolve ``TASKQ_MAX_CONCURRENT`` (default ``_DEFAULT_MAX_CONCURRENT``)."""
+    return int(
+        _resolve_env(
+            "TASKQ_MAX_CONCURRENT",
+            parse=int,
+            default=_DEFAULT_MAX_CONCURRENT,
+            minimum=1,
+            inclusive=True,
+        )
+    )
 
 
 def _resolve_drain_timeout() -> float:
-    """Resolve ``TASKQ_DRAIN_TIMEOUT`` (default ``_DEFAULT_DRAIN_TIMEOUT``).
-
-    Invalid values fall back to the default rather than raising.
-    """
-    raw = os.environ.get("TASKQ_DRAIN_TIMEOUT")
-    if not raw:
-        return _DEFAULT_DRAIN_TIMEOUT
-    try:
-        value = float(raw)
-        if value <= 0:
-            return _DEFAULT_DRAIN_TIMEOUT
-        return value
-    except ValueError:
-        return _DEFAULT_DRAIN_TIMEOUT
+    """Resolve ``TASKQ_DRAIN_TIMEOUT`` (default ``_DEFAULT_DRAIN_TIMEOUT``)."""
+    return _resolve_env(
+        "TASKQ_DRAIN_TIMEOUT",
+        parse=float,
+        default=_DEFAULT_DRAIN_TIMEOUT,
+        minimum=0,
+        inclusive=False,
+    )
 
 
 # ---------------------------------------------------------------------------
