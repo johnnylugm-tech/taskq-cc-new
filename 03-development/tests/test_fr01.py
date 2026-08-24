@@ -324,3 +324,51 @@ def test_delete_removes_task_and_results_in_tx(client, fake_repo):
     assert expected_rows_after_delete == 0, (
         f"AC6-tx-atomic failed: {expected_rows_after_delete} result rows remain"
     )
+
+
+# ---------------------------------------------------------------------------
+# Coverage-filling tests — exercise the FR-01 handler branches that are
+# reachable only via business-rule violations (duplicate name) or the GET
+# happy path. Not part of TEST_SPEC's named list, but kept locally so
+# `pytest --cov` reports 100% on the FR-01 router module.
+# ---------------------------------------------------------------------------
+
+
+def test_create_duplicate_name_returns_422(client, fake_repo):
+    """Coverage: handler `except ValueError` branch (AC-1.1 business-rule path).
+
+    Seeds a task with `name="dup-target"`, then issues a second POST that
+    satisfies pydantic validation (command non-empty, length OK) but trips
+    the repository's duplicate-name check. The handler must convert the
+    repo's ValueError into a 422 + problem+json response.
+    """
+    fake_repo.create({"command": "echo first", "name": "dup-target"})
+
+    response = client.post(
+        "/v1/tasks",
+        json={"command": "echo second", "name": "dup-target"},
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert response.status_code == 422, (
+        f"duplicate-name: expected 422, got {response.status_code} body={response.text}"
+    )
+    assert response.headers.get("content-type", "").startswith(
+        "application/problem+json"
+    ), f"expected problem+json, got {response.headers.get('content-type')!r}"
+
+
+def test_get_existing_task_returns_200(client, fake_repo):
+    """Coverage: read_task happy path (AC-1.3 200 response)."""
+    task = fake_repo.create({"command": "echo hi", "name": "existing"})
+
+    response = client.get(
+        f"/v1/tasks/{task['id']}",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert response.status_code == 200, (
+        f"existing task: expected 200, got {response.status_code} body={response.text}"
+    )
+    body = response.json()
+    assert body.get("id") == task["id"], (
+        f"id mismatch: got {body.get('id')!r}, expected {task['id']!r}"
+    )
