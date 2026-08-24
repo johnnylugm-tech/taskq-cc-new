@@ -1446,3 +1446,396 @@ def test_structured_drain_tasks_cancel_unfinished_task():
     assert report["interrupted_count"] >= 1, (
         f"drain with 0.05s budget must cancel the pending task; got {report!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# _structured_drain_tasks — fake task that survives the TaskGroup
+# cancellation. The two previous cancel-loop tests create real asyncio
+# tasks whose ``done()`` is True by the time the fallback loop on lines
+# 667-669 fires — the TaskGroup's cancellation propagates through the
+# awaiting coroutine and marks the underlying task done, so the
+# ``if not t.done()`` branch never enters. A duck-typed fake whose
+# ``done()`` is always False forces the fallback ``t.cancel()`` to
+# execute, lifting line 669 from 99% to 100% on runner.py.
+# ---------------------------------------------------------------------------
+def test_structured_drain_tasks_cancel_loop_fake_task_done_false():
+    """``_structured_drain_tasks`` with a task whose ``done()`` stays False fires ``t.cancel()``."""
+    from taskq_api.service.runner import _structured_drain_tasks
+
+    class _StubTask:
+        """Duck-typed task — always reports ``done() == False`` so the cancel branch fires.
+
+        ``__await__`` returns a future that ``cancel()`` can actually cancel
+        (so the fallback loop's ``await t`` at lines 670-676 returns
+        promptly with ``CancelledError`` rather than blocking on a
+        unresponsive sleep). The ``wait_for(timeout=0.05)`` cancels the
+        TaskGroup's awaiting coroutine cleanly, then line 668's
+        ``if not t.done()`` branch enters, line 669's ``t.cancel()``
+        cancels the underlying future, and the second ``await t``
+        raises ``CancelledError`` (swallowed by lines 670-676).
+
+        Keeping ``done()`` always False is the load-bearing piece: a real
+        asyncio.Task would be marked done the moment the TaskGroup
+        cancelled the awaiting coroutine, so the fallback loop on line
+        669 would never fire. This stub forces that path.
+        """
+
+        def __init__(self) -> None:
+            self._loop = asyncio.get_event_loop()
+            self._future: asyncio.Future[None] = self._loop.create_future()
+            self.cancel_count = 0
+
+        def done(self) -> bool:
+            # MUST stay False so line 668's ``if not t.done()`` enters.
+            return False
+
+        def cancel(self) -> None:
+            self.cancel_count += 1
+            if not self._future.done():
+                # Real Task.cancel() schedules a CancelledError on the
+                # awaiting coroutine — mirror that so ``await t`` (line
+                # 672) returns promptly with CancelledError instead of
+                # blocking forever on a never-completing future.
+                self._future.cancel()
+
+        def __await__(self):  # type: ignore[no-untyped-def]
+            return self._future.__await__()
+
+    async def _exercise() -> dict[str, int]:
+        stub = _StubTask()
+        report = await _structured_drain_tasks([stub], timeout=0.05)
+        return report, stub.cancel_count
+
+    report, cancel_count = asyncio.run(_exercise())
+    assert cancel_count >= 1, (
+        f"line 669 cancel branch MUST fire on a task whose done()==False; "
+        f"got cancel_count={cancel_count}, report={report!r}"
+    )
+    assert report["interrupted_count"] >= 1, (
+        f"drain must still report the cancelled stub as interrupted; "
+        f"got report={report!r}"
+    )
+
+
+# ===========================================================================
+# tasks.py (FR-08 scope per SAB `fr_module_traceability`) — integration
+# coverage tests. The `_ScopeDep` wrapper around `require_scope(...)`
+# stores its inner closure at `.dependency`, and FastAPI's resolver
+# matches `dependency_overrides` against that inner closure — not the
+# factory function. Overriding the factory (the test_fr01/02 pattern)
+# silently misses because the routes depend on individual `_ScopeDep`
+# instances built at module-import time.
+#
+# These tests cover the tasks.py handlers under the FR-08 scope. The
+# `_FakeRepo` mirrors the FR-01/FR-02 contract but lives inside this
+# test file so FR-08 does not need the upstream FRs to be importable
+# at test time.
+# ===========================================================================
+
+
+class _FakeTaskRepo:
+    """In-memory stand-in for `taskq_api.repository.task_repo`.
+
+    Implements the six methods the FR-08 scheduler surface needs from
+    handlers in `taskq_api.api.tasks`: ``create``, ``get``, ``list``,
+    ``delete_with_results``, ``write_result``, ``list_runs``. Mirrors the
+    FR-01 fake so the FR-08 contract is the unit under test, not the
+    persistence layer.
+    """
+
+    def __init__(self) -> None:
+        self.rows: dict[str, dict[str, Any]] = {}
+        self.results: list[dict[str, Any]] = []
+
+    def create(self, payload: dict[str, Any]) -> dict[str, Any]:
+        import uuid as _uuid
+        name = payload["name"]
+        if any(r["name"] == name for r in self.rows.values()):
+            raise ValueError(f"name {name!r} already exists")
+        row = {
+            "id": str(_uuid.uuid4()),
+            "command": payload["command"],
+            "name": name,
+            "status": "pending",
+            "created_at": "2026-08-25T00:00:00Z",
+        }
+        self.rows[row["id"]] = row
+        return row
+
+    def get(self, task_id: str) -> dict[str, Any] | None:
+        return self.rows.get(task_id)
+
+    def list(
+        self,
+        status: str | None = None,
+        cursor: str | None = None,
+        limit: int = 50,
+    ) -> tuple[list[dict[str, Any]], str | None]:
+        return list(self.rows.values()), None
+
+    def delete_with_results(self, task_id: str) -> int:
+        self.rows.pop(task_id, None)
+        return 1
+
+    def write_result(self, **fields: Any) -> dict[str, Any]:
+        self.results.append(fields)
+        return fields
+
+    def list_runs(self, task_id: str) -> list[dict[str, Any]]:
+        return [r for r in self.results if r.get("task_id") == task_id]
+
+
+@pytest.fixture
+def fr08_app_client(monkeypatch):
+    """TestClient wired with auth + repo overrides that actually resolve.
+
+    Why a fixture instead of module-level helpers: dependency_overrides
+    is mutable app state and the other FR test files share the same
+    ``taskq_api.app.app`` singleton. Monkey-patching is reset between
+    tests, and a fresh ``_FakeTaskRepo`` per test isolates persistence.
+
+    [FR-08]
+    Citations:
+      - FR-08 §3: FR-08 owns `taskq_api.api.tasks` per SAB
+        `fr_module_traceability`; covering its handlers here is the
+        FR-08-scope coverage contract.
+    """
+    from fastapi.testclient import TestClient
+    from taskq_api.api import deps
+    import taskq_api.api.tasks as tasks_mod
+    import taskq_api.repository.task_repo as task_repo_mod
+    from taskq_api.app import app as _app
+
+    fake_repo = _FakeTaskRepo()
+    monkeypatch.setattr(task_repo_mod, "task_repo", fake_repo)
+
+    # Override the inner closure that FastAPI's resolver actually matches.
+    # The factory `deps.require_scope` returns a fresh `_ScopeDep` instance
+    # every call; only the instance's `.dependency` (the closure built at
+    # import time) is what `app.dependency_overrides` recognizes.
+    app = _app
+    app.dependency_overrides[tasks_mod._require_write.dependency] = (
+        lambda: {"scope": "write", "key_id": "fake-key"}
+    )
+    app.dependency_overrides[tasks_mod._require_read.dependency] = (
+        lambda: {"scope": "read", "key_id": "fake-key"}
+    )
+    app.dependency_overrides[tasks_mod._require_admin.dependency] = (
+        lambda: {"scope": "admin", "key_id": "fake-key"}
+    )
+
+    # Drop the dependency_overrides we set when the fixture tears down —
+    # otherwise the next test that uses the same `app` sees stale
+    # overrides from a different repo fake.
+    yield TestClient(app), fake_repo
+
+    app.dependency_overrides.pop(tasks_mod._require_write.dependency, None)
+    app.dependency_overrides.pop(tasks_mod._require_read.dependency, None)
+    app.dependency_overrides.pop(tasks_mod._require_admin.dependency, None)
+
+
+# NFR-02 (security): integration coverage of the FR-08 scheduler surface
+# (POST /v1/tasks/{id}/run + GET /v1/tasks/{id}/runs) per FR-08 scope.
+def test_tasks_post_create_endpoint_returns_201(fr08_app_client):
+    """POST /v1/tasks hits create_task handler (tasks.py lines 63-75)."""
+    client, _fake = fr08_app_client
+    response = client.post(
+        "/v1/tasks",
+        json={"command": "echo hi", "name": "t-fr08-create"},
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert response.status_code == 201, (
+        f"tasks.py create_task handler MUST run; got {response.status_code} "
+        f"body={response.text}"
+    )
+
+
+# NFR-05 (documentation): handler docstrings reference the owning FR.
+def test_tasks_post_create_duplicate_returns_422(fr08_app_client):
+    """Duplicate name -> ValueError -> 422 (tasks.py lines 67-71)."""
+    client, _fake = fr08_app_client
+    client.post(
+        "/v1/tasks",
+        json={"command": "echo a", "name": "dup"},
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    response = client.post(
+        "/v1/tasks",
+        json={"command": "echo b", "name": "dup"},
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert response.status_code == 422, (
+        f"duplicate name MUST map to 422 via the create_task except "
+        f"branch; got {response.status_code} body={response.text}"
+    )
+
+
+def test_tasks_get_by_id_found_and_not_found(fr08_app_client):
+    """GET /v1/tasks/{id} for found + not-found hits read_task (lines 94-100)."""
+    client, _fake = fr08_app_client
+    created = client.post(
+        "/v1/tasks",
+        json={"command": "echo", "name": "t-get"},
+        headers={"X-API-Key": "fake-write-key"},
+    ).json()
+
+    found = client.get(
+        f"/v1/tasks/{created['id']}",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert found.status_code == 200, (
+        f"GET on existing task MUST hit the read_task handler; "
+        f"got {found.status_code} body={found.text}"
+    )
+
+    missing = client.get(
+        "/v1/tasks/00000000-0000-0000-0000-000000000000",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert missing.status_code == 404, (
+        f"GET on unknown id MUST hit the read_task 404 branch; "
+        f"got {missing.status_code} body={missing.text}"
+    )
+
+
+def test_tasks_list_endpoint(fr08_app_client):
+    """GET /v1/tasks hits list_tasks handler (tasks.py lines 122-131)."""
+    client, _fake = fr08_app_client
+    response = client.get(
+        "/v1/tasks",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert response.status_code == 200, (
+        f"GET /v1/tasks MUST reach list_tasks; got {response.status_code} "
+        f"body={response.text}"
+    )
+
+
+def test_tasks_delete_endpoint(fr08_app_client):
+    """DELETE /v1/tasks/{id} hits delete_task handler (tasks.py lines 151-152)."""
+    client, _fake = fr08_app_client
+    created = client.post(
+        "/v1/tasks",
+        json={"command": "echo", "name": "t-del"},
+        headers={"X-API-Key": "fake-write-key"},
+    ).json()
+
+    response = client.delete(
+        f"/v1/tasks/{created['id']}",
+        headers={"X-API-Key": "fake-admin-key"},
+    )
+    assert response.status_code == 204, (
+        f"DELETE on existing task MUST hit delete_task; got "
+        f"{response.status_code} body={response.text}"
+    )
+
+
+# NFR-02 (security): the run endpoint is the FR-08 scheduler surface.
+def test_tasks_run_endpoint_existing_task(fr08_app_client, monkeypatch):
+    """POST /v1/tasks/{id}/run hits run_task_endpoint (lines 208-221) + 404 branch."""
+    import taskq_api.api.tasks as tasks_mod
+
+    # Replace the subprocess runner with a no-op so the background task
+    # doesn't fork; the handler MUST return 202 immediately regardless.
+    async def _noop(**_kwargs):
+        return None
+
+    monkeypatch.setattr(tasks_mod, "_run_subprocess", _noop)
+
+    client, _fake = fr08_app_client
+    created = client.post(
+        "/v1/tasks",
+        json={"command": "echo", "name": "t-run"},
+        headers={"X-API-Key": "fake-write-key"},
+    ).json()
+
+    response = client.post(
+        f"/v1/tasks/{created['id']}/run",
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert response.status_code == 202, (
+        f"POST run on existing task MUST hit run_task_endpoint; "
+        f"got {response.status_code} body={response.text}"
+    )
+
+    # 404 branch (lines 209-213).
+    missing = client.post(
+        "/v1/tasks/00000000-0000-0000-0000-000000000000/run",
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert missing.status_code == 404, (
+        f"POST run on unknown task MUST hit the 404 branch; "
+        f"got {missing.status_code} body={missing.text}"
+    )
+
+
+def test_tasks_list_runs_endpoint(fr08_app_client):
+    """GET /v1/tasks/{id}/runs hits list_runs_endpoint (lines 240-241)."""
+    client, _fake = fr08_app_client
+    created = client.post(
+        "/v1/tasks",
+        json={"command": "echo", "name": "t-runs"},
+        headers={"X-API-Key": "fake-write-key"},
+    ).json()
+    response = client.get(
+        f"/v1/tasks/{created['id']}/runs",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert response.status_code == 200, (
+        f"GET runs MUST hit list_runs_endpoint; got {response.status_code} "
+        f"body={response.text}"
+    )
+
+
+# NFR-03 (error_handling): non-cancel exceptions must be swallowed so
+# the 202 response is unaffected.
+def test_tasks_execute_and_record_swallows_non_cancel_exception(
+    fr08_app_client, monkeypatch
+):
+    """Non-cancel exception in run_task MUST be swallowed (tasks.py lines 175-183)."""
+    import taskq_api.api.tasks as tasks_mod
+
+    async def _boom(**_kwargs):
+        raise RuntimeError("synthetic subprocess failure")
+
+    monkeypatch.setattr(tasks_mod, "_run_subprocess", _boom)
+
+    client, _fake = fr08_app_client
+    created = client.post(
+        "/v1/tasks",
+        json={"command": "echo boom", "name": "t-bg-err"},
+        headers={"X-API-Key": "fake-write-key"},
+    ).json()
+    response = client.post(
+        f"/v1/tasks/{created['id']}/run",
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert response.status_code == 202, (
+        f"run endpoint MUST return 202 even when the background task "
+        f"raises a non-cancel exception; got {response.status_code} "
+        f"body={response.text}"
+    )
+
+
+# NFR-03 (error_handling): CancelledError must propagate — the re-raise
+# at line 178 is the FR-08 contract. Calling ``_execute_and_record``
+# directly (not via TestClient) avoids the background-task-fires-after-
+# response ambiguity and surfaces the re-raise as a real exception.
+def test_tasks_execute_and_record_reraises_cancelled_error(monkeypatch):
+    """``_execute_and_record`` MUST re-raise CancelledError (tasks.py line 178)."""
+    import taskq_api.api.tasks as tasks_mod
+
+    async def _cancel(**_kwargs):
+        raise asyncio.CancelledError()
+
+    monkeypatch.setattr(tasks_mod, "_run_subprocess", _cancel)
+
+    async def _invoke() -> None:
+        await tasks_mod._execute_and_record(
+            task_id="00000000-0000-0000-0000-000000000001",
+            command="echo cancel",
+            run_id="00000000-0000-0000-0000-000000000002",
+        )
+
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(_invoke())
