@@ -34,7 +34,13 @@ from typing import Callable
 from fastapi import Depends, Header, HTTPException, status
 
 import taskq_api.repository.key_repo as key_repo_mod
-from taskq_api.service.auth import compare_keys, hash_key, scope_satisfies
+from taskq_api.service.auth import (
+    KNOWN_SCOPES,
+    compare_keys,
+    hash_key,
+    is_known_scope,
+    scope_satisfies,
+)
 
 
 # Module-level alias so the FR-03 test fixture can monkeypatch
@@ -197,10 +203,10 @@ def require_api_key(
 
 
 # Scope ordering — a higher rank satisfies a lower one. The comparator
-# itself lives on ``taskq_api.service.auth.scope_satisfies`` per the
-# FR-04 SAB binding; this module keeps the rank-table local for the
-# factory's default-argument sanity check only.
-_SCOPE_RANK = {"read": 0, "write": 1, "admin": 2}
+# lives on ``taskq_api.service.auth.scope_satisfies``; the canonical
+# scope name set (``KNOWN_SCOPES``) and the ``is_known_scope`` check
+# are also exported from ``auth`` so this module is not the source of
+# truth for either.
 
 
 def require_scope(scope: str = "read") -> Callable[[], dict]:
@@ -230,11 +236,13 @@ def require_scope(scope: str = "read") -> Callable[[], dict]:
     # Default-argument sanity check — if a caller misspells the scope
     # name, fail loudly at factory time so the misconfiguration cannot
     # silently pass-through to ``scope_satisfies`` (which would also
-    # deny it, but with a misleading error path).
-    if scope not in _SCOPE_RANK:
+    # deny it, but with a misleading error path). The canonical scope
+    # name set lives on ``taskq_api.service.auth`` per the FR-04 SAB
+    # binding; we import it rather than re-declare the table here.
+    if not is_known_scope(scope):
         raise ValueError(
             f"require_scope: unknown scope {scope!r}; "
-            f"expected one of {sorted(_SCOPE_RANK)!r}"
+            f"expected one of {sorted(KNOWN_SCOPES)!r}"
         )
 
     def _dependency(principal: dict = Depends(require_api_key)) -> dict:

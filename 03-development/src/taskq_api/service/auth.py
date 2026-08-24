@@ -24,6 +24,24 @@ import hmac
 # import so ``scope_satisfies`` does no allocation per call.
 _SCOPE_RANK: dict[str, int] = {"read": 0, "write": 1, "admin": 2}
 
+# Canonical list of recognised scopes. Exposed so callers (e.g. the
+# ``require_scope`` factory in ``taskq_api.api.deps``) can validate a
+# caller-supplied scope name without re-declaring the rank table.
+KNOWN_SCOPES: tuple[str, ...] = tuple(_SCOPE_RANK)
+
+
+def is_known_scope(scope: str) -> bool:
+    """Return True iff ``scope`` is one of the ranked scopes.
+
+    [FR-04]
+    Citations:
+      - FR-04: this module is the single source of truth for the
+        scope name set; anything that needs to validate a caller-
+        supplied scope (e.g. ``require_scope`` factory) must call
+        here rather than re-declare the table.
+    """
+    return scope in _SCOPE_RANK
+
 
 def scope_satisfies(granted: str, required: str) -> bool:
     """Return True iff ``granted`` outranks or equals ``required``.
