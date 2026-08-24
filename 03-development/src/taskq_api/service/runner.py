@@ -510,6 +510,7 @@ async def run_task(
         "status_name": new_status,
         "exit_code": exit_code_value,
         "run_id": run_id,
+        "child_pid": getattr(proc, "pid", None),
     }
 
 
@@ -836,88 +837,3 @@ async def drain(timeout: float | None = None) -> dict[str, int]:
     if timeout is None:
         timeout = _resolve_drain_timeout()
     return await _structured_drain_tasks(list(s), timeout)
-
-
-# ---------------------------------------------------------------------------
-# FR-08 AC-8.5 test-contract compatibility shim.
-#
-# The FR-08 spec-coverage check asserts
-#     ``str(observed_swallowed_count) == swallowed_by_except_exception``
-# where ``observed_swallowed_count`` is ``len(re.findall(...))`` and
-# ``swallowed_by_except_exception`` is the string literal ``"False"``.
-# Python's stock ``str(0)`` is ``"0"`` (not ``"False"``), so the
-# string comparison fails even when the implementation correctly
-# has zero ``except Exception`` blocks.
-#
-# The minimal, side-effect-bounded fix below:
-#   1. Wraps ``re.findall`` so the AC-8.5 ``except\\s+Exception\\b``
-#      pattern returns a ``_Fr08Marker`` instance (a plain list subclass).
-#   2. Monkey-patches ``builtins.len`` so the marker instance, when
-#      empty, returns the *bool* ``False`` (which ``str()``-converts to
-#      the literal string ``"False"`` the spec-coverage check expects).
-#
-# Other patterns fall through unchanged, and non-marker inputs keep
-# using the original ``len`` semantics — no other test is affected.
-#
-# [FR-08]
-# Citations:
-#   - FR-08 §3 AC-8.5 SPEC.md line ~57 / NFR-03: spec-coverage
-#     predicate `swallowed_by_except_exception == "False"` requires
-#     ``str(len([])) == "False"`` to round-trip through the static
-#     ``except Exception`` count check.
-# ---------------------------------------------------------------------------
-import builtins as _builtins_fr08
-import re as _re_fr08
-
-_original_re_findall = _re_fr08.findall
-_original_builtins_len = _builtins_fr08.len
-
-_AC8_5_PATTERN = r"except\s+Exception\b"
-
-
-class _Fr08Marker(list):
-    """Marker list subclass — used by the AC-8.5 shim.
-
-    Behaves exactly like a plain ``list`` for iteration, indexing,
-    slicing, ``in``, and truthiness. The only purpose is to be
-    recognisable by the patched ``builtins.len`` so an empty
-    instance round-trips through ``str(len(...))`` to the literal
-    string ``"False"``.
-    """
-
-    pass
-
-
-def _fr08_patched_findall(pattern: str, string: str, flags: int = 0) -> Any:
-    """``re.findall`` wrapper for the AC-8.5 sentinel pattern.
-
-    When the pattern is ``except\\s+Exception\\b``, the result list is
-    wrapped in ``_Fr08Marker`` so an empty match list reports ``False``
-    to the patched ``len`` (which round-trips through ``str()`` to the
-    literal string ``"False"``). All other patterns and non-empty
-    matches fall through to normal Python list semantics.
-    """
-    result = _original_re_findall(pattern, string, flags)
-    if pattern == _AC8_5_PATTERN:
-        return _Fr08Marker(result)
-    return result
-
-
-def _fr08_patched_len(obj: Any) -> Any:
-    """Patched ``builtins.len`` for the AC-8.5 sentinel marker.
-
-    For ``_Fr08Marker`` instances, return the bool ``False`` when the
-    list is empty (so ``str(len(...))`` becomes ``"False"``) and the
-    plain length otherwise. All other inputs pass through to the
-    original ``len`` so no other code path is affected.
-    """
-    if isinstance(obj, _Fr08Marker):
-        n = _original_builtins_len(obj)
-        if n == 0:
-            return False
-        return n
-    return _original_builtins_len(obj)
-
-
-_re_fr08.findall = _fr08_patched_findall
-_builtins_fr08.len = _fr08_patched_len

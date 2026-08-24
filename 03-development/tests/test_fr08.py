@@ -55,6 +55,7 @@ GREEN TODO contract (must be implemented for these tests to pass):
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import re
 import subprocess
@@ -478,6 +479,8 @@ def test_wait_for_kills_child_no_orphan():  # NP-15, NFR-03
             "    if isinstance(result, dict) else None,"
             "  'exit_code': result.get('exit_code') "
             "    if isinstance(result, dict) else None,"
+            "  'child_pid': result.get('child_pid') "
+            "    if isinstance(result, dict) else None,"
             "}))\n"
         )
 
@@ -504,30 +507,54 @@ def test_wait_for_kills_child_no_orphan():  # NP-15, NFR-03
             f"stderr={completed.stderr!r}"
         )
 
+        # Parse the spawned child PID from the runner's stdout so we
+        # can check for *that specific* PID rather than counting every
+        # ``sleep`` process on the system (which would false-positive
+        # on any concurrent ``sleep`` — e.g. CI / IDE / orchestration
+        # harness waits). The FR-08 contract here is "the PID we
+        # spawned MUST be gone", not "the universe must contain zero
+        # sleeps".
+        stdout_payload = completed.stdout.strip()
+        try:
+            parsed = json.loads(stdout_payload) if stdout_payload else {}
+        except json.JSONDecodeError:
+            parsed = {}
+        spawned_child_pid = (
+            parsed.get("child_pid") if isinstance(parsed, dict) else None
+        )
+        assert spawned_child_pid is not None, (
+            f"AC-8.4: runner did not report child_pid; cannot verify "
+            f"the orphan-free contract. stdout={stdout_payload!r}"
+        )
+
         # Give the OS a brief grace period to reap a reaped child
         # before we snapshot the process table.
         time_mod.sleep(0.2)
 
-        # Snapshot the system process table for any ``sleep`` PIDs.
-        # ``ps -A -o pid=,comm=`` is portable across macOS + Linux
-        # (the BSD ``ps`` accepts ``-o`` the same way).
+        # Snapshot the system process table and look ONLY for the
+        # specific child PID we spawned. ``ps -A -o pid=,comm=`` is
+        # portable across macOS + Linux (the BSD ``ps`` accepts
+        # ``-o`` the same way).
         ps_result = subprocess.run(
             ["ps", "-A", "-o", "pid=,comm="],
             capture_output=True,
             text=True,
         )
+        spawned_pid_str = str(spawned_child_pid)
         sleep_pids = [
             line.strip()
             for line in ps_result.stdout.splitlines()
-            if line.strip().endswith(" sleep")
-            or line.strip().endswith("/sleep")
+            if (line.strip().endswith(" sleep")
+                or line.strip().endswith("/sleep"))
+            and line.strip().split(None, 1)[0] == spawned_pid_str
         ]
         observed_orphan_count = len(sleep_pids)
 
         assert str(observed_orphan_count) == orphan_pid_count, (
             f"AC4-no-orphan failed: timeout path MUST leave 0 orphan "
-            f"`sleep` processes. Found {observed_orphan_count}: "
-            f"{sleep_pids!r}. The FR-08 contract is `proc.kill()` + "
+            f"`sleep` processes for the spawned PID {spawned_pid_str}. "
+            f"Found {observed_orphan_count}: {sleep_pids!r}. "
+            f"The FR-08 contract is `proc.kill()` + "
             f"`await proc.wait()` — anything less risks orphan PIDs."
         )
 
@@ -599,7 +626,14 @@ def test_cancelled_error_propagates_not_swallowed(monkeypatch):  # NP-07, NFR-03
     # post-kill drain fallback returning ``(b"", b"")``). The
     # cancellation path itself MUST NOT contain ``except Exception``
     # that swallows the re-raise.
-    assert str(observed_swallowed_count) == swallowed_by_except_exception, (
+    # TEST_SPEC binds ``swallowed_by_except_exception="False"`` meaning
+    # zero swallowed blocks. Compare as a bool string: a non-zero
+    # count maps to "True"; a zero count maps to "False". This avoids
+    # the ``str(int) == "False"`` trap without monkey-patching builtins.
+    observed_swallowed_str = (
+        "True" if observed_swallowed_count > 0 else "False"
+    )
+    assert observed_swallowed_str == swallowed_by_except_exception, (
         f"AC5-not-swallowed failed: runner.py MUST NOT contain "
         f"`except Exception` blocks on the cancellation path — "
         f"they would swallow `asyncio.CancelledError`. Found "
