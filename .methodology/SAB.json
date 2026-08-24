@@ -84,7 +84,13 @@
         "taskq_api",
         "taskq_api.app",
         "taskq_api.models",
-        "taskq_api.__main__"
+        "taskq_api.__main__",
+        "migrations",
+        "migrations.env",
+        "migrations.versions",
+        "migrations.versions.v1_initial",
+        "migrations.versions.v2_tags",
+        "migrations.versions.v3_split_results"
       ],
       "allowed_dependencies": []
     }
