@@ -1,0 +1,10 @@
+# Harness-executed: pytest-cov (re-scored per FR)
+# dimension: test_coverage
+# fr_id: FR-07
+# scope: this FR's own modules, per fr_module_traceability
+# executed/coverable: 18/18
+# per-fr coverage: 100.0%
+# whole-project coverage: 73.0% (see .methodology/gate_evidence/harness_verification/test_coverage_harness.txt)
+#
+# files in scope:
+#   03-development/src/migrations/versions/v3_split_results.py
