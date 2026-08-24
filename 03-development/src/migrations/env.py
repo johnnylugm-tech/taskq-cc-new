@@ -157,6 +157,15 @@ def run_migrations_online() -> None:
         poolclass=pool.NullPool,
     )
     head_rev = context.script.get_current_head()  # ``v3_split_results``
+    # FR-07's migration chain always defines at least v1 / v2 / v3, so
+    # ``get_current_head`` cannot return ``None`` here. Narrow the type
+    # explicitly (pyright / mypy both reject ``str | None`` flowing into
+    # the helpers below).
+    if head_rev is None:
+        raise RuntimeError(
+            "alembic script has no current head revision; the FR-07 "
+            "migration chain must define at least one revision."
+        )
     with connectable.connect() as connection:
         _reset_head_token_if_present(connection, head_rev)
 
