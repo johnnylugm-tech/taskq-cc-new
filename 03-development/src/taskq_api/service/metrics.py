@@ -24,6 +24,45 @@ from __future__ import annotations
 from typing import Any
 
 
+# Status buckets the FR-09 AC-9.4 contract requires. Tuple order is
+# preserved in the JSON response so operators see a stable shape.
+TASK_STATUSES: tuple[str, ...] = ("pending", "running", "done", "failed", "timeout")
+
+# Latency percentile labels reported under ``latency_ms``. Tuple
+# order is preserved so charting clients see a stable shape.
+LATENCY_PERCENTILES: tuple[str, ...] = ("p50", "p95", "p99")
+
+
+def _task_counts() -> dict[str, int]:
+    """Return ``{status: count}`` for every status in ``TASK_STATUSES``.
+
+    Real counts land once FR-06 wires the task_repository; this stub
+    returns zero for each status so the response shape is stable from
+    process start (operators can chart the keys without conditional
+    rendering on the client side).
+    """
+    return {status: 0 for status in TASK_STATUSES}
+
+
+def _latency_percentiles() -> dict[str, int]:
+    """Return ``{percentile: ms}`` for every percentile in ``LATENCY_PERCENTILES``.
+
+    Real percentiles land once FR-07 wires the run_history source;
+    this stub returns zero so the response shape is stable.
+    """
+    return {percentile: 0 for percentile in LATENCY_PERCENTILES}
+
+
+def _rate_limit_rejections() -> int:
+    """Return the cumulative rate-limit rejection count.
+
+    Real counter lands once FR-05 wires a rejection counter alongside
+    the bucket state; this stub returns zero so the response shape
+    is stable from process start.
+    """
+    return 0
+
+
 def metrics_payload() -> dict[str, Any]:
     """Return the admin-only metrics body for FR-09 AC-9.4.
 
@@ -44,17 +83,7 @@ def metrics_payload() -> dict[str, Any]:
     the task_repository and rate_repository sources.
     """
     return {
-        "tasks": {
-            "pending": 0,
-            "running": 0,
-            "done": 0,
-            "failed": 0,
-            "timeout": 0,
-        },
-        "latency_ms": {
-            "p50": 0,
-            "p95": 0,
-            "p99": 0,
-        },
-        "rate_limit_rejections": 0,
+        "tasks": _task_counts(),
+        "latency_ms": _latency_percentiles(),
+        "rate_limit_rejections": _rate_limit_rejections(),
     }

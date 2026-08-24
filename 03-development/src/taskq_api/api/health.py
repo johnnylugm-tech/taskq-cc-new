@@ -14,16 +14,20 @@ Citations:
     deployment drift is detected before traffic is steered at the
     new pod.
 
-The module is the canonical home of the health-check surface; the
-inline stubs in ``taskq_api.app`` are retired in favour of these
-helpers, and the route handlers in ``app.py`` import ``check_db``
-and ``check_migration_head`` at module load time so the FR-09 test
-fixture can swap them in-process via ``monkeypatch.setattr`` on the
-``app`` module's globals.
+This module owns the FR-09 health surface end-to-end:
+
+  * ``check_db`` / ``check_migration_head`` are the readiness signals
+    the ``/readyz`` handler resolves at call time. The FR-09 readiness
+    fixture monkeypatches them on this module to drive the AC-9.2 /
+    AC-9.3 contract under test.
+  * ``healthz`` / ``readyz`` are the FastAPI handlers; they live on
+    ``router`` (an ``APIRouter``) and are registered on the app via
+    ``_inline_router`` in ``taskq_api.app`` so the FR-09 lifecycle is
+    owned by this module rather than scattered as inline handlers.
 """
 from __future__ import annotations
 
-from fastapi import status
+from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
 
@@ -125,4 +129,53 @@ def readyz_response(
             "detail": detail,
         },
         media_type="application/problem+json",
+    )
+
+
+# Router carrying the FR-09 probes. ``app.py`` inlines this onto the
+# FastAPI app so every route lands as a top-level APIRoute on
+# ``app.routes`` (mirroring the FR-04 / FR-09 introspection contract
+# in ``taskq_api.api.metrics``). The handlers are public probes — no
+# ``dependencies=[...]`` is declared, so the FR-03 ``require_api_key``
+# dependency is bypassed entirely (NFR-02).
+router = APIRouter(tags=["health"], include_in_schema=False)
+
+
+@router.get("/healthz")
+def healthz_route() -> JSONResponse:
+    """``GET /healthz`` — liveness probe.
+
+    [FR-09, NFR-02]
+    Resolves ``healthz`` from this module's globals so the handler is
+    the only one with a tight coupling to the FR-09 surface.
+    """
+    return healthz()
+
+
+@router.get("/readyz")
+def readyz_route() -> JSONResponse:
+    """``GET /readyz`` — readiness probe.
+
+    [FR-09, NFR-02, NFR-03]
+    Citations:
+      - FR-09 §3 AC-9.2: returns 200 only when the DB connection is
+        reachable AND ``alembic current`` equals head.
+      - FR-09 §3 AC-9.3: deployment drift (migration not at head)
+        MUST fail closed with HTTP 503.
+      - NFR-02: no Depends() so the FR-03 auth dependency is
+        bypassed — ``/readyz`` is a public probe.
+      - NFR-03: failure responses are problem+json with
+        ``type=/errors/not-ready`` so operators can identify the
+        failing condition from the body alone.
+
+    ``check_db`` and ``check_migration_head`` are resolved from this
+    module's globals at call time, so the FR-09 readiness fixture's
+    ``monkeypatch.setattr("taskq_api.api.health", "check_db", ...)``
+    is observable end-to-end — the rebind-to-app-globals pattern that
+    an earlier draft required is no longer needed because the handler
+    now lives in the same module as the readiness primitives.
+    """
+    return readyz_response(
+        check_db(),
+        check_migration_head(),
     )
