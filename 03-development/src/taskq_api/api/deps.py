@@ -2,9 +2,9 @@
 
 The ``require_scope(scope)`` factory returns a dependency that yields the
 authenticated principal when the caller's API key carries ``scope``;
-otherwise it raises 401/403. Real auth lives here in FR-03; FR-04
-(scope semantics) is folded into the same factory so the route handlers
-can declare one dependency per scope.
+otherwise it raises 401/403 with a problem+json body. Real auth lives
+here in FR-03; FR-04 (scope semantics) is folded into the same factory
+so the route handlers can declare one dependency per scope.
 
 The factory pattern keeps the original FR-01 / FR-02 calling convention
 (``Depends(require_scope("write"))``) so route handlers do not need to
@@ -37,18 +37,12 @@ import taskq_api.repository.key_repo as key_repo_mod
 from taskq_api.service.auth import compare_keys, hash_key
 
 
-# Re-exported for the test fixture's ``monkeypatch.setattr(deps, "key_repo", ...)``.
-# The canonical singleton lives in ``taskq_api.repository.key_repo``; this
-# alias is a convenience so FR-03 handlers can import a repo reference from
-# the deps module without an extra import line.
+# Module-level alias so the FR-03 test fixture can monkeypatch
+# ``deps.key_repo`` independently of the underlying repository module.
+# ``require_api_key`` / ``create_key`` always read through this attribute.
 key_repo = key_repo_mod.key_repo
 
 
-# ---------------------------------------------------------------------------
-# Re-exports of the auth primitives — surface the same symbols the SAB
-# declares for the auth service so callers in the API layer do not have to
-# reach across two packages.
-# ---------------------------------------------------------------------------
 __all__ = [
     "hash_key",
     "compare_keys",
@@ -60,10 +54,13 @@ __all__ = [
 
 
 # ---------------------------------------------------------------------------
-# 401 / 403 problem helpers — render the same shape every FR-03 case uses.
+# problem+json type URIs — stable across every auth-failure response.
+# The global ``HTTPException`` handler in ``taskq_api.app`` reads these
+# constants to populate the body's ``type`` field (FR-03 §3 AC-3.1).
 # ---------------------------------------------------------------------------
-_TYPE_UNAUTHENTICATED = "/errors/unauthenticated"
-_TYPE_FORBIDDEN = "/errors/forbidden"
+
+TYPE_UNAUTHENTICATED = "/errors/unauthenticated"
+TYPE_FORBIDDEN = "/errors/forbidden"
 
 
 def _unauthorized(detail: str) -> HTTPException:
@@ -71,10 +68,7 @@ def _unauthorized(detail: str) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=detail,
-        headers={
-            "WWW-Authenticate": "ApiKey",
-            "Content-Type": "application/problem+json",
-        },
+        headers={"WWW-Authenticate": "ApiKey"},
     )
 
 
@@ -83,7 +77,6 @@ def _forbidden(detail: str) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail=detail,
-        headers={"Content-Type": "application/problem+json"},
     )
 
 
@@ -100,15 +93,15 @@ def require_api_key(
 
     [FR-03, NFR-02]
     Citations:
-      - FR-03 §3 AC-3.1: missing / invalid / revoked keys return 401.
+      - FR-03 §3 AC-3.1: missing / invalid / revoked keys return 401
+        with ``type=/errors/unauthenticated`` in the problem+json body.
       - FR-03 §3 AC-3.5: a non-null ``revoked_at`` is treated as invalid.
       - FR-03 §3 AC-3.2: lookup is by SHA-256 hash of the presented key.
     """
     if not x_api_key:
         raise _unauthorized("missing X-API-Key header")
 
-    presented_hash = hash_key(x_api_key)
-    row = key_repo.find_by_hash(presented_hash)
+    row = key_repo.find_by_hash(hash_key(x_api_key))
     if row is None:
         raise _unauthorized("invalid X-API-Key")
 
@@ -141,10 +134,12 @@ def require_scope(scope: str = "read") -> Callable[[], dict]:
       - FR-04: enforces that the principal's scope satisfies the
         requested scope; insufficient scope → 403.
     """
+    required_rank = _SCOPE_RANK.get(scope, 99)
+
     def _dependency(principal: dict = Depends(require_api_key)) -> dict:
         # Scope (FR-04): higher rank satisfies a lower one.
         granted = str(principal.get("scope"))
-        if _SCOPE_RANK.get(granted, -1) < _SCOPE_RANK.get(scope, 99):
+        if _SCOPE_RANK.get(granted, -1) < required_rank:
             raise _forbidden(f"scope '{scope}' required")
         return principal
 
@@ -172,6 +167,5 @@ def create_key(scope: str) -> str:
     # 32 bytes of entropy -> 43-char URL-safe base64 (well above the
     # 16-char threshold the FR-03 stdout-token regex matches).
     plaintext = secrets.token_urlsafe(32)
-    digest = hash_key(plaintext)
-    key_repo.create(scope=scope, key_hash=digest)
+    key_repo.create(scope=scope, key_hash=hash_key(plaintext))
     return plaintext

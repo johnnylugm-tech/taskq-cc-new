@@ -16,6 +16,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 
+from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_UNAUTHENTICATED
 from taskq_api.api.tasks import router as tasks_router
 
 
@@ -24,6 +25,19 @@ from taskq_api.api.tasks import router as tasks_router
 _TYPE_VALIDATION = "/errors/validation"
 _TYPE_NOT_FOUND = "/errors/not-found"
 _TYPE_HTTP = "/errors/http"
+
+# Status code -> problem+json `type` URI mapping. Centralised so every
+# handler that raises HTTPException lands on the same shape.
+_STATUS_TYPE_URIS: dict[int, str] = {
+    status.HTTP_401_UNAUTHORIZED: TYPE_UNAUTHENTICATED,
+    status.HTTP_403_FORBIDDEN: TYPE_FORBIDDEN,
+    status.HTTP_404_NOT_FOUND: _TYPE_NOT_FOUND,
+}
+
+
+def _type_uri_for_status(status_code: int) -> str:
+    """Return the problem+json ``type`` URI for ``status_code``."""
+    return _STATUS_TYPE_URIS.get(status_code, _TYPE_HTTP)
 
 
 def _problem(
@@ -115,12 +129,9 @@ def create_app() -> FastAPI:
         request: Request,
         exc: HTTPException,
     ) -> JSONResponse:
-        # Pick a stable `type` based on the status code family. Clients
-        # branch on these URIs per SPEC.md §7.
-        if exc.status_code == status.HTTP_404_NOT_FOUND:
-            type_uri = _TYPE_NOT_FOUND
-        else:
-            type_uri = _TYPE_HTTP
+        # Pick a stable `type` based on the status code. Clients branch
+        # on these URIs per SPEC.md §7 / FR-03 §3 AC-3.1.
+        type_uri = _type_uri_for_status(exc.status_code)
         return _problem(
             status_code=exc.status_code,
             type_uri=type_uri,

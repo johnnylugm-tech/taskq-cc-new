@@ -24,8 +24,7 @@ def hash_key(plaintext: str) -> str:
       - FR-03 §3 AC-3.2: keys are stored as SHA-256 hashes — plaintext
         is never persisted.
     """
-    digest = hashlib.sha256(plaintext.encode("utf-8")).hexdigest()
-    return digest
+    return hashlib.sha256(plaintext.encode("utf-8")).hexdigest()
 
 
 def compare_keys(plaintext: str, stored_hash: str) -> bool:
@@ -43,5 +42,4 @@ def compare_keys(plaintext: str, stored_hash: str) -> bool:
     """
     if not plaintext or not stored_hash:
         return False
-    expected = hash_key(plaintext)
-    return hmac.compare_digest(expected, stored_hash)
+    return hmac.compare_digest(hash_key(plaintext), stored_hash)
