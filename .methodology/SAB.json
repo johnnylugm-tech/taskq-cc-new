@@ -42,7 +42,8 @@
         },
         {
           "name": "taskq_api.service.metrics"
-        }
+        },
+        "taskq_api.service"
       ],
       "allowed_dependencies": [
         "repository"
