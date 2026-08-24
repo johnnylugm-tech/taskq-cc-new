@@ -63,6 +63,44 @@ def _problem(
     )
 
 
+def _inline_router(app: FastAPI, router) -> None:
+    """Register every route on ``router`` directly on ``app``.
+
+    FR-04 §3 AC-4.3 introspects ``app.routes`` looking for ``APIRoute``
+    instances whose ``path`` starts with ``/v1``. FastAPI 0.116+ wraps
+    each ``include_router`` call in a ``_IncludedRouter`` proxy whose
+    ``path`` attribute is missing — so the test sees zero nested
+    routes on system Python (FastAPI 0.141.1) even though the routes
+    are fully registered.
+
+    Registering each route directly preserves the AC-4.3 contract on
+    every FastAPI version, while keeping the per-FR router modules
+    (``taskq_api.api.tasks``, ``taskq_api.api.metrics``) as the
+    canonical source of the handler implementations.
+
+    The function is intentionally local to ``app.py`` — moving it to
+    a shared util would invite drift between FR-owned routers.
+    """
+    for r in router.routes:
+        # ``add_api_route`` accepts the same kwargs an APIRouter decorator
+        # uses (path, endpoint, methods, dependencies, response_model,
+        # status_code, response_class, tags, name, ...). Passing
+        # ``r.endpoint`` plus the route's existing ``methods`` /
+        # ``dependencies`` reproduces the registered handler exactly.
+        app.add_api_route(
+            path=r.path,
+            endpoint=r.endpoint,
+            methods=getattr(r, "methods", None),
+            dependencies=list(getattr(r, "dependencies", []) or []),
+            response_model=getattr(r, "response_model", None),
+            status_code=getattr(r, "status_code", None) or 200,
+            response_class=getattr(r, "response_class", None),
+            tags=list(getattr(r, "tags", []) or []),
+            name=getattr(r, "name", None),
+            include_in_schema=getattr(r, "include_in_schema", True),
+        )
+
+
 def create_app() -> FastAPI:
     """Build the FastAPI app, wire routers + error handlers."""
     app = FastAPI(
@@ -71,11 +109,13 @@ def create_app() -> FastAPI:
         description="Task queue REST API. [FR-01]",
     )
 
-    # FR-01 — `/v1/tasks` CRUD.
-    app.include_router(tasks_router)
+    # FR-01 — `/v1/tasks` CRUD. Routes are inlined (NOT include_router'd)
+    # so the FR-04 AC-4.3 route-introspection check sees every /v1 route
+    # as a direct APIRoute on ``app.routes`` regardless of FastAPI version.
+    _inline_router(app, tasks_router)
 
     # FR-04 — `/v1/metrics` (admin-only); FR-09 replaces the stub body.
-    app.include_router(metrics_router)
+    _inline_router(app, metrics_router)
 
     # FR-03 — `/healthz` and `/readyz` are exempt from auth (AC-3.6).
     # Stub bodies return 200 OK with a static text payload; FR-09
