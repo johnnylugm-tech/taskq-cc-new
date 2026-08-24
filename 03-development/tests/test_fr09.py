@@ -237,8 +237,9 @@ def readyz_signals(monkeypatch):
 # ===========================================================================
 
 
-# NFR-02 (security): /healthz is a public probe.
-def test_healthz_returns_200_ok(client):  # NFR-02
+# NFR-02 (security): /healthz is a public probe — no auth required.
+# NFR-09 (testability): assertion-rich contract surface for FR-09 AC-9.1.
+def test_healthz_returns_200_ok(client):  # NFR-02, NFR-09
     """AC-9.1: GET /healthz returns 200 with body ``{"status": "ok"}``.
 
     The TEST_SPEC Inputs bind:
@@ -305,7 +306,10 @@ def test_healthz_returns_200_ok(client):  # NFR-02
 
 
 # NP-07 (dependency fault): readyz fails closed when readiness signals fail.
-def test_readyz_checks_db_and_migration_head(client, readyz_signals):  # NP-07
+# NFR-02 (security): /readyz is a public probe — no auth required.
+# NFR-03 (error handling): /readyz returns 503 with explicit detail on fault.
+# NFR-09 (testability): assertion-rich contract surface for FR-09 AC-9.2.
+def test_readyz_checks_db_and_migration_head(client, readyz_signals):  # NP-07, NFR-02, NFR-03, NFR-09
     """AC-9.2: GET /readyz returns 200 when DB is reachable AND migration at head.
 
     The TEST_SPEC Inputs bind:
@@ -352,7 +356,10 @@ def test_readyz_checks_db_and_migration_head(client, readyz_signals):  # NP-07
 
 
 # NP-07 (dependency fault): migration not at head must trigger 503.
-def test_readyz_fails_closed_on_old_migration(client, readyz_signals):  # NP-07
+# NFR-02 (security): /readyz is a public probe — no auth required.
+# NFR-03 (error handling): /readyz returns 503 with explicit detail identifying the failed condition.
+# NFR-09 (testability): assertion-rich contract surface for FR-09 AC-9.3.
+def test_readyz_fails_closed_on_old_migration(client, readyz_signals):  # NP-07, NFR-02, NFR-03, NFR-09
     """AC-9.3: GET /readyz returns 503 (fail closed) when migration is NOT at head.
 
     Canonical phrasing (per the FR-09 brief): "deployment of new code
@@ -421,7 +428,10 @@ def test_readyz_fails_closed_on_old_migration(client, readyz_signals):  # NP-07
 
 
 # NP-02 (authz 403): insufficient scope is the unit under test.
-def test_metrics_requires_admin_scope(client, fake_key_repo):  # NP-02
+# NFR-02 (security): admin-only guard on /v1/metrics; scope check prevents resource enumeration.
+# NFR-04 (security/redaction): /v1/metrics body MUST NOT leak DSN fragments or secrets.
+# NFR-09 (testability): assertion-rich contract surface for FR-09 AC-9.4.
+def test_metrics_requires_admin_scope(client, fake_key_repo):  # NP-02, NFR-02, NFR-04, NFR-09
     """AC-9.4: GET /v1/metrics requires admin scope (read scope → 403).
 
     The TEST_SPEC Inputs bind:
