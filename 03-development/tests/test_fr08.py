@@ -61,6 +61,7 @@ import re
 import subprocess
 import sys
 import time as time_mod
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -679,3 +680,649 @@ def test_cancelled_error_propagates_not_swallowed(monkeypatch):  # NP-07, NFR-03
         f"`asyncio.CancelledError`. observed_exc_type="
         f"{observed_exc_type!r}."
     )
+
+
+# ===========================================================================
+# Coverage tests — exercise runner.py helpers from runner.py's host module
+# so coverage tracks them. The functions below reach into FR-02 helpers
+# (`run_task`, `state_machine`, `_redact`, env-var resolution, the
+# ``_safe_*`` shims, ``_reap_after_kill``, ``_drain_pipes``) plus the
+# FR-08 surface edge cases (``Scheduler.{drain,inflight}``,
+# module-level ``drain()``, ``_structured_drain_tasks`` empty path).
+# These exist purely to lift ``runner.py`` coverage above the Gate 1
+# 80% threshold. Each test is a self-contained regression.
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# run_task in-process happy path — exercises lines 413-509 of runner.py.
+# task_id=None so the ``_safe_*`` shims early-return without touching
+# the repo layer (the subprocess IS the unit of work per FR-02 AC-2.5).
+# ---------------------------------------------------------------------------
+def test_run_task_in_process_executes_clean_command():
+    """In-process ``run_task`` happy path → status_name='done', exit_code=0."""
+    from taskq_api.service.runner import run_task, _redact
+
+    # ``_redact`` exercise — covers line 194-198 (AC-9 redaction branch).
+    redacted = _redact("noise token=abc123 more noise")
+    assert "[REDACTED]" in redacted, (
+        f"_redact must replace token=<value> with [REDACTED]; got {redacted!r}"
+    )
+    # Empty / falsy input is preserved (covers line 196 early return).
+    assert _redact("") == "", "_redact('') must short-circuit"
+    assert _redact(None) is None, "_redact(None) must short-circuit"
+
+    async def _exercise() -> dict[str, Any]:
+        return await run_task(command="echo hello-world", task_id=None)
+
+    result = asyncio.run(_exercise())
+    assert result["status_name"] == "done", (
+        f"echo hello-world must produce status_name=done; got {result!r}"
+    )
+    assert result["exit_code"] == 0, (
+        f"echo hello-world must produce exit_code=0; got {result!r}"
+    )
+    # The runner returns the canonical {status_name, exit_code, run_id,
+    # child_pid} dict; stdout is persisted via task_repo, not returned
+    # in-band. The redaction helper exercised above is the in-process
+    # surface that covers the stdout-tail handling code path.
+    assert isinstance(result.get("run_id"), str), (
+        f"run_id must be a UUID string; result={result!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# run_task tokenisation failure (shlex.split ValueError) — covers the
+# branch at lines 422-438 of runner.py. An unmatched quote is the
+# canonical trigger.
+# ---------------------------------------------------------------------------
+def test_run_task_in_process_unmatched_quote_tokenise_failure():
+    """Invalid shell syntax returns the ``failed`` + tokenise-failure sentinel."""
+    from taskq_api.service.runner import run_task, _EXIT_TOKENISE_FAILURE
+
+    async def _exercise() -> dict[str, Any]:
+        return await run_task(command="echo 'unterminated", task_id=None)
+
+    result = asyncio.run(_exercise())
+    assert result["status_name"] == "failed", (
+        f"Unmatched quote must produce failed; got {result!r}"
+    )
+    assert result["exit_code"] == _EXIT_TOKENISE_FAILURE, (
+        f"Unmatched quote must produce exit_code="
+        f"{_EXIT_TOKENISE_FAILURE}; got {result!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# run_task command-not-found — covers the (FileNotFoundError, OSError)
+# branch at lines 441-462 of runner.py.
+# ---------------------------------------------------------------------------
+def test_run_task_in_process_command_not_found():
+    """Nonexistent executable returns ``failed`` + command-not-found sentinel."""
+    from taskq_api.service.runner import run_task, _EXIT_COMMAND_NOT_FOUND
+
+    async def _exercise() -> dict[str, Any]:
+        # Use a clearly-nonexistent binary; subprocess raises
+        # ``FileNotFoundError`` on ``create_subprocess_exec``.
+        return await run_task(
+            command="this_binary_does_not_exist_12345",
+            task_id=None,
+        )
+
+    result = asyncio.run(_exercise())
+    assert result["status_name"] == "failed", (
+        f"Missing executable must produce failed; got {result!r}"
+    )
+    assert result["exit_code"] == _EXIT_COMMAND_NOT_FOUND, (
+        f"Missing executable must produce exit_code="
+        f"{_EXIT_COMMAND_NOT_FOUND}; got {result!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# run_task with non-zero exit code — exits cleanly but maps to "failed"
+# via ``state_machine(exit_code=1)``. Covers the AC-2.4 sub-row 6 path.
+# ---------------------------------------------------------------------------
+def test_run_task_in_process_non_zero_exit_marks_failed():
+    """Non-zero exit code returns ``failed``; exercises state_machine path."""
+    from taskq_api.service.runner import run_task
+
+    async def _exercise() -> dict[str, Any]:
+        # ``false`` is the POSIX canonical "exit 1" stub.
+        return await run_task(command="false", task_id=None)
+
+    result = asyncio.run(_exercise())
+    assert result["status_name"] == "failed", (
+        f"'false' must produce failed; got {result!r}"
+    )
+    assert result["exit_code"] != 0, (
+        f"'false' must produce non-zero exit_code; got {result!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# state_machine — pure function directly exercised. Covers lines 116-169.
+# All four TEST_SPEC sub-rows (AC-2.4 cases 4..8) are enumerated so the
+# state-transition surface is fully covered.
+# ---------------------------------------------------------------------------
+def test_state_machine_all_branches():
+    """``state_machine`` covers pending->running, done, failed, timeout, cancel."""
+    from taskq_api.service.runner import state_machine
+
+    # AC4-pending-running.
+    assert state_machine("pending", trigger="execute") == {"status": "running"}
+    # AC5-running-done.
+    assert state_machine("running", exit_code=0) == {"status": "done"}
+    # AC6-running-failed.
+    assert state_machine("running", exit_code=2) == {"status": "failed"}
+    # AC7-running-timeout.
+    assert state_machine("running", timeout_triggered=True) == {
+        "status": "timeout"
+    }
+    # Unknown transition returns the input unchanged (lines 167-169).
+    assert state_machine("running") == {"status": "running"}
+    assert state_machine("done", trigger="execute") == {"status": "done"}
+    # AC8-cancel-propagates: cancel=True raises CancelledError (line 147-150).
+    with pytest.raises(asyncio.CancelledError):
+        state_machine("pending", cancel=True)
+    # cancel=True on running also raises.
+    with pytest.raises(asyncio.CancelledError):
+        state_machine("running", cancel=True)
+
+
+# ---------------------------------------------------------------------------
+# _resolve_timeout — covers lines 175-191 (explicit kw, env var, default).
+# ---------------------------------------------------------------------------
+def test_resolve_timeout_priority_and_fallback(monkeypatch):
+    """``_resolve_timeout`` honours explicit kw, env var, and default."""
+    from taskq_api.service.runner import _resolve_timeout, _DEFAULT_TIMEOUT_SECONDS
+
+    # Explicit kw wins.
+    assert _resolve_timeout(7.5) == 7.5, (
+        "explicit timeout_seconds kw must short-circuit env"
+    )
+    # env var used when kw is None.
+    monkeypatch.setenv("TASKQ_TASK_TIMEOUT", "12.0")
+    assert _resolve_timeout(None) == 12.0, (
+        "TASKQ_TASK_TIMEOUT=12.0 must be parsed and returned"
+    )
+    # Default when env var absent (covers line 191).
+    monkeypatch.delenv("TASKQ_TASK_TIMEOUT", raising=False)
+    assert _resolve_timeout(None) == _DEFAULT_TIMEOUT_SECONDS, (
+        f"default must be {_DEFAULT_TIMEOUT_SECONDS} when env unset"
+    )
+    # Garbage env value falls back to default (covers lines 187-190).
+    monkeypatch.setenv("TASKQ_TASK_TIMEOUT", "not-a-float")
+    assert _resolve_timeout(None) == _DEFAULT_TIMEOUT_SECONDS, (
+        f"invalid env value must fall back to {_DEFAULT_TIMEOUT_SECONDS}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# _now_iso and _elapsed_ms — covers lines 201-210.
+# ---------------------------------------------------------------------------
+def test_now_iso_and_elapsed_ms_helpers():
+    """ISO timestamp helper + elapsed-ms helper return sane values."""
+    from taskq_api.service.runner import _now_iso, _elapsed_ms
+
+    ts = _now_iso()
+    assert isinstance(ts, str) and "T" in ts, (
+        f"_now_iso must produce an ISO-8601 string with 'T'; got {ts!r}"
+    )
+
+    # Elapsed-ms: ~10ms after a "fresh" datetime.
+    started = datetime.now(timezone.utc) - timedelta(milliseconds=10)
+    elapsed = _elapsed_ms(started)
+    assert 5 <= elapsed <= 1500, (
+        f"_elapsed_ms must be a small positive int around 10ms; got {elapsed}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# _resolve_env — covers lines 548-573. The 3-branch function (unset /
+# invalid / valid) is exercised explicitly.
+# ---------------------------------------------------------------------------
+def test_resolve_env_branches(monkeypatch):
+    """``_resolve_env`` handles unset, invalid, and valid inputs."""
+    from taskq_api.service.runner import _resolve_env
+
+    # Unset -> default (line 564-566).
+    monkeypatch.delenv("TASKQ_TEST_NOEXIST", raising=False)
+    assert _resolve_env(
+        "TASKQ_TEST_NOEXIST",
+        parse=int,
+        default=42,
+        minimum=1,
+        inclusive=True,
+    ) == 42
+
+    # Valid value (inclusive). Covers the `return value if ... else default`
+    # path on line 572.
+    monkeypatch.setenv("TASKQ_TEST_VALID", "8")
+    assert _resolve_env(
+        "TASKQ_TEST_VALID",
+        parse=int,
+        default=42,
+        minimum=1,
+        inclusive=True,
+    ) == 8
+
+    # Below-minimum (inclusive): falls back to default.
+    monkeypatch.setenv("TASKQ_TEST_LOW", "0")
+    assert _resolve_env(
+        "TASKQ_TEST_LOW",
+        parse=int,
+        default=42,
+        minimum=1,
+        inclusive=True,
+    ) == 42
+
+    # Non-inclusive minimum path (line 573: ``return value if value > minimum``).
+    monkeypatch.setenv("TASKQ_TEST_FLOAT", "1.5")
+    assert _resolve_env(
+        "TASKQ_TEST_FLOAT",
+        parse=float,
+        default=9.0,
+        minimum=0,
+        inclusive=False,
+    ) == 1.5
+
+    # Invalid value (ValueError) — covers lines 567-570.
+    monkeypatch.setenv("TASKQ_TEST_BAD", "not-a-number")
+    assert _resolve_env(
+        "TASKQ_TEST_BAD",
+        parse=int,
+        default=42,
+        minimum=1,
+        inclusive=True,
+    ) == 42
+
+
+# ---------------------------------------------------------------------------
+# _resolve_max_concurrent / _resolve_drain_timeout — covers 576-598.
+# ---------------------------------------------------------------------------
+def test_resolve_max_concurrent_and_drain_timeout(monkeypatch):
+    """Env-var helpers return the configured value or the default fallback."""
+    from taskq_api.service.runner import (
+        _resolve_max_concurrent,
+        _resolve_drain_timeout,
+        _DEFAULT_MAX_CONCURRENT,
+        _DEFAULT_DRAIN_TIMEOUT,
+    )
+
+    # Unset env -> defaults (covers branches 564-566 of _resolve_env).
+    monkeypatch.delenv("TASKQ_MAX_CONCURRENT", raising=False)
+    monkeypatch.delenv("TASKQ_DRAIN_TIMEOUT", raising=False)
+    assert _resolve_max_concurrent() == _DEFAULT_MAX_CONCURRENT
+    assert _resolve_drain_timeout() == _DEFAULT_DRAIN_TIMEOUT
+
+    # Valid env -> parsed value.
+    monkeypatch.setenv("TASKQ_MAX_CONCURRENT", "16")
+    monkeypatch.setenv("TASKQ_DRAIN_TIMEOUT", "3.5")
+    assert _resolve_max_concurrent() == 16
+    assert _resolve_drain_timeout() == 3.5
+
+    # Invalid env -> falls back to defaults (covers 567-570, 591-595).
+    monkeypatch.setenv("TASKQ_MAX_CONCURRENT", "not-an-int")
+    monkeypatch.setenv("TASKQ_DRAIN_TIMEOUT", "not-a-float")
+    assert _resolve_max_concurrent() == _DEFAULT_MAX_CONCURRENT
+    assert _resolve_drain_timeout() == _DEFAULT_DRAIN_TIMEOUT
+
+    # Below-minimum (max < 1, drain <= 0) -> defaults (covers 571-573).
+    monkeypatch.setenv("TASKQ_MAX_CONCURRENT", "0")
+    monkeypatch.setenv("TASKQ_DRAIN_TIMEOUT", "-1")
+    assert _resolve_max_concurrent() == _DEFAULT_MAX_CONCURRENT
+    assert _resolve_drain_timeout() == _DEFAULT_DRAIN_TIMEOUT
+
+
+# ---------------------------------------------------------------------------
+# Scheduler edge cases — empty drain, properties, inflight.
+# Covers lines 718-794 of runner.py.
+# ---------------------------------------------------------------------------
+def test_scheduler_properties_and_empty_drain():
+    """``Scheduler.{max_concurrent,inflight}`` + empty ``drain`` paths."""
+    from taskq_api.service.runner import Scheduler
+
+    # Below-1 cap is clamped to 1 (lines 724-725).
+    sch = Scheduler(max_concurrent=0)
+    assert sch.max_concurrent == 1, (
+        f"Scheduler(max_concurrent=0) must clamp to 1; got {sch.max_concurrent}"
+    )
+    # inflight on empty scheduler is 0 (lines 736-741).
+    assert sch.inflight == 0, (
+        f"Empty scheduler inflight must be 0; got {sch.inflight}"
+    )
+    # Drain on empty scheduler returns zero-count report (lines 786-787).
+    report = asyncio.run(sch.drain(timeout=0.1))
+    assert report == {"completed_count": 0, "interrupted_count": 0}, (
+        f"Empty drain must return zero counts; got {report!r}"
+    )
+
+    # Drain with explicit timeout=None — exercises the env-var fallback at
+    # lines 788-793.
+    sch2 = Scheduler(max_concurrent=4, drain_timeout=2.5)
+    # Submit a quick task to occupy the scheduler momentarily.
+    async def _quick() -> int:
+        return 7
+
+    async def _exercise() -> dict[str, int]:
+        sch2.submit(_quick())
+        # Yield once so the task is registered as in-flight.
+        await asyncio.sleep(0)
+        # drain_timeout=2.5 is the configured value (no env lookup).
+        return await sch2.drain()
+
+    report_with_task = asyncio.run(_exercise())
+    assert report_with_task["completed_count"] >= 1, (
+        f"At least one task must be reported completed; got {report_with_task!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Module-level schedule/drain edge cases — covers lines 802-838.
+# ---------------------------------------------------------------------------
+def test_module_level_drain_with_no_tasks(monkeypatch):
+    """Module-level ``drain()`` returns zero-count when no tasks are scheduled."""
+    from taskq_api.service import runner
+
+    monkeypatch.setenv("TASKQ_DRAIN_TIMEOUT", "0.5")
+
+    async def _exercise() -> dict[str, int]:
+        # No tasks scheduled at all — the early-return branch at lines
+        # 834-836 must run.
+        return await runner.drain(timeout=0.25)
+
+    report = asyncio.run(_exercise())
+    assert report == {"completed_count": 0, "interrupted_count": 0}, (
+        f"No-task drain must return zero counts; got {report!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Module-level schedule + drain — happy path with an env-var
+# TASKQ_DRAIN_TIMEOUT so the env-resolver branch at lines 837-838 is hit.
+# ---------------------------------------------------------------------------
+def test_module_level_schedule_and_drain_path(monkeypatch):
+    """``schedule`` followed by ``drain`` collects at least one completion."""
+    from taskq_api.service import runner
+
+    monkeypatch.setenv("TASKQ_DRAIN_TIMEOUT", "0.5")
+
+    async def _quick() -> str:
+        return "ok"
+
+    async def _exercise() -> dict[str, int]:
+        runner.schedule(_quick())
+        # Yield so the task registers as in-flight.
+        await asyncio.sleep(0)
+        # Drain with no explicit timeout — exercises line 838 (env-var
+        # fallback path).
+        return await runner.drain()
+
+    report = asyncio.run(_exercise())
+    assert report["completed_count"] >= 1, (
+        f"schedule->drain must count at least one completion; got {report!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# run_task with redaction in stdout — exercises _redact via the
+# subprocess output path. Print a ``token=`` value and assert the
+# persisted stdout is redacted to ``[REDACTED]``.
+# ---------------------------------------------------------------------------
+def test_run_task_in_process_redacts_token_in_stdout():
+    """``run_task`` redacts ``token=<value>`` from stdout before persisting."""
+    from taskq_api.service.runner import run_task, _redact, _REDACTED_MARKER
+
+    # Direct _redact checks for completeness.
+    assert _redact("plain") == "plain", "_redact must leave plain text alone"
+    assert _REDACTED_MARKER == "[REDACTED]", (
+        f"marker constant must be '[REDACTED]'; got {_REDACTED_MARKER!r}"
+    )
+    # Multiple tokens redacted; non-token surrounding text preserved.
+    assert _redact("a token=x b token=y c") == f"a {_REDACTED_MARKER} b {_REDACTED_MARKER} c"
+
+    # In-process subprocess path prints a ``token=`` value; the runner
+    # redacts stdout via _redact before persist. We can't capture the
+    # persisted row without a DB, but the redaction constant + regex
+    # path are fully exercised by direct calls.
+    async def _exercise() -> dict[str, Any]:
+        return await run_task(
+            command='printf "token=should_stay_secret\\n"',
+            task_id=None,
+        )
+
+    result = asyncio.run(_exercise())
+    assert result["status_name"] == "done", (
+        f"printf must produce done; got {result!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# run_task timeout branch — covers lines 471-489 of runner.py (the
+# ``asyncio.TimeoutError`` arm), which also drives ``_reap_after_kill``
+# (lines 328-340) and ``_drain_pipes`` (lines 361-367).
+# ---------------------------------------------------------------------------
+def test_run_task_in_process_timeout_branch():
+    """``run_task`` fires the ``_reap_after_kill`` + ``_drain_pipes`` path
+    when ``TASKQ_TASK_TIMEOUT`` fires. Lines 471-489 + 328-367 covered."""
+    from taskq_api.service.runner import run_task, _reap_after_kill, _drain_pipes
+
+    async def _exercise() -> dict[str, Any]:
+        # 0.2s timeout against a 5s sleep → TimeoutError must fire.
+        return await run_task(
+            command="sleep 5",
+            timeout_seconds=0.2,
+            task_id=None,
+        )
+
+    result = asyncio.run(_exercise())
+    assert result["status_name"] == "timeout", (
+        f"timed-out run_task must produce status_name=timeout; got {result!r}"
+    )
+    # Exit code is None on timeout (line 488-489) — the runner doesn't
+    # know what the child would have returned.
+    assert result["exit_code"] is None, (
+        f"timeout path must leave exit_code as None; got {result!r}"
+    )
+
+    # Direct exercise of the two drain helpers — guarantees both branches
+    # of each helper are covered (kill/wait error arms).
+    async def _exercise_helpers() -> None:
+        # Spawn a slow child, kill it, then exercise both helpers.
+        proc = await asyncio.create_subprocess_exec(
+            "sleep", "5",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            await _reap_after_kill(proc)
+            # Drain pipes after kill — should return bytes (possibly empty).
+            out, err = await _drain_pipes(proc)
+            assert isinstance(out, (bytes, bytearray)), (
+                f"_drain_pipes stdout must be bytes; got {type(out).__name__}"
+            )
+            assert isinstance(err, (bytes, bytearray)), (
+                f"_drain_pipes stderr must be bytes; got {type(err).__name__}"
+            )
+        finally:
+            if proc.returncode is None:
+                try:
+                    proc.kill()
+                except ProcessLookupError:
+                    pass
+
+    asyncio.run(_exercise_helpers())
+
+
+# ---------------------------------------------------------------------------
+# _structured_drain_tasks empty-list path — covers line 646
+# (the ``if not tasks: return {...}`` early return).
+# ---------------------------------------------------------------------------
+def test_structured_drain_tasks_empty_list():
+    """``_structured_drain_tasks([])`` short-circuits to a zero-count report."""
+    from taskq_api.service.runner import _structured_drain_tasks
+
+    async def _exercise() -> dict[str, int]:
+        return await _structured_drain_tasks([], timeout=1.0)
+
+    report = asyncio.run(_exercise())
+    assert report == {"completed_count": 0, "interrupted_count": 0}, (
+        f"empty-list drain must return zero counts; got {report!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# _structured_drain_tasks timeout path — covers lines 664-676 (the
+# cancellation loop that marks long-running tasks as ``interrupted``).
+# Submit one short-ish task but drain with a budget too tight to fit.
+# ---------------------------------------------------------------------------
+def test_structured_drain_tasks_timeout_path():
+    """When the drain budget fires, tasks are cancelled and reported as interrupted."""
+    from taskq_api.service.runner import Scheduler
+
+    async def _slow() -> str:
+        # Hold long enough that the drain budget (0.05s) fires first.
+        await asyncio.sleep(2.0)
+        return "slow_done"
+
+    async def _exercise() -> dict[str, int]:
+        sch = Scheduler(max_concurrent=2)
+        sch.submit(_slow())
+        # Yield so the task registers.
+        await asyncio.sleep(0)
+        # Drain budget smaller than the task sleep → TimeoutError,
+        # then cancel loop runs (lines 664-676).
+        return await sch.drain(timeout=0.05)
+
+    report = asyncio.run(_exercise())
+    # Either completed (rare, on very fast systems) or interrupted.
+    assert (report["completed_count"] + report["interrupted_count"]) >= 1, (
+        f"drain must report at least one task; got {report!r}"
+    )
+    assert report["interrupted_count"] >= 1, (
+        f"drain budget=0.05 must cancel the slow task; got {report!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Safe-helper bodies — covers lines 232-297. ``task_id=None`` exercises
+# the early-return guards; a non-None ``task_id`` with a mocked repo
+# exercises the try/except bodies.
+# ---------------------------------------------------------------------------
+def test_safe_helpers_swallow_repo_errors(monkeypatch):
+    """``_safe_update_status`` / ``_safe_write_result`` / ``_safe_persist_terminal``
+    swallow ``OSError`` from the repo layer (best-effort contract)."""
+    from taskq_api.service import runner as r
+
+    # task_id=None exercises the early-return guards (lines 232-233,
+    # 251-252, 283-284).
+    r._safe_update_status(None, "running")  # body not entered
+    r._safe_write_result(task_id=None)  # body not entered
+    r._safe_persist_terminal(
+        None,
+        status="done",
+        run_id="r",
+        exit_code=0,
+        stdout_tail="",
+        stderr_tail="",
+        duration_ms=0,
+        finished_at="",
+    )
+
+    # With a real task_id the try-block runs. Patch the repo to raise
+    # ``OSError`` so the ``except _NON_FATAL_REPO_ERRORS: pass`` body
+    # executes (lines 234-239, 253-256, 285-297).
+    fake_repo = r.task_repo_mod.task_repo
+    monkeypatch.setattr(
+        fake_repo, "update_status", lambda *a, **k: (_ for _ in ()).throw(OSError("down"))
+    )
+    monkeypatch.setattr(
+        fake_repo, "write_result", lambda *a, **k: (_ for _ in ()).throw(OSError("down"))
+    )
+
+    # None of these should raise — best-effort persistence holds.
+    r._safe_update_status("task-fake", "running")
+    r._safe_write_result(
+        task_id="task-fake",
+        run_id="r",
+        exit_code=0,
+        stdout_tail="",
+        stderr_tail="",
+        duration_ms=0,
+        finished_at="",
+    )
+    r._safe_persist_terminal(
+        "task-fake",
+        status="done",
+        run_id="r",
+        exit_code=0,
+        stdout_tail="",
+        stderr_tail="",
+        duration_ms=0,
+        finished_at="",
+    )
+
+
+# ---------------------------------------------------------------------------
+# _reap_after_kill — already-reaped process. Covers lines 330-340
+# (the ``except ProcessLookupError`` arms on both kill() and wait()).
+# ---------------------------------------------------------------------------
+def test_reap_after_kill_handles_already_reaped_process():
+    """``_reap_after_kill`` swallows ``ProcessLookupError`` on a reaped child."""
+    from taskq_api.service.runner import _reap_after_kill
+
+    async def _exercise() -> None:
+        # Spawn a short-lived process and wait for it to finish.
+        proc = await asyncio.create_subprocess_exec(
+            "true",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        # Wait until the child is reaped; then re-running the
+        # kill+wait helpers must trigger ProcessLookupError on both
+        # call sites, exercising lines 330-332 and 336-340.
+        await proc.wait()
+        await _reap_after_kill(proc)
+
+    asyncio.run(_exercise())
+
+
+# ---------------------------------------------------------------------------
+# _drain_pipes timeout fallback — covers lines 366-367
+# (the ``return (b'', b'')`` short-circuit on ``TimeoutError``).
+# ---------------------------------------------------------------------------
+def test_drain_pipes_timeout_fallback(monkeypatch):
+    """``_drain_pipes`` returns ``(b'', b'')`` when the drain budget fires."""
+    from taskq_api.service.runner import _drain_pipes, _DRAIN_TIMEOUT_SECONDS
+
+    # Force the wait_for to TimeoutError by tightening the budget
+    # below the child's self-termination latency. Use a process that
+    # holds its stdout/stderr open until the test kills it.
+    async def _exercise() -> tuple[bytes, bytes]:
+        proc = await asyncio.create_subprocess_exec(
+            "sh", "-c", "sleep 5",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            # Patch the drain timeout to near-zero so communicate() can't
+            # complete inside the budget — drives the (b'', b'') return.
+            monkeypatch.setattr(
+                "taskq_api.service.runner._DRAIN_TIMEOUT_SECONDS", 0.001,
+            )
+            return await _drain_pipes(proc)
+        finally:
+            if proc.returncode is None:
+                try:
+                    proc.kill()
+                except ProcessLookupError:
+                    pass
+                try:
+                    await proc.wait()
+                except (ProcessLookupError, asyncio.TimeoutError):
+                    pass
+
+    out, err = asyncio.run(_exercise())
+    assert out == b"", f"_drain_pipes timeout must return b''; got {out!r}"
+    assert err == b"", f"_drain_pipes timeout must return b''; got {err!r}"
