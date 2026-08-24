@@ -73,6 +73,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 
@@ -504,4 +505,68 @@ def test_healthz_and_readyz_require_no_auth(client):
     assert readyz_status == "200", (
         f"AC6-no-auth-200 failed on /readyz: expected '200', "
         f"got {readyz_status!r} body={readyz_resp.text!r}"
+    )
+
+
+# ===========================================================================
+# Coverage-targeted unit tests — drive the dep callables directly so the
+# success / 403 branches in deps.py are exercised without faking the FR-01
+# task_repo (the HTTP layer is the FR-03 unit under test, not task_repo).
+# ===========================================================================
+
+
+def test_require_api_key_returns_principal_when_key_valid(
+    fake_key_repo, monkeypatch
+):
+    """Coverage: deps.py line 111 — successful auth returns the principal.
+
+    Drives ``deps.require_api_key(x_api_key=...)`` directly (no HTTP
+    roundtrip) so the post-validation branch is exercised independently
+    of the FR-01 task_repo.
+    """
+    plaintext = "tk_coverage_success_key_abcdef"
+    fake_key_repo.create(scope="read", key_hash=deps.hash_key(plaintext))
+    monkeypatch.setattr(deps, "key_repo", fake_key_repo, raising=False)
+
+    principal = deps.require_api_key(x_api_key=plaintext)
+    assert principal["scope"] == "read", (
+        f"require_api_key returned wrong scope: {principal!r}"
+    )
+    assert principal["key_id"], (
+        f"require_api_key returned empty key_id: {principal!r}"
+    )
+
+
+def test_require_scope_raises_403_when_granted_below_required():
+    """Coverage: deps.py lines 77, 141-143 — require_scope 403 branch.
+
+    Drives ``deps.require_scope("admin")(principal=...)`` with a
+    read-scope principal so the insufficient-scope branch fires
+    ``_forbidden(...)`` (line 77) via the raise on line 143.
+    """
+    dep = deps.require_scope("admin")
+
+    with pytest.raises(HTTPException) as exc_info:
+        dep(principal={"key_id": "k-coverage-1", "scope": "read"})
+
+    assert exc_info.value.status_code == 403, (
+        f"require_scope(admin) on read principal must 403, got "
+        f"{exc_info.value.status_code!r}"
+    )
+
+
+def test_require_scope_returns_principal_when_granted_satisfies():
+    """Coverage: deps.py lines 141, 144 — require_scope success branch.
+
+    Drives ``deps.require_scope("read")(principal=...)`` with an
+    admin-scope principal so the granted-rank ≥ required-rank branch
+    returns the principal on line 144.
+    """
+    dep = deps.require_scope("read")
+
+    principal = dep(principal={"key_id": "k-coverage-2", "scope": "admin"})
+
+    assert principal["scope"] == "admin", (
+        f"require_scope(read) on admin principal must return "
+        f"principal unchanged, got {principal!r}"
     )
