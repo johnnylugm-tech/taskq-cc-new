@@ -19,7 +19,8 @@
         {
           "name": "taskq_api.errors"
         },
-        "taskq_api.api"
+        "taskq_api.api",
+        "taskq_api.api.metrics"
       ],
       "allowed_dependencies": [
         "service"
