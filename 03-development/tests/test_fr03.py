@@ -164,6 +164,7 @@ def client(fake_key_repo, monkeypatch):
 # ===========================================================================
 
 
+# NFR-02 (security): 401 contract on missing/invalid API key.
 def test_missing_or_invalid_api_key_returns_401(client):
     """AC-3.1: missing/invalid X-API-Key returns 401 + application/problem+json.
 
@@ -213,6 +214,7 @@ def test_missing_or_invalid_api_key_returns_401(client):
 # ===========================================================================
 
 
+# NFR-02 (security): keys stored as SHA-256 hash, plaintext never persisted.
 def test_keys_stored_as_sha256_hash(fake_key_repo, monkeypatch):
     """AC-3.2: API keys are stored as SHA-256 hashes; plaintext never persisted.
 
@@ -293,6 +295,7 @@ def test_keys_stored_as_sha256_hash(fake_key_repo, monkeypatch):
 # ===========================================================================
 
 
+# NFR-02 (security): hmac.compare_digest constant-time compare required.
 def test_compare_uses_hmac_compare_digest():
     """AC-3.3: API key comparison uses hmac.compare_digest (constant-time).
 
@@ -351,6 +354,7 @@ def test_compare_uses_hmac_compare_digest():
 # ===========================================================================
 
 
+# NFR-04 (security): plaintext printed exactly once, never persisted.
 def test_key_create_prints_plaintext_exactly_once(tmp_path, monkeypatch):
     """AC-3.4: `python -m taskq_api key create --scope <scope>` prints once.
 
@@ -430,6 +434,7 @@ def test_key_create_prints_plaintext_exactly_once(tmp_path, monkeypatch):
 # ===========================================================================
 
 
+# NFR-02 (security): revoked keys must be rejected like unknown keys.
 def test_revoked_key_treated_as_invalid(client, fake_key_repo):
     """AC-3.5: a key with non-null `revoked_at` is treated as invalid.
 
@@ -466,6 +471,7 @@ def test_revoked_key_treated_as_invalid(client, fake_key_repo):
 # ===========================================================================
 
 
+# NFR-02 (security): /healthz and /readyz exempt from auth.
 def test_healthz_and_readyz_require_no_auth(client):
     """AC-3.6: /healthz and /readyz do not require authentication.
 
