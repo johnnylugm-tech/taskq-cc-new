@@ -1,0 +1,11 @@
+---
+key: e86ab0a8aec8
+source: gate-block
+phase: 3
+dimension: type_safety
+fr_ids: FR-04
+created_at: 2026-08-24
+---
+
+**Failure:** Gate 1 blocked [dimension_below_threshold]: type_safety scored 65.0, needs 100.0 (gap 35.0)
+**Fix:** Run `mypy .`; add missing annotations and fix all type errors
