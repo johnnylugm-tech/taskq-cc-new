@@ -1,14 +1,21 @@
 """FastAPI application factory for taskq-api.
 
-[FR-01, FR-03, FR-09]
+[FR-01, FR-03, FR-04, FR-09]
 Citations:
   - FR-01: `app` is the FastAPI instance the FR-01 tests mount.
   - FR-03: registers ``/healthz`` and ``/readyz`` routes that bypass
     the ``X-API-Key`` dependency (NFR-02: these endpoints MUST NOT
     require authentication).
-  - FR-09: full health + metrics endpoints will be wired here in
-    their own FR; the FR-03 stub returns ``200 OK`` with a static
-    body so the FR-03 AC-3.6 contract is satisfied today.
+  - FR-04: ``/v1/metrics`` is admin-gated via ``require_scope("admin")``
+    so the AC-4.2 insufficient-scope probe has a canonical target.
+  - FR-09: ``/healthz`` (AC-9.1) and ``/readyz`` (AC-9.2 / AC-9.3)
+    route handlers live here but delegate to the helpers in
+    ``taskq_api.api.health`` (``healthz``, ``readyz_response``).
+    The handlers import ``check_db`` and ``check_migration_head``
+    at module load time so the FR-09 readiness fixture can swap
+    them in-process via ``monkeypatch.setattr`` on this module's
+    globals. ``/v1/metrics`` (AC-9.4) delegates to
+    ``taskq_api.service.metrics.metrics_payload`` for its body.
 """
 from __future__ import annotations
 
@@ -19,9 +26,20 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRoute
 
+from taskq_api.api import health as health_mod
 from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_RATE_LIMITED, TYPE_UNAUTHENTICATED
 from taskq_api.api.metrics import router as metrics_router
 from taskq_api.api.tasks import router as tasks_router
+from taskq_api.service.metrics import metrics_payload
+
+# Re-bind the FR-09 readiness primitives into this module's globals so
+# the FR-09 readiness fixture's ``monkeypatch.setattr("taskq_api.app.check_db", ...)``
+# lands on the function the ``readyz`` handler resolves at call time.
+# The handler reads ``check_db`` from its enclosing module's globals
+# (NOT from ``health_mod``), so the rebind below is what makes the
+# fixture's dual-target patch observable end-to-end.
+check_db = health_mod.check_db
+check_migration_head = health_mod.check_migration_head
 
 
 # Stable type URIs for the problem+json responses. Errors reference these
@@ -125,42 +143,50 @@ def create_app() -> FastAPI:
     # FR-04 — `/v1/metrics` (admin-only); FR-09 replaces the stub body.
     _inline_router(app, metrics_router)
 
-    # FR-03 — `/healthz` and `/readyz` are exempt from auth (AC-3.6).
-    # Stub bodies return 200 OK with a static text payload; FR-09
-    # replaces these with the real liveness/readiness probes.
+    # FR-09 — `/healthz` (AC-9.1) and `/readyz` (AC-9.2 / AC-9.3) are
+    # exempt from auth (NFR-02: public liveness / readiness probes).
+    # The handler bodies delegate to ``taskq_api.api.health`` so the
+    # readiness fixture's monkeypatch on ``taskq_api.app.check_db`` /
+    # ``taskq_api.app.check_migration_head`` is observable end-to-end:
+    # the helpers are bound into this module's globals above, and the
+    # handler resolves them from those globals at call time.
     @app.get("/healthz", include_in_schema=False)
-    def healthz() -> Response:
-        """Liveness probe — returns ``200 OK`` with no auth required.
+    def healthz() -> JSONResponse:
+        """Liveness probe — returns ``200 OK`` with body ``{"status":"ok"}``.
 
-        [FR-03, NFR-02]
+        [FR-09, NFR-02]
         Citations:
-          - FR-03 §3 AC-3.6: ``/healthz`` MUST NOT require
-            authentication; this handler declares no Depends() so the
-            FR-03 ``require_api_key`` dependency is bypassed entirely.
+          - FR-09 §3 AC-9.1: ``GET /healthz`` returns 200 with body
+            ``{"status":"ok"}`` while the process is alive.
+          - NFR-02: this handler declares no Depends() so the FR-03
+            ``require_api_key`` dependency is bypassed entirely.
         """
-        return Response(
-            content=b"ok",
-            status_code=status.HTTP_200_OK,
-            media_type="text/plain",
-        )
+        return health_mod.healthz()
 
     @app.get("/readyz", include_in_schema=False)
-    def readyz() -> Response:
-        """Readiness probe — returns ``200 OK`` with no auth required.
+    def readyz() -> JSONResponse:
+        """Readiness probe — 200 when DB up AND migration at head, else 503.
 
-        [FR-03, NFR-02]
+        [FR-09, NFR-02, NFR-03]
         Citations:
-          - FR-03 §3 AC-3.6: ``/readyz`` MUST NOT require
-            authentication; this handler declares no Depends() so the
-            FR-03 ``require_api_key`` dependency is bypassed entirely.
+          - FR-09 §3 AC-9.2: returns 200 only when the DB connection
+            is reachable AND ``alembic current`` equals head.
+          - FR-09 §3 AC-9.3: deployment drift (migration not at head)
+            MUST fail closed with HTTP 503.
+          - NFR-02: no Depends() so the FR-03 auth dependency is
+            bypassed — ``/readyz`` is a public probe.
+          - NFR-03: failure responses are problem+json with
+            ``type=/errors/not-ready`` so operators can identify the
+            failing condition from the body alone.
         """
-        return Response(
-            content=b"ok",
-            status_code=status.HTTP_200_OK,
-            media_type="text/plain",
+        return health_mod.readyz_response(
+            check_db(),
+            check_migration_head(),
         )
 
-    # FR-09 — health/metrics reserved here, registered by their own FR.
+    # FR-09 — admin metrics body generator lives in ``taskq_api.service.metrics``;
+    # the route is registered via ``_inline_router`` above (FR-04 owns the
+    # scope guard, FR-09 owns the body shape).
 
     # ---- Error handlers: render application/problem+json for all errors.
 
