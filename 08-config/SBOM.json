@@ -1,0 +1,281 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:5f1d6b7a-2a3e-4c8a-9b0d-1a2b3c4d5e6f",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-08-24T00:00:00Z",
+    "tools": [
+      {
+        "vendor": "taskq-api",
+        "name": "pip-licenses",
+        "version": "4.5.1"
+      }
+    ],
+    "authors": [
+      {
+        "name": "taskq-api maintainers",
+        "email": "noreply@example.invalid"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "taskq-api",
+      "name": "taskq-api",
+      "version": "0.1.0"
+    },
+    "properties": [
+      {
+        "name": "spec.version",
+        "value": "v1.0.0"
+      },
+      {
+        "name": "phase",
+        "value": "3"
+      },
+      {
+        "name": "language",
+        "value": "python"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/fastapi@0.115.0",
+      "name": "fastapi",
+      "version": "0.115.0",
+      "purl": "pkg:pypi/fastapi@0.115.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/uvicorn@0.30.6",
+      "name": "uvicorn",
+      "version": "0.30.6",
+      "purl": "pkg:pypi/uvicorn@0.30.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/pydantic@2.9.2",
+      "name": "pydantic",
+      "version": "2.9.2",
+      "purl": "pkg:pypi/pydantic@2.9.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/sqlalchemy@2.0.36",
+      "name": "sqlalchemy",
+      "version": "2.0.36",
+      "purl": "pkg:pypi/sqlalchemy@2.0.36",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/alembic@1.13.3",
+      "name": "alembic",
+      "version": "1.13.3",
+      "purl": "pkg:pypi/alembic@1.13.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/httpx@0.27.2",
+      "name": "httpx",
+      "version": "0.27.2",
+      "purl": "pkg:pypi/httpx@0.27.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/starlette@0.38.6",
+      "name": "starlette",
+      "version": "0.38.6",
+      "purl": "pkg:pypi/starlette@0.38.6",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/anyio@4.6.0",
+      "name": "anyio",
+      "version": "4.6.0",
+      "purl": "pkg:pypi/anyio@4.6.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/click@8.1.7",
+      "name": "click",
+      "version": "8.1.7",
+      "purl": "pkg:pypi/click@8.1.7",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/pytest@8.3.3",
+      "name": "pytest",
+      "version": "8.3.3",
+      "purl": "pkg:pypi/pytest@8.3.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/pytest-benchmark@4.0.0",
+      "name": "pytest-benchmark",
+      "version": "4.0.0",
+      "purl": "pkg:pypi/pytest-benchmark@4.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/import-linter@2.3",
+      "name": "import-linter",
+      "version": "2.3",
+      "purl": "pkg:pypi/import-linter@2.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/mutmut@2.4.4",
+      "name": "mutmut",
+      "version": "2.4.4",
+      "purl": "pkg:pypi/mutmut@2.4.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/bandit@1.7.10",
+      "name": "bandit",
+      "version": "1.7.10",
+      "purl": "pkg:pypi/bandit@1.7.10",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/ruff@0.6.8",
+      "name": "ruff",
+      "version": "0.6.8",
+      "purl": "pkg:pypi/ruff@0.6.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pip/Mako@1.3.5",
+      "name": "Mako",
+      "version": "1.3.5",
+      "purl": "pkg:pypi/Mako@1.3.5",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "taskq-api",
+      "dependsOn": [
+        "pkg:pip/fastapi@0.115.0",
+        "pkg:pip/uvicorn@0.30.6",
+        "pkg:pip/pydantic@2.9.2",
+        "pkg:pip/sqlalchemy@2.0.36",
+        "pkg:pip/alembic@1.13.3",
+        "pkg:pip/httpx@0.27.2"
+      ]
+    }
+  ]
+}
