@@ -375,6 +375,12 @@ def check_rate_limit(key_hash: str, cost: int = 1) -> dict:
     equal to ``retry_after`` (rounded up to seconds, minimum 1) and a
     problem+json body whose ``type`` is ``/errors/rate-limited``.
 
+    ``tokens_remaining`` reports the **pre-consume** balance — i.e.
+    the bucket state as it was when this call arrived. The post-
+    decrement count returned by ``rate_repo.consume`` is incremented
+    back by ``cost`` when the consume succeeded so callers see how
+    much quota was available, not how much is left after the take.
+
     The function reads ``RATE_BURST`` / ``RATE_PER_SEC`` from this
     module's globals at call time so callers (notably the FR-05
     monkeypatch fixture) can override the policy by setting
@@ -387,8 +393,8 @@ def check_rate_limit(key_hash: str, cost: int = 1) -> dict:
         and refilled at ``RATE_PER_SEC`` tokens/second.
       - FR-05 §3 AC-5.2: when the bucket cannot satisfy ``cost``,
         ``allowed=False`` and ``retry_after`` is the seconds-until-
-        next-token count derived from
-        ``taskq_api.service.ratelimit.retry_after_seconds``.
+        next-token count computed by the real repo's consume path
+        (delegated to ``taskq_api.service.ratelimit.retry_after_seconds``).
       - FR-05 §3 AC-5.3: the underlying ``rate_repo.consume`` runs
         inside a single transaction holding a row-level lock so
         concurrent workers cannot both consume the last token.
@@ -397,20 +403,15 @@ def check_rate_limit(key_hash: str, cost: int = 1) -> dict:
     rate_repo.get_or_create(
         key_hash, burst=RATE_BURST, refill_per_sec=RATE_PER_SEC
     )
-    # Consume — this applies the refill + decrement atomically.
+    # Consume — this applies the refill + decrement atomically and
+    # returns the post-decrement token count alongside ``allowed``.
     result = rate_repo.consume(key_hash, cost=cost)
     allowed = bool(result.get("allowed", False))
-    # The fake ``_FakeRateRepo.consume`` (and the real
-    # ``_SQLiteRateRepo.consume``) applies refill-then-decrement in
-    # place; ``bucket["tokens"]`` after the call reflects the
-    # post-refill / post-decrement state. To recover the
-    # pre-consume available count we read the bucket again and add
-    # back ``cost`` when the consume succeeded (no decrement on a
-    # failed consume).
-    bucket = rate_repo.get_or_create(
-        key_hash, burst=RATE_BURST, refill_per_sec=RATE_PER_SEC
-    )
-    remaining = float(bucket["tokens"])
+    # ``result["tokens"]`` is post-decrement. Surface the pre-consume
+    # balance (the contract callers depend on) by adding ``cost`` back
+    # on success. Failed consumes leave the bucket untouched, so the
+    # post-refill / pre-decrement count is already the right number.
+    remaining = float(result.get("tokens", 0.0))
     if allowed:
         remaining += cost
     return {

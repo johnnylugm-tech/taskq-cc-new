@@ -38,6 +38,8 @@ from typing import Any
 from sqlalchemy import Column, Float, Integer, String, create_engine, select
 from sqlalchemy.orm import Session, declarative_base
 
+from taskq_api.service.ratelimit import refill, retry_after_seconds
+
 
 # ---------------------------------------------------------------------------
 # ORM model — the ``rate_buckets`` table.
@@ -165,12 +167,18 @@ class _SQLiteRateRepo:
                     session.flush()
 
                 now = time.monotonic()
-                elapsed = max(0.0, now - float(row.last_refill_ts))
                 refill_per_sec = float(row.refill_per_sec)
                 burst_capacity = float(row.burst)
-                new_tokens = min(
-                    burst_capacity,
-                    float(row.tokens) + elapsed * refill_per_sec,
+                # FR-05 §3 AC-5.1: apply the canonical refill policy
+                # via ``taskq_api.service.ratelimit.refill`` so the
+                # repository is the persistence adapter only — the
+                # bucket math lives in one place.
+                new_tokens = refill(
+                    tokens=float(row.tokens),
+                    last_refill_ts=float(row.last_refill_ts),
+                    now=now,
+                    burst=int(row.burst),
+                    refill_per_sec=refill_per_sec,
                 )
 
                 if new_tokens >= cost:
@@ -178,9 +186,13 @@ class _SQLiteRateRepo:
                     allowed = True
                     retry_after = 0.0
                 else:
-                    deficit = cost - new_tokens
-                    retry_after = (
-                        deficit / refill_per_sec if refill_per_sec else 1.0
+                    # FR-05 §3 AC-5.2: positive Retry-After in seconds;
+                    # the helper handles the degenerate zero-refill
+                    # policy (returns 1.0) so the HTTP layer always
+                    # sees a positive value.
+                    retry_after = retry_after_seconds(
+                        deficit=cost - new_tokens,
+                        refill_per_sec=refill_per_sec,
                     )
                     allowed = False
 
