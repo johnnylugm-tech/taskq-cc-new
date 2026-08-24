@@ -1,15 +1,20 @@
 """FastAPI application factory for taskq-api.
 
-[FR-01, FR-09]
+[FR-01, FR-03, FR-09]
 Citations:
   - FR-01: `app` is the FastAPI instance the FR-01 tests mount.
-  - FR-09: health + metrics endpoints will be wired here in their own FR.
+  - FR-03: registers ``/healthz`` and ``/readyz`` routes that bypass
+    the ``X-API-Key`` dependency (NFR-02: these endpoints MUST NOT
+    require authentication).
+  - FR-09: full health + metrics endpoints will be wired here in
+    their own FR; the FR-03 stub returns ``200 OK`` with a static
+    body so the FR-03 AC-3.6 contract is satisfied today.
 """
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from taskq_api.api.tasks import router as tasks_router
 
@@ -53,6 +58,41 @@ def create_app() -> FastAPI:
 
     # FR-01 — `/v1/tasks` CRUD.
     app.include_router(tasks_router)
+
+    # FR-03 — `/healthz` and `/readyz` are exempt from auth (AC-3.6).
+    # Stub bodies return 200 OK with a static text payload; FR-09
+    # replaces these with the real liveness/readiness probes.
+    @app.get("/healthz", include_in_schema=False)
+    def healthz() -> Response:
+        """Liveness probe — returns ``200 OK`` with no auth required.
+
+        [FR-03, NFR-02]
+        Citations:
+          - FR-03 §3 AC-3.6: ``/healthz`` MUST NOT require
+            authentication; this handler declares no Depends() so the
+            FR-03 ``require_api_key`` dependency is bypassed entirely.
+        """
+        return Response(
+            content=b"ok",
+            status_code=status.HTTP_200_OK,
+            media_type="text/plain",
+        )
+
+    @app.get("/readyz", include_in_schema=False)
+    def readyz() -> Response:
+        """Readiness probe — returns ``200 OK`` with no auth required.
+
+        [FR-03, NFR-02]
+        Citations:
+          - FR-03 §3 AC-3.6: ``/readyz`` MUST NOT require
+            authentication; this handler declares no Depends() so the
+            FR-03 ``require_api_key`` dependency is bypassed entirely.
+        """
+        return Response(
+            content=b"ok",
+            status_code=status.HTTP_200_OK,
+            media_type="text/plain",
+        )
 
     # FR-09 — health/metrics reserved here, registered by their own FR.
 

@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import asyncio
 import uuid
-from typing import Callable
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response, status
@@ -31,21 +30,15 @@ from taskq_api.service.runner import run_task as _run_subprocess
 router = APIRouter(prefix="/v1/tasks", tags=["tasks"])
 
 
-# Scope dependency callables — wrapped as `def` so the test fixture's override
-# of `deps.require_scope` is resolved at request time, not at module-load time.
-# The factory returns a sub-dependency; FastAPI then calls it to obtain the
-# principal dict. `_principal` in each handler therefore is `dict`, even
-# though these wrappers return `Callable[[], dict]`.
-def _require_write() -> Callable[[], dict]:
-    return deps.require_scope("write")
-
-
-def _require_read() -> Callable[[], dict]:
-    return deps.require_scope("read")
-
-
-def _require_admin() -> Callable[[], dict]:
-    return deps.require_scope("admin")
+# Scope dependency callables — bind the scope string at handler decoration
+# time so FastAPI resolves the inner `Depends(require_api_key)` recursively.
+# Returning a callable from a wrapper (e.g. `def _require_write(): return
+# deps.require_scope("write")`) does NOT work — FastAPI treats the wrapper
+# as a leaf dependency and skips introspecting the returned function's
+# own `Depends(...)` declarations.
+_require_write = deps.require_scope("write")
+_require_read = deps.require_scope("read")
+_require_admin = deps.require_scope("admin")
 
 
 @router.post(

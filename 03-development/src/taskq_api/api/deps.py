@@ -1,61 +1,177 @@
-"""FastAPI dependencies for auth + scope checks.
+"""FastAPI dependencies for API-key auth + scope checks.
 
-The `require_scope(scope)` factory returns a dependency that yields the
-authenticated principal when the caller's API key carries `scope`; otherwise
-it raises 401/403. Real auth/scope enforcement lives in FR-03 / FR-04 — this
-module is the shared stub they both depend on, exposed here so that FR-01
-handlers can declare the dependency today.
+The ``require_scope(scope)`` factory returns a dependency that yields the
+authenticated principal when the caller's API key carries ``scope``;
+otherwise it raises 401/403. Real auth lives here in FR-03; FR-04
+(scope semantics) is folded into the same factory so the route handlers
+can declare one dependency per scope.
+
+The factory pattern keeps the original FR-01 / FR-02 calling convention
+(``Depends(require_scope("write"))``) so route handlers do not need to
+declare the sub-dependency themselves. Auth is invoked inline by the
+returned callable (which receives the ``X-API-Key`` header as an
+explicit parameter) because FastAPI only resolves ``Depends(...)`` on
+the registered dependency tree, not on values returned by a factory
+call.
 
 [FR-01, FR-03, FR-04, FR-05]
 Citations:
-  - `require_scope` is invoked by FR-01 handlers via
-    `Depends(require_scope("write"))`. The required scope is bound at handler
-    decoration time so FastAPI can introspect the inner dependency without
-    treating `scope` as a query parameter.
-  - The dependency override mechanism maps this module's `require_scope`
-    symbol to a test-only callable; FastAPI invokes that callable with the
-    same positional arg the real `require_scope` would receive.
+  - ``require_scope`` is invoked by FR-01 handlers via
+    ``Depends(require_scope("write"))``. The required scope is bound at
+    handler decoration time so FastAPI can introspect the inner
+    dependency without treating ``scope`` as a query parameter.
+  - FR-03: ``require_api_key`` extracts the ``X-API-Key`` header,
+    looks up its SHA-256 hash in ``key_repo``, and rejects 401 on
+    missing / unrecognised / revoked rows.
+  - FR-04: ``require_scope`` calls ``require_api_key`` first, then
+    enforces the requested scope.
 """
 from __future__ import annotations
 
+import secrets
 from typing import Callable
 
-from fastapi import HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
+
+import taskq_api.repository.key_repo as key_repo_mod
+from taskq_api.service.auth import compare_keys, hash_key
+
+
+# Re-exported for the test fixture's ``monkeypatch.setattr(deps, "key_repo", ...)``.
+# The canonical singleton lives in ``taskq_api.repository.key_repo``; this
+# alias is a convenience so FR-03 handlers can import a repo reference from
+# the deps module without an extra import line.
+key_repo = key_repo_mod.key_repo
+
+
+# ---------------------------------------------------------------------------
+# Re-exports of the auth primitives — surface the same symbols the SAB
+# declares for the auth service so callers in the API layer do not have to
+# reach across two packages.
+# ---------------------------------------------------------------------------
+__all__ = [
+    "hash_key",
+    "compare_keys",
+    "require_api_key",
+    "require_scope",
+    "create_key",
+    "key_repo",
+]
+
+
+# ---------------------------------------------------------------------------
+# 401 / 403 problem helpers — render the same shape every FR-03 case uses.
+# ---------------------------------------------------------------------------
+_TYPE_UNAUTHENTICATED = "/errors/unauthenticated"
+_TYPE_FORBIDDEN = "/errors/forbidden"
+
+
+def _unauthorized(detail: str) -> HTTPException:
+    """Build the standard 401 problem+json for an unauthenticated request."""
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={
+            "WWW-Authenticate": "ApiKey",
+            "Content-Type": "application/problem+json",
+        },
+    )
+
+
+def _forbidden(detail: str) -> HTTPException:
+    """Build the standard 403 problem+json for an insufficient scope."""
+    return HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=detail,
+        headers={"Content-Type": "application/problem+json"},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Auth primitive — pure FastAPI dependency.
+# ---------------------------------------------------------------------------
+def require_api_key(
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+) -> dict:
+    """FastAPI dependency that authenticates the request's ``X-API-Key``.
+
+    On success returns the principal dict ``{"key_id": ..., "scope": ...}``
+    so downstream dependencies (``require_scope``) can branch on it.
+
+    [FR-03, NFR-02]
+    Citations:
+      - FR-03 §3 AC-3.1: missing / invalid / revoked keys return 401.
+      - FR-03 §3 AC-3.5: a non-null ``revoked_at`` is treated as invalid.
+      - FR-03 §3 AC-3.2: lookup is by SHA-256 hash of the presented key.
+    """
+    if not x_api_key:
+        raise _unauthorized("missing X-API-Key header")
+
+    presented_hash = hash_key(x_api_key)
+    row = key_repo.find_by_hash(presented_hash)
+    if row is None:
+        raise _unauthorized("invalid X-API-Key")
+
+    if row.get("revoked_at"):
+        raise _unauthorized("revoked X-API-Key")
+
+    return {"key_id": row.get("key_id"), "scope": row.get("scope")}
+
+
+# Scope ordering — a higher rank satisfies a lower one.
+_SCOPE_RANK = {"read": 0, "write": 1, "admin": 2}
 
 
 def require_scope(scope: str = "read") -> Callable[[], dict]:
-    """Return a FastAPI dependency that enforces `scope`.
+    """Return a FastAPI dependency that authenticates and enforces ``scope``.
 
-    Args:
-        scope: Minimum scope required by the calling route (e.g. `"write"`,
-            `"admin"`). Bound at handler decoration time
-            (`Depends(require_scope("write"))`) so FastAPI can introspect
-            the inner callable without promoting `scope` to a query
-            parameter.
-
-    Returns:
-        Dependency callable. The inner function returns
-        `{"scope": <granted_scope>, "key_id": <key_id>}` on success.
-
-    Raises:
-        HTTPException: 401 when no API key is present or it is invalid;
-            403 when the principal's scope is insufficient.
+    The returned callable declares ``Depends(require_api_key)`` so
+    FastAPI's dependency resolver recursively wires the auth check
+    before the scope check runs. This is the FR-03/FR-04 contract:
+    ``require_api_key`` (FR-03) authenticates the presented key, and
+    the scope branch here (FR-04) enforces that the principal's scope
+    satisfies the requested scope.
 
     [FR-01, FR-03, FR-04, FR-05]
     Citations:
-      - FR-01: declared as the route dependency on every `/v1/tasks` handler.
-      - FR-03: real implementation extracts the principal from the API key.
-      - FR-04: real implementation compares principal.scope vs requested scope.
+      - FR-01: declared as the route dependency on every ``/v1/tasks``
+        handler via ``Depends(require_scope("..."))``.
+      - FR-03: depends on ``require_api_key`` which performs the SHA-256
+        lookup + revocation check.
+      - FR-04: enforces that the principal's scope satisfies the
+        requested scope; insufficient scope → 403.
     """
-    # Real implementation (FR-03 / FR-04) is provided per route below.
-    # For FR-01 RED tests this dependency is overridden in the test fixture
-    # by `app.dependency_overrides[deps.require_scope]`. The override is
-    # invoked with the same positional args the real factory would receive.
-    def _dependency() -> dict:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="unauthorized",
-            headers={"WWW-Authenticate": "ApiKey"},
-        )
+    def _dependency(principal: dict = Depends(require_api_key)) -> dict:
+        # Scope (FR-04): higher rank satisfies a lower one.
+        granted = str(principal.get("scope"))
+        if _SCOPE_RANK.get(granted, -1) < _SCOPE_RANK.get(scope, 99):
+            raise _forbidden(f"scope '{scope}' required")
+        return principal
 
     return _dependency
+
+
+# ---------------------------------------------------------------------------
+# Key creation — plaintext returned to the caller once, never persisted.
+# ---------------------------------------------------------------------------
+def create_key(scope: str) -> str:
+    """Generate a fresh API key, persist its hash, return the plaintext.
+
+    The plaintext is returned exactly once (the contract of FR-03 §3
+    AC-3.4); the caller is responsible for handing it to the user.
+    Only the SHA-256 hash is persisted via ``key_repo.create`` so the
+    plaintext never appears in any persisted state.
+
+    [FR-03, NFR-02, NFR-04]
+    Citations:
+      - FR-03 §3 AC-3.2: stored value is a 64-char hex SHA-256 hash.
+      - FR-03 §3 AC-3.4: plaintext printed exactly once at creation.
+      - NFR-04 (security): plaintext MUST NOT appear in any persisted
+        file (logs, metrics, DB rows).
+    """
+    # 32 bytes of entropy -> 43-char URL-safe base64 (well above the
+    # 16-char threshold the FR-03 stdout-token regex matches).
+    plaintext = secrets.token_urlsafe(32)
+    digest = hash_key(plaintext)
+    key_repo.create(scope=scope, key_hash=digest)
+    return plaintext
