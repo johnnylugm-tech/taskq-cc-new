@@ -1,0 +1,15 @@
+{
+  "deliverable": "/Users/johnny/projects/taskq-cc-new/01-requirements/SRS.md",
+  "canonical": "/Users/johnny/projects/taskq-cc-new/SPEC.md",
+  "mode": "srs_vs_spec",
+  "spec_present": true,
+  "summary": {
+    "total_ac": 0,
+    "verbatim_count": 0,
+    "interpreted_count": 0,
+    "invention_count": 0,
+    "over_spec_threshold": 0.7,
+    "high_score_count": 0
+  },
+  "per_ac": []
+}
