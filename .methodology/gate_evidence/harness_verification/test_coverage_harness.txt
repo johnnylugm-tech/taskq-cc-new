@@ -1,0 +1,39 @@
+# Harness-executed: pytest-cov
+# returncode: 0
+# agent_score: 100.0 | threshold: 80.0
+
+........                                                                 [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:10
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:10: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+03-development/tests/test_fr01.py::test_create_task_valid
+03-development/tests/test_fr01.py::test_post_invalid_body_returns_422
+03-development/tests/test_fr01.py::test_get_unknown_returns_404
+03-development/tests/test_fr01.py::test_list_uses_cursor_pagination
+03-development/tests/test_fr01.py::test_limit_default_and_upper_bound
+03-development/tests/test_fr01.py::test_delete_removes_task_and_results_in_tx
+03-development/tests/test_fr01.py::test_create_duplicate_name_returns_422
+03-development/tests/test_fr01.py::test_get_existing_task_returns_200
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/httpx/_client.py:690: DeprecationWarning: The 'app' shortcut is now deprecated. Use the explicit style 'transport=WSGITransport(app=...)' instead.
+    warnings.warn(message, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+______________ coverage: platform darwin, python 3.11.15-final-0 _______________
+
+Name                                                   Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                   0      0   100%
+03-development/src/taskq_api/api/__init__.py               0      0   100%
+03-development/src/taskq_api/api/deps.py                   7      1    86%   55
+03-development/src/taskq_api/api/tasks.py                 35      0   100%
+03-development/src/taskq_api/app.py                       25      0   100%
+03-development/src/taskq_api/models/__init__.py            0      0   100%
+03-development/src/taskq_api/models/schemas.py            26      1    96%   38
+03-development/src/taskq_api/repository/__init__.py        0      0   100%
+03-development/src/taskq_api/repository/task_repo.py      36     25    31%   36-50, 53, 61-66, 69-77
+------------------------------------------------------------------------------------
+TOTAL                                                    129     27    79%
+8 passed, 9 warnings in 0.26s

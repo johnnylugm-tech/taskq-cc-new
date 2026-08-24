@@ -1,0 +1,16 @@
+# Harness-executed: pyright
+# returncode: 0
+# agent_score: 100.0 | threshold: 100.0
+
+{
+    "version": "1.1.409",
+    "time": "1787565359944",
+    "generalDiagnostics": [],
+    "summary": {
+        "filesAnalyzed": 9,
+        "errorCount": 0,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.463
+    }
+}

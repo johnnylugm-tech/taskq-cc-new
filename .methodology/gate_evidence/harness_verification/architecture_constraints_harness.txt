@@ -1,0 +1,19 @@
+# Harness-executed: import-linter
+# returncode: 0
+# agent_score: 100.0 | threshold: 100.0
+
+[1m=============[0m
+[1mImport Linter[0m
+[1m=============[0m
+[22m[0m
+[1m---------[0m
+[1mContracts[0m
+[1m---------[0m
+[22m[0m
+[1mAnalyzed 9 files, 4 dependencies.[0m
+[1m---------------------------------[0m
+[22m[0m
+[22mno_circular_dependencies [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
+[22mtaskq_api_self_check [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
+[22m[0m
+[22mContracts: 2 kept, 0 broken.[0m
