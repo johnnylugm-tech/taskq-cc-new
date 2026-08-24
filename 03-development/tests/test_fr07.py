@@ -69,6 +69,10 @@ import tempfile
 from pathlib import Path
 
 import pytest
+import sqlalchemy as sa
+from sqlalchemy import create_engine
+from alembic.operations import Operations
+from alembic.runtime.migration import MigrationContext
 
 # ---------------------------------------------------------------------------
 # SAB binding — top-level import per the test contract.
@@ -167,7 +171,12 @@ def _list_sqlite_tables(db_path: Path) -> set[str]:
 # ===========================================================================
 
 
-def test_upgrade_head_succeeds_against_real_sqlite(tmp_path):
+# NFR-09 (testability, real-SQLite invariant): the AC-7.1 measurement is the
+# canonical real-DB round-trip signal the NFR-09 contract demands — the test
+# invokes ``python -m alembic upgrade head`` against an on-disk SQLite file, not
+# an in-memory mock. NFR-12 (verifiability): the ``alembic upgrade head`` step is
+# the chain Makefile::verify-system starts from.
+def test_upgrade_head_succeeds_against_real_sqlite(tmp_path):  # NFR-09, NFR-12
     """AC-7.1: ``alembic upgrade head`` against a real SQLite database file.
 
     The TEST_SPEC Inputs declare ``db_path="/tmp/taskq_upgrade_test.db"``
@@ -276,7 +285,11 @@ def test_upgrade_head_succeeds_against_real_sqlite(tmp_path):
 # ===========================================================================
 
 
-def test_downgrade_base_no_residual_tables(tmp_path):
+# NFR-12 (verifiability): the ``alembic downgrade base`` half of the
+# verify-system chain. NFR-03 (error_handling): the FR-07 contract requires a
+# real, reversible downgrade (no destructive shortcuts) so migration failures
+# leave the database on the previous revision (R10 mitigation).
+def test_downgrade_base_no_residual_tables(tmp_path):  # NFR-12, NFR-03
     """AC-7.2: ``alembic downgrade base`` leaves no residual tables.
 
     The TEST_SPEC Inputs declare
@@ -354,7 +367,11 @@ def test_downgrade_base_no_residual_tables(tmp_path):
 # ===========================================================================
 
 
-def test_round_trip_reversibility_v3_data_move(tmp_path):
+# NFR-09 (testability, real-SQLite round-trip): the load-bearing FR-07 property
+# — v3 data migration MUST round-trip byte-for-byte against a real SQLite file
+# (R1 mitigation). NFR-12 (verifiability): exercises the upgrade → write →
+# downgrade -1 → upgrade head chain the verify-system target wraps.
+def test_round_trip_reversibility_v3_data_move(tmp_path):  # NFR-09, NFR-12
     """AC-7.3: v3 round-trip preserves every sample-data column byte-for-byte.
 
     The TEST_SPEC Inputs declare the precondition in prose because the
@@ -581,7 +598,12 @@ def test_round_trip_reversibility_v3_data_move(tmp_path):
 # ===========================================================================
 
 
-def test_no_destructive_shortcuts_in_downgrade():
+# NFR-03 (error_handling): a real downgrade() — not ``op.execute("DROP
+# TABLE …")`` — is the FR-07 failure-rollback contract (R10 mitigation: migration
+# failure MUST leave the database on the previous revision, not silently drop
+# schema). NFR-09 (testability): the absence-of-shortcuts check is what
+# distinguishes a real reversible migration from a stub.
+def test_no_destructive_shortcuts_in_downgrade():  # NFR-03, NFR-09
     """AC-7.4: no destructive shortcuts (``DROP TABLE`` / ``DROP COLUMN`` / ``op.execute("DROP TABLE ...")``) in downgrade.
 
     The TEST_SPEC Inputs declare
@@ -732,7 +754,11 @@ def test_no_destructive_shortcuts_in_downgrade():
 # ===========================================================================
 
 
-def test_each_migration_covered_by_offline_sql_assert(tmp_path):
+# NFR-09 (testability, zero-skip): migration files MUST be covered by real
+# assertions against Alembic offline-SQL output — ``migration files納入測試
+# 覆蓋`` is FR-07's own assertion. NFR-12 (verifiability): the offline-SQL
+# pipeline is one of the make verify-system pre-conditions.
+def test_each_migration_covered_by_offline_sql_assert(tmp_path):  # NFR-09, NFR-12
     """AC-7.5: every migration file is exercised by alembic offline SQL.
 
     The TEST_SPEC Inputs declare
@@ -831,3 +857,117 @@ def test_each_migration_covered_by_offline_sql_assert(tmp_path):
             f"empty — the migration must emit at least one DDL "
             f"statement via alembic's offline SQL renderer."
         )
+
+
+# ===========================================================================
+# Coverage tests — in-process exercise of v3_split_results.upgrade() and
+# downgrade() bodies. The subprocess-based TEST_SPEC cases above invoke
+# alembic through `python -m alembic ...`, which does not record coverage
+# on the migration's callables. These cases install an in-process alembic
+# MigrationContext / Operations proxy so the ``upgrade()`` and ``downgrade()``
+# bodies (lines 84-104 and 126-142 of v3_split_results.py) are exercised
+# in-process and counted by coverage.
+# ===========================================================================
+
+
+def _build_v3_schema_and_seed(conn) -> None:
+    """Bring the schema to v2 and seed a single ``tasks.result_json`` row.
+
+    Drives ``v1_initial.upgrade()`` → ``v2_tags.upgrade()`` under an
+    installed alembic Operations proxy so the resulting schema matches
+    what an in-line ``alembic upgrade v2_tags`` would leave behind, then
+    seeds one sample task. The seeding step is what makes the v3 round-trip
+    observable — a non-null ``result_json`` is the load-bearing data the
+    v3 move copies into ``task_results``.
+    """
+    import migrations.versions.v1_initial as v1_initial_mod
+    import migrations.versions.v2_tags as v2_tags_mod
+
+    v1_initial_mod.upgrade()
+    v2_tags_mod.upgrade()
+    conn.execute(
+        sa.text(
+            "INSERT INTO tasks (id, command, name, result_json) "
+            "VALUES (:id, :cmd, :name, :rj)"
+        ),
+        {
+            "id": "cov-id-1",
+            "cmd": "echo coverage",
+            "name": "cov-task-1",
+            "rj": '{"exit_code": 0, "stdout_tail": "ok\\n"}',
+        },
+    )
+
+
+def test_v3_upgrade_and_downgrade_executed_in_process() -> None:
+    """Coverage: invoke ``upgrade()`` and ``downgrade()`` in-process.
+
+    The TEST_SPEC cases run alembic as an out-of-process subprocess, which
+    does NOT count coverage on the migration's own callables. This case
+    installs an in-process alembic ``Operations`` proxy over a real
+    in-memory SQLite engine and exercises both callables directly so
+    the body of each (lines 84-104 / 126-142) is recorded as covered.
+
+    AC mapping (NFR-09 real-DB invariant): the engine is real SQLite
+    (``sqlite:///:memory:``), not a mock — the same NFR-09 contract the
+    subprocess cases uphold.
+    """
+    engine = create_engine("sqlite:///:memory:")
+    with engine.begin() as conn:
+        ctx = MigrationContext.configure(conn)
+        ops = Operations(ctx)
+        ops._install_proxy()
+        try:
+            _build_v3_schema_and_seed(conn)
+
+            # ---- upgrade() body coverage (lines 84-104) ----
+            v3_mod.upgrade()
+
+            post_upgrade_task_cols = {
+                row[1]
+                for row in conn.execute(sa.text("PRAGMA table_info(tasks)")).fetchall()
+            }
+            assert "result_json" not in post_upgrade_task_cols, (
+                "v3.upgrade() must drop the ``result_json`` column from ``tasks``."
+            )
+            moved_rows = conn.execute(
+                sa.text("SELECT task_id, result_json FROM task_results ORDER BY task_id")
+            ).fetchall()
+            assert moved_rows == [
+                ("cov-id-1", '{"exit_code": 0, "stdout_tail": "ok\\n"}')
+            ], (
+                f"v3.upgrade() must copy every non-null ``tasks.result_json`` "
+                f"row into ``task_results`` byte-for-byte. Got {moved_rows!r}."
+            )
+
+            # ---- downgrade() body coverage (lines 126-142) ----
+            v3_mod.downgrade()
+
+            post_downgrade_task_cols = {
+                row[1]
+                for row in conn.execute(sa.text("PRAGMA table_info(tasks)")).fetchall()
+            }
+            assert "result_json" in post_downgrade_task_cols, (
+                "v3.downgrade() must re-add the ``result_json`` column on ``tasks``."
+            )
+            restored_rows = conn.execute(
+                sa.text("SELECT id, result_json FROM tasks ORDER BY id")
+            ).fetchall()
+            assert restored_rows == [
+                ("cov-id-1", '{"exit_code": 0, "stdout_tail": "ok\\n"}')
+            ], (
+                f"v3.downgrade() must restore ``task_results`` rows back into "
+                f"``tasks.result_json`` byte-for-byte. Got {restored_rows!r}."
+            )
+            remaining_tables = {
+                row[0]
+                for row in conn.execute(
+                    sa.text("SELECT name FROM sqlite_master WHERE type='table'")
+                ).fetchall()
+            }
+            assert "task_results" not in remaining_tables, (
+                f"v3.downgrade() must drop the ``task_results`` table after "
+                f"the reverse data move. Found tables={sorted(remaining_tables)!r}."
+            )
+        finally:
+            ops._remove_proxy()
