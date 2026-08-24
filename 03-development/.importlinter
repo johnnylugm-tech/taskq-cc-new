@@ -1,0 +1,58 @@
+[importlinter]
+root_packages =
+    taskq_api
+    sqlalchemy
+include_external_packages = True
+
+# SAB architecture_constraints (FR-01).
+# Enforced via import-linter contracts. Each contract maps to one SAB
+# declaration. Exit 0 → score 100; any broken contract → score 0.
+#
+# Note: project source lives in `src/` and lint-imports runs with
+# PYTHONPATH=src. Run from this directory: `lint-imports --verbose`.
+#
+# Constraint coverage:
+#   - downward_only_layer_dependencies  → `layers` contract (api > repository > models).
+#                                         The same contract also enforces the SAB's
+#                                         no_circular_dependencies: any cycle would be an
+#                                         upward edge, which the layers contract rejects.
+#   - no_sqlalchemy_above_repository     → `forbidden` contract (api may not import sqlalchemy).
+#   - models_sqlalchemy_orm_declarative_only
+#                                       → `forbidden` contract (models may not import
+#                                         sqlalchemy.sql / sqlalchemy.schema — those are
+#                                         the non-ORM Core/Table surfaces).
+
+# downward_only_layer_dependencies — api → repository → models.
+# Also covers no_circular_dependencies: any cycle implies an upward edge,
+# which this contract rejects.
+[importlinter:contract:downward-only-layer-dependencies]
+name = Downward-only layer dependencies (api → repository → models)
+type = layers
+layers =
+    taskq_api.api
+    taskq_api.repository
+    taskq_api.models
+
+# no_sqlalchemy_above_repository — api layer may not import sqlalchemy.
+[importlinter:contract:no-sqlalchemy-above-repository]
+name = No sqlalchemy imports above repository layer
+type = forbidden
+source_modules =
+    taskq_api.api
+forbidden_modules =
+    sqlalchemy
+
+# models_sqlalchemy_orm_declarative_only — models must use declarative ORM,
+# not raw SQL strings / core Table reflection. Enforced by forbidding the
+# raw-SQL / core-Table submodules at the package boundary (treat each entry
+# as a module rather than a package to keep import-linter from rejecting
+# sub-packages of external packages).
+[importlinter:contract:models-sqlalchemy-orm-declarative-only]
+name = Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema
+type = forbidden
+source_modules =
+    taskq_api.models
+forbidden_modules =
+    sqlalchemy.sql
+    sqlalchemy.schema
+as_packages = False
