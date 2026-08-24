@@ -33,38 +33,28 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
-from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_RATE_LIMITED, TYPE_UNAUTHENTICATED
 from taskq_api.api.health import router as health_router
 from taskq_api.api.metrics import router as metrics_router
 from taskq_api.api.tasks import router as tasks_router
 from taskq_api.errors import STATUS_TYPE_MAP, problem_response
 
 
-# Stable type URIs for the problem+json responses. Errors reference these
-# so clients can branch on `type` instead of parsing `detail`.
-_TYPE_VALIDATION = "/errors/validation"
-_TYPE_NOT_FOUND = "/errors/not-found"
-_TYPE_HTTP = "/errors/http"
-_TYPE_INTERNAL = "/errors/internal"
-
-# Status code -> problem+json `type` URI mapping. Centralised so every
-# handler that raises HTTPException lands on the same shape. Falls back
-# to STATUS_TYPE_MAP when present, else the generic /errors/http URI.
-_STATUS_TYPE_URIS: dict[int, str] = {
-    status.HTTP_401_UNAUTHORIZED: TYPE_UNAUTHENTICATED,
-    status.HTTP_403_FORBIDDEN: TYPE_FORBIDDEN,
-    status.HTTP_404_NOT_FOUND: _TYPE_NOT_FOUND,
-    status.HTTP_422_UNPROCESSABLE_ENTITY: _TYPE_VALIDATION,
-    status.HTTP_429_TOO_MANY_REQUESTS: TYPE_RATE_LIMITED,
-    status.HTTP_503_SERVICE_UNAVAILABLE: "/errors/not-ready",
-}
+# Fallback ``type`` URI for status codes outside the SPEC.md §7 mapping.
+# Every code enumerated in ``STATUS_TYPE_MAP`` already maps to its canonical
+# ``/errors/<slug>`` URI; codes the SPEC does not enumerate fall back here
+# so clients still see a parseable ``type`` (rather than a 500-shaped body).
+_TYPE_HTTP_FALLBACK = "/errors/http"
 
 
 def _type_uri_for_status(status_code: int) -> str:
-    """Return the problem+json ``type`` URI for ``status_code``."""
-    if status_code in STATUS_TYPE_MAP:
-        return STATUS_TYPE_MAP[status_code]
-    return _STATUS_TYPE_URIS.get(status_code, _TYPE_HTTP)
+    """Return the problem+json ``type`` URI for ``status_code``.
+
+    Looks the code up in the canonical map from
+    :data:`taskq_api.errors.STATUS_TYPE_MAP` (per SPEC.md §7) and falls
+    back to a generic ``/errors/http`` URI for codes the SPEC does not
+    enumerate.
+    """
+    return STATUS_TYPE_MAP.get(status_code, _TYPE_HTTP_FALLBACK)
 
 
 # Module-level logger — FR-10 §3 AC-10.4 requires a log line carrying
@@ -198,7 +188,7 @@ def _body_pre_validation_middleware(app_instance: FastAPI):
                         return _problem_response(
                             request=request,
                             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            type_uri=_TYPE_VALIDATION,
+                            type_uri=STATUS_TYPE_MAP[422],
                             title="Validation error",
                             detail="Request body validation failed",
                         )
@@ -294,7 +284,7 @@ def create_app() -> FastAPI:
         return _problem_response(
             request=request,
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            type_uri=_TYPE_VALIDATION,
+            type_uri=STATUS_TYPE_MAP[422],
             title="Validation error",
             detail="Request body validation failed",
         )
@@ -333,7 +323,7 @@ def create_app() -> FastAPI:
         return _problem_response(
             request=request,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            type_uri=_TYPE_INTERNAL,
+            type_uri=STATUS_TYPE_MAP[500],
             title="Internal server error",
             detail="Internal server error",
         )
