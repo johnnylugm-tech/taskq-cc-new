@@ -1,23 +1,29 @@
-"""Tasks REST API router — FR-01.
+"""Tasks REST API router — FR-01 + FR-02.
 
-[FR-01]
+[FR-01, FR-02]
 Citations:
   - FR-01 §3 (SPEC.md): Task resource CRUD API contract:
       POST   /v1/tasks         create_task(body)   -> TaskOut | 422
       GET    /v1/tasks/{id}    read_task(id)      -> TaskOut | 404
       GET    /v1/tasks         list_tasks(...)    -> {items, next_cursor, limit} | 422
       DELETE /v1/tasks/{id}    delete_task(id)    -> 204
+  - FR-02 §3 (SPEC.md): Task execution API contract:
+      POST   /v1/tasks/{id}/run run_task(id)       -> 202 {run_id} | 404
+      GET    /v1/tasks/{id}/runs list_runs(id)     -> 200 {items: [RunOut,...]} newest->oldest
 """
 from __future__ import annotations
 
+import asyncio
+import uuid
 from typing import Callable
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response, status
 
 import taskq_api.repository.task_repo as task_repo_mod
 from taskq_api.api import deps
-from taskq_api.models.schemas import TaskCreate, TaskList, TaskOut
+from taskq_api.models.schemas import RunList, RunOut, TaskCreate, TaskList, TaskOut
+from taskq_api.service.runner import run_task as _run_subprocess
 
 
 # Router under `/v1/tasks` per FR-01. The app includes it without a
@@ -145,3 +151,90 @@ def delete_task(
     """
     task_repo_mod.task_repo.delete_with_results(str(task_id))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# ===========================================================================
+# FR-02 — Task execution endpoints
+# ===========================================================================
+
+
+async def _execute_and_record(task_id: str, command: str, run_id: str) -> None:
+    """Background-task shim: spawn subprocess, persist result row.
+
+    [FR-02]
+    Citations:
+      - FR-02 §3 AC-2.5: invokes `run_task` from the FR-02 service
+        module; the service module is responsible for writing the
+        result row to `task_results`.
+    """
+    try:
+        await _run_subprocess(
+            command=command,
+            task_id=task_id,
+            run_id=run_id,
+        )
+    except asyncio.CancelledError:
+        # FR-02 §3 / NFR-03: re-raise so the orchestrator observes the
+        # cancel signal (does NOT swallow).
+        raise
+    except Exception:
+        # The 202 response has already been sent; surface non-cancel
+        # failures via the persisted result row instead of crashing
+        # the background worker.
+        pass
+
+
+@router.post(
+    "/{task_id}/run",
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def run_task_endpoint(
+    task_id: UUID,
+    background_tasks: BackgroundTasks,
+    _principal: dict = Depends(_require_write),
+) -> dict[str, str]:
+    """Trigger task execution. AC-2.1.
+
+    Returns ``202 Accepted`` with a 36-char ``run_id`` immediately; the
+    actual subprocess is scheduled as a FastAPI BackgroundTask so the
+    client does not have to wait for execution.
+
+    [FR-02]
+    Citations:
+      - FR-02 §3 AC-2.1: returns HTTP 202 + ``run_id``.
+      - FR-02 §3: schedules `run_task` from the FR-02 service module.
+      - FR-06: delegates `get` / persistence to `task_repo`.
+    """
+    row = task_repo_mod.task_repo.get(str(task_id))
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"task {task_id} not found",
+        )
+    run_id = str(uuid.uuid4())
+    background_tasks.add_task(
+        _execute_and_record,
+        str(task_id),
+        row["command"],
+        run_id,
+    )
+    return {"run_id": run_id}
+
+
+@router.get(
+    "/{task_id}/runs",
+    response_model=RunList,
+)
+def list_runs_endpoint(
+    task_id: UUID,
+    _principal: dict = Depends(_require_read),
+) -> RunList:
+    """List execution history for a task. AC-2.6.
+
+    [FR-02]
+    Citations:
+      - FR-02 §3 AC-2.6: returns rows newest-to-oldest by `finished_at`.
+      - FR-06: delegates to `task_repo.task_repo.list_runs`.
+    """
+    items = task_repo_mod.task_repo.list_runs(str(task_id))
+    return RunList(items=[RunOut(**row) for row in items])

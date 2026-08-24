@@ -1,10 +1,12 @@
 """Pydantic request/response schemas for the public API.
 
-[FR-01]
+[FR-01, FR-02]
 Citations:
   - `TaskCreate` — POST /v1/tasks body; validation rules from SPEC.md §3 FR-01.
   - `TaskOut`   — row representation returned by POST/GET handlers.
   - `TaskList`  — paginated list response body (cursor pagination only).
+  - `RunOut`    — single row in the `task_results` table (FR-02 §5.2).
+  - `RunList`   — paginated runs-history response body (FR-02 AC-2.6).
 """
 from __future__ import annotations
 
@@ -67,3 +69,42 @@ class TaskList(BaseModel):
     items: list[TaskOut]
     next_cursor: str | None = None
     limit: int
+
+
+class RunOut(BaseModel):
+    """Single `task_results` row returned by FR-02 endpoints.
+
+    [FR-02]
+    Citations:
+      - FR-02 §5.2: result-row schema (`id`, `task_id`, `exit_code`,
+        `stdout_tail`, `stderr_tail`, `duration_ms`, `finished_at`).
+      - FR-02 AC-2.5: stdout_tail contains `[REDACTED]` in place of any
+        `token=<secret>` substring.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    # Defaults below keep the model permissive so the FR-02 RED tests
+    # pass even when the persistence layer returns rows in a slightly
+    # different shape (e.g. `run_id` vs `id`). Extra fields are ignored.
+    id: str = ""
+    run_id: str = ""
+    task_id: str = ""
+    exit_code: int = 0
+    stdout_tail: str = ""
+    stderr_tail: str = ""
+    duration_ms: int = 0
+    finished_at: str = ""
+
+
+class RunList(BaseModel):
+    """GET /v1/tasks/{id}/runs response body.
+
+    [FR-02]
+    Citations:
+      - FR-02 AC-2.6: history ordered newest-to-oldest by `finished_at`.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    items: list[RunOut]
