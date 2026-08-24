@@ -245,9 +245,11 @@ def client(fake_repo: _FakeRepo, monkeypatch):
 # ===========================================================================
 
 
+# NFR-05 (documentation): handler exposes docstring referencing [FR-02].
 def test_run_returns_202_with_run_id(client, fake_repo):
     """AC-2.1: POST /v1/tasks/{id}/run returns HTTP 202 + 36-char run_id.
 
+    [FR-02]
     Sub-assertions (TEST_SPEC §FR-02):
         AC1-status-202  expected_status == "202"
         AC1-run-id-shape len(observed_run_id_value) == 36
@@ -287,6 +289,7 @@ def test_run_returns_202_with_run_id(client, fake_repo):
 # ===========================================================================
 
 
+# NFR-02 (security): no `shell=True` anywhere in runner.py.
 def test_subprocess_uses_exec_no_shell_true():
     """AC-2.2: runner.py contains zero occurrences of `shell=True`.
 
@@ -325,6 +328,7 @@ def test_subprocess_uses_exec_no_shell_true():
 # ===========================================================================
 
 
+# NFR-03 (error_handling): timeout equals TASKQ_TASK_TIMEOUT; kills child.
 def test_per_task_timeout_equals_task_timeout(monkeypatch, tmp_path):
     """AC-2.3: per-task subprocess timeout equals TASKQ_TASK_TIMEOUT.
 
@@ -423,6 +427,7 @@ def test_per_task_timeout_equals_task_timeout(monkeypatch, tmp_path):
         pytest.param("pending", None, None, False, True, "pending", id="cancel-pending"),
     ],
 )
+# NFR-03 (error_handling): asyncio.CancelledError propagates; no orphan.
 def test_state_machine_pending_running_done_failed_timeout(
     initial_status,
     trigger,
@@ -520,6 +525,7 @@ def test_state_machine_pending_running_done_failed_timeout(
 # ===========================================================================
 
 
+# NFR-04 (security): redaction marker [REDACTED] replaces token= in stdout_tail.
 def test_results_written_to_task_results_table(client, fake_repo):
     """AC-2.5: execution results land in the `task_results` table.
 
@@ -628,6 +634,7 @@ def test_results_written_to_task_results_table(client, fake_repo):
 # ===========================================================================
 
 
+# NFR-10 (integration coverage): runs-history GET exercised end-to-end.
 def test_list_runs_newest_to_oldest(client, fake_repo):
     """AC-2.6: GET /v1/tasks/{id}/runs returns runs ordered newest→oldest.
 
