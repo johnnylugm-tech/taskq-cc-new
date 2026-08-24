@@ -24,13 +24,18 @@ from taskq_api.models.schemas import TaskCreate, TaskList, TaskOut
 router = APIRouter(prefix="/v1/tasks", tags=["tasks"])
 
 
-# Scope dependency callables — the lambda wrapper around `deps.require_scope`
-# is intentional: the test fixture overrides the factory symbol itself, so
-# the wrapper must invoke it at request time (not at module-load time) for
-# the override to take effect.
-_require_write = lambda: deps.require_scope("write")
-_require_read = lambda: deps.require_scope("read")
-_require_admin = lambda: deps.require_scope("admin")
+# Scope dependency callables — wrapped as `def` so the test fixture's override
+# of `deps.require_scope` is resolved at request time, not at module-load time.
+def _require_write() -> dict:
+    return deps.require_scope("write")
+
+
+def _require_read() -> dict:
+    return deps.require_scope("read")
+
+
+def _require_admin() -> dict:
+    return deps.require_scope("admin")
 
 
 @router.post(
