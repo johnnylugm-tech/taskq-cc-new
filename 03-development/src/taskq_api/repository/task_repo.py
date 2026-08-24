@@ -76,6 +76,48 @@ class _InMemoryTaskRepo:
                 count += 1
         return count
 
+    # ------------------------------------------------------------------
+    # FR-02 surface — state-machine persistence and run-history queries.
+    # ------------------------------------------------------------------
+    def update_status(self, task_id: str, status: str) -> None:
+        """Set ``rows[task_id]["status"] = status`` (no-op when absent)."""
+        row = self.rows.get(task_id)
+        if row is not None:
+            row["status"] = status
+
+    def write_result(self, **fields: Any) -> dict[str, Any]:
+        """Append a row to ``results`` and return it (test seam for FR-02)."""
+        import uuid
+
+        result_id = str(uuid.uuid4())
+        row: dict[str, Any] = {"id": result_id}
+        row.update(fields)
+        # Key under the supplied run_id when present, else under result_id,
+        # so `delete_with_results` can still sweep results by task_id.
+        key = str(row.get("run_id") or result_id)
+        self.results[key] = row
+        return row
+
+    def list_runs(
+        self,
+        task_id: str,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        """Return rows whose ``task_id`` matches, newest-to-oldest.
+
+        Ordering is by ``finished_at`` descending when present, falling back
+        to insertion order so FR-02 tests get a deterministic newest-first
+        view of the in-memory store.
+        """
+        matching = [
+            row for row in self.results.values() if row.get("task_id") == task_id
+        ]
+        matching.sort(
+            key=lambda r: str(r.get("finished_at") or ""),
+            reverse=True,
+        )
+        return matching[:limit]
+
 
 # Singleton — tests assign `task_repo_mod.task_repo = fake_repo` to swap it.
 task_repo = _InMemoryTaskRepo()
