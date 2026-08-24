@@ -35,8 +35,8 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from sqlalchemy import Column, Float, Integer, String, create_engine, select
-from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy import Float, Integer, String, create_engine, select
+from sqlalchemy.orm import Mapped, Session, declarative_base, mapped_column
 
 from taskq_api.service.ratelimit import refill, retry_after_seconds
 
@@ -60,11 +60,15 @@ class RateBucket(_Base):
 
     __tablename__ = "rate_buckets"
 
-    key_hash = Column(String, primary_key=True)
-    tokens = Column(Float, nullable=False, default=0.0)
-    burst = Column(Integer, nullable=False, default=20)
-    refill_per_sec = Column(Float, nullable=False, default=5.0)
-    last_refill_ts = Column(Float, nullable=False, default=0.0)
+    # Mapped[...] + mapped_column give pyright accurate attribute types
+    # (str / float / int) instead of the legacy ``Column[T]`` descriptors
+    # which static analysers see as the Column object itself rather than
+    # the runtime-mapped value type.
+    key_hash: Mapped[str] = mapped_column(String, primary_key=True)
+    tokens: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    burst: Mapped[int] = mapped_column(Integer, nullable=False, default=20)
+    refill_per_sec: Mapped[float] = mapped_column(Float, nullable=False, default=5.0)
+    last_refill_ts: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
 
 
 # ---------------------------------------------------------------------------
