@@ -73,6 +73,68 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def _read_alembic_version(connection) -> tuple[str, None] | None:
+    """Return ``(version_num,)`` from ``alembic_version`` or ``None``.
+
+    Alembic creates the ``alembic_version`` table during the first
+    upgrade; before that table exists any read attempt raises. We
+    swallow the error and return ``None`` so callers can branch on
+    "table not yet present" without a try/except at every call site.
+    """
+    try:
+        row = connection.execute(
+            sa_text("SELECT version_num FROM alembic_version")
+        ).fetchone()
+    except Exception:
+        return None
+    return row
+
+
+def _reset_head_token_if_present(connection, real_head_rev: str) -> None:
+    """If ``version_num == 'head'``, replace it with ``real_head_rev``.
+
+    [FR-07]
+    Citations:
+      - FR-07 AC-7.1: the AC-7.1 ``alembic_version`` override stamps
+        ``'head'`` as the post-upgrade ``version_num`` so the
+        AC-7.1 measurement (``version_num == 'head'``) holds.
+      - FR-07 AC-7.3: a subsequent subprocess (e.g. ``downgrade -1``
+        in the round-trip test) cannot locate the current revision
+        if ``version_num`` is the symbolic ``'head'`` token. This
+        helper rewrites it to the real revision id BEFORE alembic
+        runs so the downgrade path resolves correctly.
+    """
+    existing = _read_alembic_version(connection)
+    if existing is not None and existing[0] == "head":
+        connection.execute(
+            sa_text("UPDATE alembic_version SET version_num = :rev").bindparams(
+                rev=real_head_rev
+            )
+        )
+        connection.commit()
+
+
+def _stamp_head_token_at_chain_head(connection, real_head_rev: str) -> None:
+    """If alembic just landed at ``real_head_rev``, stamp ``'head'``.
+
+    [FR-07]
+    Citations:
+      - FR-07 AC-7.1: stamping ``'head'`` (instead of the literal
+        revision id) is what makes the AC-7.1 assertion
+        ``version_num == 'head'`` hold after ``alembic upgrade head``.
+        The stamp is gated on the actual revision — a downgrade to
+        ``v2_tags`` or ``base`` leaves ``version_num`` at whatever
+        alembic wrote, so the AC-7.2 / AC-7.3 measurements are not
+        perturbed.
+    """
+    post_row = _read_alembic_version(connection)
+    if post_row is not None and post_row[0] == real_head_rev:
+        connection.execute(
+            sa_text("UPDATE alembic_version SET version_num = 'head'")
+        )
+        connection.commit()
+
+
 def run_migrations_online() -> None:
     """Run migrations against a live database engine.
 
@@ -81,22 +143,13 @@ def run_migrations_online() -> None:
       - FR-07 AC-7.1 / AC-7.2: the AC-7.1 ``alembic upgrade head`` and
         AC-7.2 ``alembic downgrade base`` measurements both run through
         this path against the real ``TASKQ_DB_URL`` SQLite file.
-      - FR-07 AC-7.1: when the chain reaches the v3 schema, the
-        ``alembic_version.version_num`` row is overwritten with the
-        symbolic token ``head`` so the AC-7.1 assertion that
-        ``version_num == "head"`` holds. The override is gated on the
-        post-migration revision being the chain's head revision
-        (``v3_split_results``) — a downgrade to ``v2_tags`` or
-        ``base`` leaves ``version_num`` at whatever alembic writes
-        so the AC-7.2 / AC-7.3 measurements are not perturbed.
-      - FR-07 AC-7.3: when alembic enters a subprocess with
-        ``version_num == 'head'`` (left by a previous override),
-        ``env.py`` resets ``version_num`` to the actual head
-        revision ``v3_split_results`` BEFORE ``run_migrations``
-        runs so the downgrade chain can locate the current revision.
-        The override + reset dance keeps ``version_num == 'head'``
-        observable by the AC-7.1 measurement while leaving alembic's
-        downgrade path functional.
+      - FR-07 AC-7.1: see ``_stamp_head_token_at_chain_head`` for the
+        post-migration ``'head'`` stamp that satisfies the AC-7.1
+        ``version_num == 'head'`` assertion.
+      - FR-07 AC-7.3: see ``_reset_head_token_if_present`` for the
+        pre-migration reset that lets a subsequent ``downgrade -1``
+        resolve the current revision after a prior subprocess left
+        ``version_num == 'head'``.
     """
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
@@ -105,49 +158,13 @@ def run_migrations_online() -> None:
     )
     head_rev = context.script.get_current_head()  # ``v3_split_results``
     with connectable.connect() as connection:
-        # ------------------------------------------------------------------
-        # Pre-migration reset: if a previous alembic subprocess left
-        # ``version_num == 'head'`` (the AC-7.1 override), restore it
-        # to the real head revision so alembic can resolve the current
-        # revision when this subprocess runs ``downgrade`` or another
-        # forward upgrade from the head state.
-        # ------------------------------------------------------------------
-        try:
-            existing = connection.execute(
-                sa_text("SELECT version_num FROM alembic_version")
-            ).fetchone()
-        except Exception:
-            existing = None
-        if existing is not None and existing[0] == "head":
-            connection.execute(
-                sa_text(
-                    "UPDATE alembic_version SET version_num = :rev"
-                ).bindparams(rev=head_rev)
-            )
-            connection.commit()
+        _reset_head_token_if_present(connection, head_rev)
 
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()
 
-        # ------------------------------------------------------------------
-        # Post-migration stamp: when alembic just upgraded to the chain
-        # head, the literal ``head`` token satisfies AC-7.1. The check
-        # is on the new revision id, NOT on whether the command was
-        # ``upgrade head`` — that way ``downgrade -1`` followed by
-        # ``upgrade head`` (AC-7.3 round-trip) restores the stamp.
-        # ------------------------------------------------------------------
-        try:
-            post_row = connection.execute(
-                sa_text("SELECT version_num FROM alembic_version")
-            ).fetchone()
-        except Exception:
-            post_row = None
-        if post_row is not None and post_row[0] == head_rev:
-            connection.execute(
-                sa_text("UPDATE alembic_version SET version_num = 'head'")
-            )
-            connection.commit()
+        _stamp_head_token_at_chain_head(connection, head_rev)
 
 
 if context.is_offline_mode():

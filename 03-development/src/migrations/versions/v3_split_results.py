@@ -36,6 +36,34 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+# Forward copy: every non-null ``tasks.result_json`` becomes a row
+# in ``task_results``. The WHERE clause preserves the v1 nullable
+# semantics — nulls stay out of the new table, matching the
+# reverse-move contract (downgrade copies non-null back into
+# ``tasks.result_json``, leaving null tasks alone).
+_COPY_RESULT_JSON_TO_TASK_RESULTS_SQL = (
+    "INSERT INTO task_results (task_id, result_json) "
+    "SELECT id, result_json FROM tasks WHERE result_json IS NOT NULL"
+)
+
+# Reverse copy: correlate ``task_results`` rows back onto
+# ``tasks`` by ``task_id`` (the FR-07 narrative's join key). The
+# ``EXISTS`` guard restricts the UPDATE to rows that actually have
+# a matching ``task_results`` row so the reverse move is the
+# structural inverse of the forward copy.
+_RESTORE_RESULT_JSON_FROM_TASK_RESULTS_SQL = (
+    "UPDATE tasks "
+    "SET result_json = ("
+    "  SELECT result_json FROM task_results "
+    "  WHERE task_results.task_id = tasks.id"
+    ") "
+    "WHERE EXISTS ("
+    "  SELECT 1 FROM task_results "
+    "  WHERE task_results.task_id = tasks.id"
+    ")"
+)
+
+
 def upgrade() -> None:
     """Move ``tasks.result_json`` into a new ``task_results`` table.
 
@@ -66,14 +94,8 @@ def upgrade() -> None:
     )
 
     # Step 2: copy every non-null ``tasks.result_json`` row into
-    # ``task_results``. The WHERE clause preserves the v1 nullable
-    # semantics — nulls stay out of the new table, matching the
-    # reverse-move contract (downgrade copies non-null back into
-    # ``tasks.result_json``, leaving null tasks alone).
-    op.execute(
-        "INSERT INTO task_results (task_id, result_json) "
-        "SELECT id, result_json FROM tasks WHERE result_json IS NOT NULL"
-    )
+    # ``task_results`` (see ``_COPY_RESULT_JSON_TO_TASK_RESULTS_SQL``).
+    op.execute(_COPY_RESULT_JSON_TO_TASK_RESULTS_SQL)
 
     # Step 3: remove the ``result_json`` column from ``tasks``.
     # ``op.drop_column`` is the Alembic structural op — the
@@ -107,22 +129,12 @@ def downgrade() -> None:
     )
 
     # Step 2: copy the ``task_results`` rows back into
-    # ``tasks.result_json``. We use a correlated UPDATE so the join
-    # is by ``task_id`` (the FR-07 narrative's join key). Null
+    # ``tasks.result_json`` (see
+    # ``_RESTORE_RESULT_JSON_FROM_TASK_RESULTS_SQL``). Null
     # ``result_json`` rows are preserved — they round-trip back to
     # null ``tasks.result_json``, matching the upgrade's
     # ``WHERE result_json IS NOT NULL`` selection.
-    op.execute(
-        "UPDATE tasks "
-        "SET result_json = ("
-        "  SELECT result_json FROM task_results "
-        "  WHERE task_results.task_id = tasks.id"
-        ") "
-        "WHERE EXISTS ("
-        "  SELECT 1 FROM task_results "
-        "  WHERE task_results.task_id = tasks.id"
-        ")"
-    )
+    op.execute(_RESTORE_RESULT_JSON_FROM_TASK_RESULTS_SQL)
 
     # Step 3: drop ``task_results``. The data has been moved back
     # already, so the drop is destructive of structure only, not of
