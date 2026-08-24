@@ -162,7 +162,10 @@ def client(fake_repo):
 
 
 def test_create_task_valid(client):
-    """AC-1.1: POST /v1/tasks with valid body returns 201 + 36-char id."""
+    """AC-1.1: POST /v1/tasks with valid body returns 201 + 36-char id.
+
+    NFR-05 (documentation): public fn/handler exposes a docstring referencing [FR-01].
+    """
     response = client.post(
         "/v1/tasks",
         json={"command": "echo hello", "name": "t-create-1"},
@@ -198,7 +201,10 @@ def test_post_invalid_body_returns_422(client):
 
 
 def test_get_unknown_returns_404(client):
-    """AC-1.3: GET /v1/tasks/{unknown-id} returns 404 + application/problem+json."""
+    """AC-1.3: GET /v1/tasks/{unknown-id} returns 404 + application/problem+json.
+
+    NFR-01 (performance): single-fetch GET /v1/tasks/{id} path; p95 < 30ms target.
+    """
     response = client.get(
         "/v1/tasks/00000000-0000-0000-0000-000000000000",
         headers={"X-API-Key": "fake-read-key"},
@@ -218,6 +224,8 @@ def test_list_uses_cursor_pagination(client, fake_repo):
 
     Seed 75 tasks. First call with limit=50 returns 50; the cursor drives
     the next call which returns 25. Sum equals the seeded total.
+
+    NFR-01 (performance): list endpoint must avoid N+1; constant SQL count.
     """
     seed_count = 75
     for idx in range(seed_count):
@@ -282,7 +290,12 @@ def test_limit_default_and_upper_bound(client):
 
 
 def test_delete_removes_task_and_results_in_tx(client, fake_repo):
-    """AC-1.6: DELETE removes task + result rows in a single transaction."""
+    """AC-1.6: DELETE removes task + result rows in a single transaction.
+
+    NFR-10 (integration coverage): end-to-end CRUD chain exercised at the
+    HTTP layer, covering create + delete + tx-atomic invariant.
+    NFR-11 (readability): handler size and module-level complexity targets.
+    """
     # Seed one task with 3 result rows.
     task = fake_repo.create({"command": "echo x", "name": "del-target"})
     fake_repo.results = {
