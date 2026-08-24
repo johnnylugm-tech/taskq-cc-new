@@ -10,6 +10,7 @@ Citations:
 """
 from __future__ import annotations
 
+from typing import Callable
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -26,15 +27,18 @@ router = APIRouter(prefix="/v1/tasks", tags=["tasks"])
 
 # Scope dependency callables — wrapped as `def` so the test fixture's override
 # of `deps.require_scope` is resolved at request time, not at module-load time.
-def _require_write() -> dict:
+# The factory returns a sub-dependency; FastAPI then calls it to obtain the
+# principal dict. `_principal` in each handler therefore is `dict`, even
+# though these wrappers return `Callable[[], dict]`.
+def _require_write() -> Callable[[], dict]:
     return deps.require_scope("write")
 
 
-def _require_read() -> dict:
+def _require_read() -> Callable[[], dict]:
     return deps.require_scope("read")
 
 
-def _require_admin() -> dict:
+def _require_admin() -> Callable[[], dict]:
     return deps.require_scope("admin")
 
 

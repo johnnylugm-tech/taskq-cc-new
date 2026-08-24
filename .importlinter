@@ -1,0 +1,11 @@
+[importlinter]
+root_package = taskq_api
+
+[importlinter:contract:no_circular_dependencies]
+name = no_circular_dependencies
+type = layers
+layers =
+    taskq_api.app
+    taskq_api.api
+    taskq_api.repository
+    taskq_api.models

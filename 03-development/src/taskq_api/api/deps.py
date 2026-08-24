@@ -18,10 +18,12 @@ Citations:
 """
 from __future__ import annotations
 
+from typing import Callable
+
 from fastapi import HTTPException, status
 
 
-def require_scope(scope: str = "read"):
+def require_scope(scope: str = "read") -> Callable[[], dict]:
     """Return a FastAPI dependency that enforces `scope`.
 
     Args:

@@ -1,0 +1,56 @@
+{
+  "classified_at": "2026-08-24T08:46:42Z",
+  "cli_tools": [
+    "alembic",
+    "bandit",
+    "coverage",
+    "httpx",
+    "importlinter",
+    "lint-imports",
+    "mutmut",
+    "pip",
+    "pip-compile",
+    "pip-licenses",
+    "piplicenses",
+    "pytest",
+    "pytest-benchmark",
+    "pytest_cov",
+    "python3.11",
+    "radon",
+    "ruff",
+    "uvicorn"
+  ],
+  "enforcer_sha": "b03b9f753510c4167c084103b15a4da52fdf8b08",
+  "env_vars": {
+    "dev_opt_in": [],
+    "has_default": [
+      "TASKQ_CORS_ORIGINS",
+      "TASKQ_DB_POOL_SIZE",
+      "TASKQ_DB_URL",
+      "TASKQ_DRAIN_TIMEOUT",
+      "TASKQ_HOST",
+      "TASKQ_LOG_FORMAT",
+      "TASKQ_LOG_LEVEL",
+      "TASKQ_MAX_CONCURRENT",
+      "TASKQ_PORT",
+      "TASKQ_RATE_BURST",
+      "TASKQ_RATE_PER_SEC",
+      "TASKQ_TASK_TIMEOUT"
+    ],
+    "mandatory": []
+  },
+  "infra_services": {
+    "docker_compose_services": [],
+    "required": [
+      {
+        "checked_via": "python -c 'import sqlite3; print(sqlite3.sqlite_version)' -> 3.50.4; touch .sessi-work/_sqlite_probe.db succeeded",
+        "fix": "",
+        "name": "sqlite",
+        "reachable": true,
+        "type": "SQLite 3 (file-based)"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "source_sha256": "2d0a7ccc4906542f3eb72f8e2e047f984d09d31579e76372b9f4561811a9f543"
+}
