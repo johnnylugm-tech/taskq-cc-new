@@ -53,6 +53,15 @@ import taskq_api.repository.task_repo as task_repo_mod
 _REDACTION_PATTERN = re.compile(r"token=\S*")
 _REDACTED_MARKER = "[REDACTED]"
 
+# Timeout budget defaults — env var overrides win.
+_DEFAULT_TIMEOUT_SECONDS = 30.0
+_DRAIN_TIMEOUT_SECONDS = 1.0
+
+# Conventional shell exit code for "command not found".
+_EXIT_COMMAND_NOT_FOUND = 127
+# Conventional exit code when tokenisation itself fails.
+_EXIT_TOKENISE_FAILURE = -1
+
 
 # ---------------------------------------------------------------------------
 # State machine — pure function, NO side effects. The five TEST_SPEC
@@ -116,7 +125,7 @@ def state_machine(
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Small helpers — pure functions, no I/O.
 # ---------------------------------------------------------------------------
 def _resolve_timeout(timeout_seconds: float | None) -> float:
     """Resolve the effective per-task timeout in seconds.
@@ -124,7 +133,7 @@ def _resolve_timeout(timeout_seconds: float | None) -> float:
     Priority:
         1. ``timeout_seconds`` keyword argument (highest).
         2. ``TASKQ_TASK_TIMEOUT`` env var (parsed as float).
-        3. Default 30.0 seconds.
+        3. Default 30 seconds.
     """
     if timeout_seconds is not None:
         return float(timeout_seconds)
@@ -134,7 +143,7 @@ def _resolve_timeout(timeout_seconds: float | None) -> float:
             return float(env_value)
         except ValueError:
             pass
-    return 30.0
+    return _DEFAULT_TIMEOUT_SECONDS
 
 
 def _redact(text: str) -> str:
@@ -147,6 +156,95 @@ def _redact(text: str) -> str:
 def _now_iso() -> str:
     """Return current UTC timestamp in ISO-8601 form."""
     return datetime.now(timezone.utc).isoformat()
+
+
+def _elapsed_ms(started_at_dt: datetime) -> int:
+    """Wall-clock milliseconds between ``started_at_dt`` and now (UTC)."""
+    return int(
+        (datetime.now(timezone.utc) - started_at_dt).total_seconds() * 1000
+    )
+
+
+# ---------------------------------------------------------------------------
+# Persistence helpers — best-effort, swallow repo failures so the
+# subprocess remains the unit of work. Each helper centralises one of
+# the three shapes ``run_task`` needs.
+# ---------------------------------------------------------------------------
+def _safe_update_status(task_id: str | None, status: str) -> None:
+    """Best-effort: update the task row's status (no-op without ``task_id``)."""
+    if not task_id:
+        return
+    try:
+        task_repo_mod.task_repo.update_status(task_id, status)
+    except Exception:
+        # The runner must not block on repo failures — the subprocess
+        # is the unit of work.
+        pass
+
+
+def _safe_write_result(task_id: str | None, **fields: Any) -> None:
+    """Best-effort: append a row to ``task_results`` (no-op without ``task_id``)."""
+    if not task_id:
+        return
+    try:
+        task_repo_mod.task_repo.write_result(task_id=task_id, **fields)
+    except Exception:
+        pass
+
+
+def _safe_persist_terminal(
+    task_id: str | None,
+    *,
+    status: str,
+    run_id: str,
+    exit_code: int,
+    stdout_tail: str,
+    stderr_tail: str,
+    duration_ms: int,
+    finished_at: str,
+) -> None:
+    """Best-effort terminal-state persistence.
+
+    Issues ``update_status`` then ``write_result`` inside a single
+    try-block so a status-write failure does not leave a partial
+    terminal-row orphan. The two calls share one failure boundary
+    on purpose — that ordering is part of the GREEN contract.
+    """
+    if not task_id:
+        return
+    try:
+        task_repo_mod.task_repo.update_status(task_id, status)
+        task_repo_mod.task_repo.write_result(
+            task_id=task_id,
+            run_id=run_id,
+            exit_code=exit_code,
+            stdout_tail=stdout_tail,
+            stderr_tail=stderr_tail,
+            duration_ms=duration_ms,
+            finished_at=finished_at,
+        )
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Subprocess helpers
+# ---------------------------------------------------------------------------
+async def _drain_pipes(
+    proc: asyncio.subprocess.Process,
+) -> tuple[bytes, bytes]:
+    """Drain stdout/stderr after kill (best-effort, short timeout).
+
+    Returns ``(b"", b"")`` if the child does not exit before the drain
+    budget elapses — we don't want to block the request on a zombie.
+    """
+    try:
+        return await asyncio.wait_for(
+            proc.communicate(),
+            timeout=_DRAIN_TIMEOUT_SECONDS,
+        )
+    except Exception:
+        return (b"", b"")
 
 
 # ---------------------------------------------------------------------------
@@ -193,40 +291,31 @@ async def run_task(
       - FR-02 §3 AC-2.5: result row persisted via ``task_repo``.
     """
     timeout = _resolve_timeout(timeout_seconds)
-
     if run_id is None:
         run_id = str(uuid.uuid4())
-
     started_at_dt = datetime.now(timezone.utc)
 
     # ---- 1) Mark the task as "running" (best-effort). --------------------
-    if task_id:
-        try:
-            task_repo_mod.task_repo.update_status(task_id, "running")
-        except Exception:
-            # The runner must not block on repo failures — the
-            # subprocess is the unit of work.
-            pass
+    _safe_update_status(task_id, "running")
 
     # ---- 2) Tokenise the command. Never invoke a shell. -----------------
     try:
         args = shlex.split(command)
     except ValueError as exc:
-        finished_at = _now_iso()
-        if task_id:
-            try:
-                task_repo_mod.task_repo.write_result(
-                    task_id=task_id,
-                    run_id=run_id,
-                    exit_code=-1,
-                    stdout_tail="",
-                    stderr_tail=str(exc),
-                    duration_ms=0,
-                    finished_at=finished_at,
-                )
-            except Exception:
-                pass
-        return {"status_name": "failed", "exit_code": -1, "run_id": run_id}
+        _safe_write_result(
+            task_id=task_id,
+            run_id=run_id,
+            exit_code=_EXIT_TOKENISE_FAILURE,
+            stdout_tail="",
+            stderr_tail=str(exc),
+            duration_ms=0,
+            finished_at=_now_iso(),
+        )
+        return {
+            "status_name": "failed",
+            "exit_code": _EXIT_TOKENISE_FAILURE,
+            "run_id": run_id,
+        }
 
     # ---- 3) Spawn the subprocess. ----------------------------------------
     try:
@@ -236,28 +325,24 @@ async def run_task(
             stderr=asyncio.subprocess.PIPE,
         )
     except (FileNotFoundError, OSError) as exc:
-        finished_at = _now_iso()
-        if task_id:
-            try:
-                task_repo_mod.task_repo.update_status(task_id, "failed")
-                task_repo_mod.task_repo.write_result(
-                    task_id=task_id,
-                    run_id=run_id,
-                    exit_code=127,
-                    stdout_tail="",
-                    stderr_tail=str(exc),
-                    duration_ms=0,
-                    finished_at=finished_at,
-                )
-            except Exception:
-                pass
-        return {"status_name": "failed", "exit_code": 127, "run_id": run_id}
+        _safe_persist_terminal(
+            task_id=task_id,
+            status="failed",
+            run_id=run_id,
+            exit_code=_EXIT_COMMAND_NOT_FOUND,
+            stdout_tail="",
+            stderr_tail=str(exc),
+            duration_ms=0,
+            finished_at=_now_iso(),
+        )
+        return {
+            "status_name": "failed",
+            "exit_code": _EXIT_COMMAND_NOT_FOUND,
+            "run_id": run_id,
+        }
 
-    # ---- 4) Wait for the subprocess with the configured timeout. ----------
+    # ---- 4) Wait for the subprocess with the configured timeout. --------
     timeout_triggered = False
-    stdout_bytes = b""
-    stderr_bytes = b""
-
     try:
         stdout_bytes, stderr_bytes = await asyncio.wait_for(
             proc.communicate(),
@@ -265,65 +350,41 @@ async def run_task(
         )
     except asyncio.TimeoutError:
         timeout_triggered = True
-        # Kill the child so it doesn't outlive the request. ignore the
+        # Kill the child so it doesn't outlive the request; ignore the
         # race where it has already exited.
         try:
             proc.kill()
         except ProcessLookupError:
             pass
-        # Drain pipes (best-effort) so the kernel buffers don't block.
-        try:
-            stdout_bytes, stderr_bytes = await asyncio.wait_for(
-                proc.communicate(),
-                timeout=1.0,
-            )
-        except (asyncio.TimeoutError, Exception):
-            stdout_bytes = b""
-            stderr_bytes = b""
+        stdout_bytes, stderr_bytes = await _drain_pipes(proc)
 
-    # ---- 5) Compute duration + status. -----------------------------------
-    duration_ms = int(
-        (datetime.now(timezone.utc) - started_at_dt).total_seconds() * 1000
-    )
+    # ---- 5) Compute duration + status. ----------------------------------
+    duration_ms = _elapsed_ms(started_at_dt)
     finished_at = _now_iso()
-
-    stdout_text = (
-        stdout_bytes.decode("utf-8", errors="replace") if stdout_bytes else ""
-    )
-    stderr_text = (
-        stderr_bytes.decode("utf-8", errors="replace") if stderr_bytes else ""
-    )
+    stdout_text = stdout_bytes.decode("utf-8", errors="replace")
+    stderr_text = stderr_bytes.decode("utf-8", errors="replace")
 
     if timeout_triggered:
         new_status = "timeout"
         exit_code_value: int | None = None
     else:
         exit_code_value = proc.returncode
-        result = state_machine(
+        new_status = state_machine(
             "running",
             exit_code=exit_code_value,
-            timeout_triggered=False,
-        )
-        new_status = result["status"]
+        )["status"]
 
-    stdout_tail = _redact(stdout_text)
-    stderr_tail = _redact(stderr_text)
-
-    # ---- 6) Persist result row (best-effort). ----------------------------
-    if task_id:
-        try:
-            task_repo_mod.task_repo.update_status(task_id, new_status)
-            task_repo_mod.task_repo.write_result(
-                task_id=task_id,
-                run_id=run_id,
-                exit_code=(exit_code_value if exit_code_value is not None else -1),
-                stdout_tail=stdout_tail,
-                stderr_tail=stderr_tail,
-                duration_ms=duration_ms,
-                finished_at=finished_at,
-            )
-        except Exception:
-            pass
+    # ---- 6) Persist the terminal row (best-effort). ----------------------
+    _safe_persist_terminal(
+        task_id=task_id,
+        status=new_status,
+        run_id=run_id,
+        exit_code=(exit_code_value if exit_code_value is not None else -1),
+        stdout_tail=_redact(stdout_text),
+        stderr_tail=_redact(stderr_text),
+        duration_ms=duration_ms,
+        finished_at=finished_at,
+    )
 
     return {
         "status_name": new_status,
