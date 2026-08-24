@@ -2,7 +2,7 @@
 # returncode: 1
 # agent_score: 100.0 | threshold: 80.0
 
-FFFFFFFFF.......FFFFFFFFF...................................             [100%]
+FFFFFFFFF.......FFFFFFFFF.......................................         [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:10
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:10: PendingDeprecationWarning: Please use `import python_multipart` instead.
@@ -12,6 +12,7 @@ FFFFFFFFF.......FFFFFFFFF...................................             [100%]
 03-development/tests/test_fr02.py: 11 warnings
 03-development/tests/test_fr03.py: 3 warnings
 03-development/tests/test_fr04.py: 3 warnings
+03-development/tests/test_fr05.py: 2 warnings
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/httpx/_client.py:690: DeprecationWarning: The 'app' shortcut is now deprecated. Use the explicit style 'transport=WSGITransport(app=...)' instead.
     warnings.warn(message, DeprecationWarning)
 
@@ -24,20 +25,22 @@ Name                                                   Stmts   Miss  Cover   Mis
 03-development/src/taskq_api/__init__.py                   0      0   100%
 03-development/src/taskq_api/__main__.py                  24     24     0%   17-69
 03-development/src/taskq_api/api/__init__.py               0      0   100%
-03-development/src/taskq_api/api/deps.py                  50      0   100%
+03-development/src/taskq_api/api/deps.py                  74      0   100%
 03-development/src/taskq_api/api/metrics.py                8      1    88%   46
-03-development/src/taskq_api/api/tasks.py                 53     23    57%   63-75, 94-100, 122-127, 151-152, 179-183, 208-221, 240-241
-03-development/src/taskq_api/app.py                       41      2    95%   94, 169
+03-development/src/taskq_api/api/tasks.py                 53     21    60%   63-75, 94-100, 151-152, 179-183, 208-221, 240-241
+03-development/src/taskq_api/app.py                       41      2    95%   95, 170
 03-development/src/taskq_api/models/__init__.py            0      0   100%
 03-development/src/taskq_api/models/schemas.py            39      4    90%   38-43
 03-development/src/taskq_api/repository/__init__.py        0      0   100%
 03-development/src/taskq_api/repository/key_repo.py       17      7    59%   47-55, 75-77
+03-development/src/taskq_api/repository/rate_repo.py      48     27    44%   111-125, 151-206
 03-development/src/taskq_api/repository/task_repo.py      52     38    27%   36-50, 53, 61-66, 69-77, 84-86, 90-99, 112-119
 03-development/src/taskq_api/service/__init__.py           0      0   100%
 03-development/src/taskq_api/service/auth.py              19      1    95%   89
+03-development/src/taskq_api/service/ratelimit.py         10      5    50%   61-62, 78-80
 03-development/src/taskq_api/service/runner.py           110      0   100%
 ------------------------------------------------------------------------------------
-TOTAL                                                    413    100    76%
+TOTAL                                                    495    130    74%
 =========================== short test summary info ============================
 FAILED 03-development/tests/test_fr01.py::test_create_task_valid - AssertionE...
 FAILED 03-development/tests/test_fr01.py::test_post_invalid_body_returns_422
@@ -57,4 +60,4 @@ FAILED 03-development/tests/test_fr02.py::test_get_known_task_returns_200 - A...
 FAILED 03-development/tests/test_fr02.py::test_list_tasks_returns_paginated_items
 FAILED 03-development/tests/test_fr02.py::test_delete_task_returns_204_and_invokes_admin_scope
 FAILED 03-development/tests/test_fr02.py::test_execute_and_record_swallows_non_cancel_exception
-18 failed, 42 passed, 26 warnings in 2.87s
+18 failed, 46 passed, 28 warnings in 4.28s

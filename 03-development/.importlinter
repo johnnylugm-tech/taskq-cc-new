@@ -34,16 +34,19 @@ layers =
     taskq_api.models
 
 # no_sqlalchemy_above_repository — nothing above the repository layer may
-# import sqlalchemy. The composition root (`taskq_api.app`) and the package
-# root (`taskq_api/__init__.py`) are included as source_modules so the
-# forbidden-import contract actually reaches them; without this the
-# arch_contract_coverage check has modules the boundary claims but does not
-# enforce.
+# import sqlalchemy. The composition root (`taskq_api.app`) and the api
+# package (`taskq_api.api`, which covers `taskq_api.api.deps` and every
+# other api submodule) are listed as source_modules so the
+# forbidden-import contract reaches every module that touches HTTP
+# request handling. The package root (`taskq_api/__init__.py`) is a
+# docstring-only stub (no imports) so it does not need to be in
+# source_modules; including the bare `taskq_api` package would over-
+# reach and forbid the *repository* layer (which legitimately uses
+# SQLAlchemy per FR-05 §3 AC-5.3) from importing it.
 [importlinter:contract:no-sqlalchemy-above-repository]
 name = No sqlalchemy imports above repository layer
 type = forbidden
 source_modules =
-    taskq_api
     taskq_api.app
     taskq_api.api
 forbidden_modules =

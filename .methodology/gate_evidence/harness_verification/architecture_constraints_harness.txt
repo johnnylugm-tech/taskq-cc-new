@@ -10,7 +10,7 @@
 [1mContracts[0m
 [1m---------[0m
 [22m[0m
-[1mAnalyzed 15 files, 12 dependencies.[0m
+[1mAnalyzed 17 files, 13 dependencies.[0m
 [1m-----------------------------------[0m
 [22m[0m
 [22mno_circular_dependencies [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
