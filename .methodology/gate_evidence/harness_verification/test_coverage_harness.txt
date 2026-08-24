@@ -2,8 +2,8 @@
 # returncode: 1
 # agent_score: 100.0 | threshold: 80.0
 
-FFFFFFFFF.......FFFFFFFFF..........F....F............................... [ 63%]
-.........................................                                [100%]
+FFFFFFFFF.......FFFFFFFFF..........F....F............................... [ 59%]
+.................................................                        [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
@@ -24,9 +24,10 @@ Name                                                         Stmts   Miss  Cover
 03-development/src/taskq_api/__main__.py                        24      2    92%   64-65
 03-development/src/taskq_api/api/__init__.py                     0      0   100%
 03-development/src/taskq_api/api/deps.py                        74      0   100%
-03-development/src/taskq_api/api/metrics.py                      8      1    88%   46
+03-development/src/taskq_api/api/health.py                      27      0   100%
+03-development/src/taskq_api/api/metrics.py                     10      1    90%   53
 03-development/src/taskq_api/api/tasks.py                       53      0   100%
-03-development/src/taskq_api/app.py                             42      2    95%   97, 172
+03-development/src/taskq_api/app.py                             38      2    95%   105, 156
 03-development/src/taskq_api/models/__init__.py                  0      0   100%
 03-development/src/taskq_api/models/schemas.py                  39      1    97%   40
 03-development/src/taskq_api/repository/__init__.py              0      0   100%
@@ -37,10 +38,11 @@ Name                                                         Stmts   Miss  Cover
 03-development/src/taskq_api/repository/task_repo.py            52     38    27%   36-50, 53, 61-66, 69-77, 84-86, 90-99, 112-119
 03-development/src/taskq_api/service/__init__.py                 0      0   100%
 03-development/src/taskq_api/service/auth.py                    19      1    95%   89
+03-development/src/taskq_api/service/metrics.py                 12      0   100%
 03-development/src/taskq_api/service/ratelimit.py               10      5    50%   61-62, 78-80
 03-development/src/taskq_api/service/runner.py                 208      0   100%
 ------------------------------------------------------------------------------------------
-TOTAL                                                          769     81    89%
+TOTAL                                                          806     81    90%
 
 =========================== short test summary info ============================
 FAILED 03-development/tests/test_fr01.py::test_create_task_valid - AssertionE...
@@ -63,7 +65,7 @@ FAILED 03-development/tests/test_fr02.py::test_delete_task_returns_204_and_invok
 FAILED 03-development/tests/test_fr02.py::test_execute_and_record_swallows_non_cancel_exception
 FAILED 03-development/tests/test_fr02.py::test_drain_pipes_returns_empty_on_exception
 FAILED 03-development/tests/test_fr02.py::test_run_task_timeout_handles_process_already_exited
-20 failed, 93 passed, 1 warning in 10.10s
+20 failed, 101 passed, 1 warning in 10.08s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 

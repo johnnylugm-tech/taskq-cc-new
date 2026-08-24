@@ -10,7 +10,7 @@ Import Linter
 Contracts
 ---------
 
-Analyzed 19 files, 14 dependencies.
+Analyzed 21 files, 16 dependencies.
 -----------------------------------
 
 no_circular_dependencies KEPT
