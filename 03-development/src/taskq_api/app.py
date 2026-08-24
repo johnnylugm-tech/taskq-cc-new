@@ -23,14 +23,13 @@ from collections.abc import Mapping
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
 from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_RATE_LIMITED, TYPE_UNAUTHENTICATED
 from taskq_api.api.health import router as health_router
 from taskq_api.api.metrics import router as metrics_router
 from taskq_api.api.tasks import router as tasks_router
-from taskq_api.service.metrics import metrics_payload
 
 
 # Stable type URIs for the problem+json responses. Errors reference these
