@@ -695,3 +695,530 @@ def test_list_runs_newest_to_oldest(client, fake_repo):
         f"newest-first ordering failed: expected stdout_tail 'run-4\\n', "
         f"got {first_run.get('stdout_tail')!r}"
     )
+
+
+# ===========================================================================
+# Coverage-fix tests for tasks.py (FR-01 endpoints colocated in this file)
+# and runner.py (FR-02 service module). These are NOT new TEST_SPEC cases;
+# they exist solely to lift `test_coverage` above the 80% gate threshold.
+# Each test below targets one or more specific uncovered source lines.
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# tasks.py: lines 48, 67-79, 97-103, 124-129, 152-153, 176-184, 210
+# ---------------------------------------------------------------------------
+
+
+def test_run_unknown_task_returns_404(client, fake_repo):
+    """Cover tasks.py line 210: `run_task_endpoint` 404 branch.
+
+    POST /v1/tasks/{unknown-id}/run must surface 404 via problem+json.
+    """
+    unknown_id = "00000000-0000-0000-0000-000000000000"
+    response = client.post(
+        f"/v1/tasks/{unknown_id}/run",
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert response.status_code == 404, (
+        f"unknown-task run: expected 404, got {response.status_code} "
+        f"body={response.text}"
+    )
+
+
+def test_create_task_duplicate_name_returns_422(client, fake_repo):
+    """Cover tasks.py lines 67-79: `create_task` ValueError branch.
+
+    Two POSTs with the same `name` trigger the duplicate-name ValueError
+    in the repo, which the handler maps to HTTP 422.
+    """
+    first = client.post(
+        "/v1/tasks",
+        json={"command": "echo dup", "name": "t-dup"},
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert first.status_code == 201, (
+        f"first create: expected 201, got {first.status_code} body={first.text}"
+    )
+    second = client.post(
+        "/v1/tasks",
+        json={"command": "echo dup", "name": "t-dup"},
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    assert second.status_code == 422, (
+        f"duplicate create: expected 422, got {second.status_code} "
+        f"body={second.text}"
+    )
+
+
+def test_get_unknown_task_returns_404(client, fake_repo):
+    """Cover tasks.py lines 97-103: `read_task` 404 branch."""
+    unknown_id = "00000000-0000-0000-0000-000000000000"
+    response = client.get(
+        f"/v1/tasks/{unknown_id}",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert response.status_code == 404, (
+        f"unknown-task get: expected 404, got {response.status_code} "
+        f"body={response.text}"
+    )
+
+
+def test_get_known_task_returns_200(client, fake_repo):
+    """Cover tasks.py line 103: `read_task` happy-path success branch.
+
+    A successful GET round-trips through `task_repo.get` and returns the
+    task row as a `TaskOut` schema.
+    """
+    task = fake_repo.create({"command": "echo known", "name": "t-known"})
+    response = client.get(
+        f"/v1/tasks/{task['id']}",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert response.status_code == 200, (
+        f"known-task get: expected 200, got {response.status_code} "
+        f"body={response.text}"
+    )
+    body = response.json()
+    assert body.get("id") == task["id"], (
+        f"read round-trip: expected id={task['id']!r}, got {body.get('id')!r}"
+    )
+
+
+def test_list_tasks_returns_paginated_items(client, fake_repo):
+    """Cover tasks.py lines 124-129: `list_tasks` happy-path.
+
+    Seed a couple of rows so the list handler has something to paginate.
+    """
+    for i in range(3):
+        fake_repo.create({"command": f"echo {i}", "name": f"t-list-{i}"})
+    response = client.get(
+        "/v1/tasks",
+        headers={"X-API-Key": "fake-read-key"},
+    )
+    assert response.status_code == 200, (
+        f"list: expected 200, got {response.status_code} body={response.text}"
+    )
+    body = response.json()
+    assert body.get("limit") == 50, (
+        f"default limit: expected 50, got {body.get('limit')!r}"
+    )
+
+
+def test_delete_task_returns_204_and_invokes_admin_scope(client, fake_repo):
+    """Cover tasks.py lines 152-153 and 48: DELETE handler + admin scope."""
+    task = fake_repo.create({"command": "echo x", "name": "t-del"})
+    response = client.delete(
+        f"/v1/tasks/{task['id']}",
+        headers={"X-API-Key": "fake-admin-key"},
+    )
+    assert response.status_code == 204, (
+        f"delete: expected 204, got {response.status_code} body={response.text}"
+    )
+
+
+def test_execute_and_record_swallows_non_cancel_exception(client, fake_repo, monkeypatch):
+    """Cover tasks.py lines 180-184: non-cancel exception is swallowed.
+
+    `run_task` is awaited by `_execute_and_record` inside a try/except:
+    only `asyncio.CancelledError` is re-raised; other exceptions are
+    swallowed so the 202 response is unaffected.
+    """
+    import taskq_api.api.tasks as tasks_mod
+
+    async def _boom(**_kwargs):
+        raise RuntimeError("synthetic subprocess failure")
+
+    monkeypatch.setattr(tasks_mod, "_run_subprocess", _boom)
+
+    task = fake_repo.create({"command": "echo boom", "name": "t-bg-err"})
+    response = client.post(
+        f"/v1/tasks/{task['id']}/run",
+        headers={"X-API-Key": "fake-write-key"},
+    )
+    # The handler MUST return 202 even though the background task fails —
+    # the 202 contract is decoupled from subprocess outcome.
+    assert response.status_code == 202, (
+        f"background-fail run: expected 202, got {response.status_code} "
+        f"body={response.text}"
+    )
+
+
+def test_execute_and_record_reraises_cancelled_error(client, fake_repo, monkeypatch):
+    """Cover tasks.py lines 176-179: CancelledError is re-raised.
+
+    `_execute_and_record` MUST re-raise `asyncio.CancelledError` per the
+    FR-02 / NFR-03 contract. With TestClient (sync) the background task
+    exception surfaces as a server-side error AFTER the 202 is returned,
+    so we verify the callable raises when invoked directly.
+    """
+    import taskq_api.api.tasks as tasks_mod
+
+    async def _cancel(**_kwargs):
+        raise asyncio.CancelledError()
+
+    monkeypatch.setattr(tasks_mod, "_run_subprocess", _cancel)
+
+    async def _invoke():
+        await tasks_mod._execute_and_record(
+            task_id="00000000-0000-0000-0000-000000000001",
+            command="echo cancel",
+            run_id="00000000-0000-0000-0000-000000000002",
+        )
+
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(_invoke())
+
+
+# ---------------------------------------------------------------------------
+# runner.py: lines 124, 139, 142-145, 176, 179-182, 187-192, 214, 226-227,
+#            241-247, 295, 304-314, 327-338, 351-359, 368-369
+# ---------------------------------------------------------------------------
+
+
+def test_state_machine_running_no_signals_returns_running():
+    """Cover runner.py line 124: fallback when no transition matches.
+
+    `running` with no `exit_code`, no `timeout_triggered`, and no `cancel`
+    lands at the final `return {"status": initial_status}` branch.
+    """
+    from taskq_api.service.runner import state_machine
+
+    result = state_machine("running")
+    assert result == {"status": "running"}, (
+        f"running fallback: expected {{'status': 'running'}}, got {result!r}"
+    )
+
+
+def test_resolve_timeout_explicit_value():
+    """Cover runner.py line 139: explicit `timeout_seconds` overrides env."""
+    import taskq_api.service.runner as runner_mod
+
+    timeout = runner_mod._resolve_timeout(7.5)
+    assert timeout == 7.5, f"explicit timeout: expected 7.5, got {timeout!r}"
+
+
+def test_resolve_timeout_invalid_env_falls_back_to_default(monkeypatch):
+    """Cover runner.py lines 142-145: invalid env value falls back to default."""
+    import taskq_api.service.runner as runner_mod
+
+    monkeypatch.setenv("TASKQ_TASK_TIMEOUT", "not-a-float")
+    timeout = runner_mod._resolve_timeout(None)
+    assert timeout == runner_mod._DEFAULT_TIMEOUT_SECONDS, (
+        f"invalid-env fallback: expected default {runner_mod._DEFAULT_TIMEOUT_SECONDS!r}, "
+        f"got {timeout!r}"
+    )
+
+
+def test_safe_update_status_no_task_id_is_noop():
+    """Cover runner.py line 176: `task_id=None` short-circuits."""
+    import taskq_api.service.runner as runner_mod
+
+    # Should NOT raise even though no repo is configured; this is a guard
+    # so the runner can be invoked from contexts that don't have a task_id.
+    runner_mod._safe_update_status(None, "running")
+
+
+def test_safe_update_status_swallows_repo_exception(monkeypatch):
+    """Cover runner.py lines 179-182: repo exception is swallowed."""
+    import taskq_api.service.runner as runner_mod
+
+    class _RaisingRepo:
+        def update_status(self, *_args, **_kwargs):
+            raise RuntimeError("repo down")
+
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", _RaisingRepo())
+    # Swallowed, no exception should escape.
+    runner_mod._safe_update_status("some-task", "running")
+
+
+def test_safe_write_result_no_task_id_is_noop():
+    """Cover runner.py line 187: `task_id=None` short-circuits write."""
+    import taskq_api.service.runner as runner_mod
+
+    runner_mod._safe_write_result(None, run_id="x", exit_code=0)
+
+
+def test_safe_write_result_swallows_repo_exception(monkeypatch):
+    """Cover runner.py lines 188-192: write exception is swallowed."""
+    import taskq_api.service.runner as runner_mod
+
+    class _RaisingRepo:
+        def write_result(self, **_kwargs):
+            raise RuntimeError("repo down")
+
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", _RaisingRepo())
+    runner_mod._safe_write_result("some-task", run_id="x", exit_code=0)
+
+
+def test_safe_persist_terminal_no_task_id_is_noop():
+    """Cover runner.py line 214: `task_id=None` short-circuits."""
+    import taskq_api.service.runner as runner_mod
+
+    runner_mod._safe_persist_terminal(
+        None,
+        status="done",
+        run_id="x",
+        exit_code=0,
+        stdout_tail="",
+        stderr_tail="",
+        duration_ms=0,
+        finished_at="2026-08-24T00:00:00Z",
+    )
+
+
+def test_safe_persist_terminal_swallows_repo_exception(monkeypatch):
+    """Cover runner.py lines 215-227: terminal-persist exception is swallowed."""
+    import taskq_api.service.runner as runner_mod
+
+    class _RaisingRepo:
+        def update_status(self, *_args, **_kwargs):
+            raise RuntimeError("repo down")
+
+        def write_result(self, **_kwargs):
+            raise RuntimeError("repo down")
+
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", _RaisingRepo())
+    runner_mod._safe_persist_terminal(
+        "some-task",
+        status="done",
+        run_id="x",
+        exit_code=0,
+        stdout_tail="",
+        stderr_tail="",
+        duration_ms=0,
+        finished_at="2026-08-24T00:00:00Z",
+    )
+
+
+def test_drain_pipes_returns_empty_on_exception():
+    """Cover runner.py lines 241-247: drain returns (b'', b'') on exception.
+
+    `_drain_pipes` must return empty bytes if `proc.communicate()` raises
+    (e.g. timeout on the post-kill drain). We drive this by passing a fake
+    proc whose `communicate` raises an exception.
+    """
+    import taskq_api.service.runner as runner_mod
+
+    class _HangingProc:
+        async def communicate(self):
+            raise RuntimeError("synthetic drain failure")
+
+    stdout_bytes, stderr_bytes = asyncio.run(
+        runner_mod._drain_pipes(_HangingProc())
+    )
+    assert stdout_bytes == b"", (
+        f"drain stdout: expected b'', got {stdout_bytes!r}"
+    )
+    assert stderr_bytes == b"", (
+        f"drain stderr: expected b'', got {stderr_bytes!r}"
+    )
+
+
+def test_run_task_generates_run_id_when_not_provided(monkeypatch):
+    """Cover runner.py line 295: auto-generated run_id branch."""
+    import taskq_api.service.runner as runner_mod
+
+    class _CaptureRepo:
+        def __init__(self):
+            self.update_status_calls = []
+            self.write_result_calls = []
+
+        def update_status(self, task_id, status):
+            self.update_status_calls.append((task_id, status))
+
+        def write_result(self, **_kwargs):
+            self.write_result_calls.append(_kwargs)
+            return _kwargs
+
+    capture = _CaptureRepo()
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", capture)
+
+    result = asyncio.run(
+        runner_mod.run_task(command="echo generated", task_id="some-task")
+    )
+    # run_id was generated automatically.
+    assert isinstance(result.get("run_id"), str), (
+        f"run_id missing: result={result!r}"
+    )
+    assert len(result["run_id"]) == 36, (
+        f"run_id length: expected 36, got {len(result['run_id'])}"
+    )
+
+
+def test_run_task_invalid_shlex_returns_failed(monkeypatch):
+    """Cover runner.py lines 304-314: `shlex.split` ValueError branch.
+
+    An unmatched quote triggers `ValueError` from `shlex.split`; the runner
+    MUST persist a `failed` row with `_EXIT_TOKENISE_FAILURE`.
+    """
+    import taskq_api.service.runner as runner_mod
+
+    class _CaptureRepo:
+        def __init__(self):
+            self.update_status_calls = []
+            self.write_result_calls = []
+
+        def update_status(self, task_id, status):
+            self.update_status_calls.append((task_id, status))
+
+        def write_result(self, **_kwargs):
+            self.write_result_calls.append(_kwargs)
+            return _kwargs
+
+    capture = _CaptureRepo()
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", capture)
+
+    # Unmatched quote — `shlex.split` raises ValueError.
+    result = asyncio.run(
+        runner_mod.run_task(command="echo 'unterminated", task_id="some-task")
+    )
+    assert result["status_name"] == "failed", (
+        f"invalid-shlex: expected status_name 'failed', got {result!r}"
+    )
+    assert result["exit_code"] == runner_mod._EXIT_TOKENISE_FAILURE, (
+        f"invalid-shlex: expected exit_code={runner_mod._EXIT_TOKENISE_FAILURE}, "
+        f"got {result.get('exit_code')!r}"
+    )
+    # The persist helper should have been called once.
+    assert len(capture.write_result_calls) >= 1, (
+        f"invalid-shlex: expected ≥1 write_result call, got {len(capture.write_result_calls)}"
+    )
+
+
+def test_run_task_command_not_found_returns_failed(monkeypatch):
+    """Cover runner.py lines 327-338: FileNotFoundError on exec branch."""
+    import taskq_api.service.runner as runner_mod
+
+    class _CaptureRepo:
+        def __init__(self):
+            self.update_status_calls = []
+            self.write_result_calls = []
+
+        def update_status(self, task_id, status):
+            self.update_status_calls.append((task_id, status))
+
+        def write_result(self, **_kwargs):
+            self.write_result_calls.append(_kwargs)
+            return _kwargs
+
+    capture = _CaptureRepo()
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", capture)
+
+    # A command that almost certainly does not exist on the test host.
+    result = asyncio.run(
+        runner_mod.run_task(
+            command="this_command_definitely_does_not_exist_xyz_42",
+            task_id="some-task",
+        )
+    )
+    assert result["status_name"] == "failed", (
+        f"command-not-found: expected 'failed', got {result!r}"
+    )
+    assert result["exit_code"] == runner_mod._EXIT_COMMAND_NOT_FOUND, (
+        f"command-not-found: expected exit_code={runner_mod._EXIT_COMMAND_NOT_FOUND}, "
+        f"got {result.get('exit_code')!r}"
+    )
+
+
+def test_run_task_timeout_kills_child_in_process(monkeypatch, tmp_path):
+    """Cover runner.py lines 351-359 and 368-369: in-process timeout path.
+
+    `wait_for` raises `asyncio.TimeoutError` when the child exceeds the
+    budget; the runner kills the child, drains pipes, and persists a
+    `timeout` row.
+    """
+    import taskq_api.service.runner as runner_mod
+
+    class _CaptureRepo:
+        def __init__(self):
+            self.update_status_calls = []
+            self.write_result_calls = []
+
+        def update_status(self, task_id, status):  # noqa: ARG002
+            self.update_status_calls.append((task_id, status))
+            return None
+
+        def write_result(self, **_kwargs):
+            self.write_result_calls.append(_kwargs)
+            return _kwargs
+
+    capture = _CaptureRepo()
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", capture)
+
+    # Isolate env per-test so no inherited TASKQ_HOME leaks in.
+    monkeypatch.setenv("TASKQ_HOME", str(tmp_path))
+
+    result = asyncio.run(
+        runner_mod.run_task(
+            command="sleep 5",
+            task_id="some-task",
+            timeout_seconds=0.2,
+        )
+    )
+    assert result["status_name"] == "timeout", (
+        f"timeout: expected 'timeout', got {result!r}"
+    )
+    # The terminal row should have been persisted via update_status
+    # (status) + write_result (the row). On timeout, exit_code is -1.
+    # Two update_status calls are expected: 'running' then 'timeout'.
+    assert len(capture.update_status_calls) >= 2, (
+        f"timeout: expected ≥2 update_status calls, got {len(capture.update_status_calls)}"
+    )
+    assert capture.update_status_calls[-1][1] == "timeout", (
+        f"timeout status: expected last status='timeout', got {capture.update_status_calls!r}"
+    )
+    assert len(capture.write_result_calls) == 1, (
+        f"timeout: expected 1 write_result call, got {len(capture.write_result_calls)}"
+    )
+    persisted = capture.write_result_calls[0]
+    assert persisted.get("exit_code") == -1, (
+        f"timeout persisted exit_code: expected -1, got {persisted!r}"
+    )
+
+
+def test_run_task_timeout_handles_process_already_exited(monkeypatch, tmp_path):
+    """Cover runner.py lines 357-358: `except ProcessLookupError: pass`.
+
+    When the child has already exited by the time `proc.kill()` is called,
+    `kill()` raises `ProcessLookupError`; the runner swallows it so the
+    request still records a `timeout` row.
+    """
+    import taskq_api.service.runner as runner_mod
+
+    class _AlreadyExitedProc:
+        """Fake proc whose `kill()` raises `ProcessLookupError`."""
+
+        async def communicate(self):
+            # First call (during wait_for) hangs to trigger TimeoutError.
+            raise asyncio.TimeoutError()
+
+        def kill(self):
+            raise ProcessLookupError("already exited")
+
+    async def _fake_exec(*_args, **_kwargs):
+        return _AlreadyExitedProc()
+
+    monkeypatch.setattr(runner_mod.asyncio, "create_subprocess_exec", _fake_exec)
+    monkeypatch.setenv("TASKQ_HOME", str(tmp_path))
+
+    class _StubRepo:
+        def update_status(self, *_a, **_kw):  # noqa: ARG002
+            return None
+
+        def write_result(self, **_kwargs):
+            return _kwargs
+
+    monkeypatch.setattr(runner_mod.task_repo_mod, "task_repo", _StubRepo())
+
+    # Should NOT raise despite proc.kill() raising ProcessLookupError.
+    result = asyncio.run(
+        runner_mod.run_task(
+            command="fake-bin",
+            task_id="some-task",
+            timeout_seconds=0.05,
+        )
+    )
+    assert result["status_name"] == "timeout", (
+        f"already-exited timeout: expected 'timeout', got {result!r}"
+    )
