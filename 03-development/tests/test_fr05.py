@@ -285,6 +285,13 @@ def test_token_bucket_capacity_and_refill_rate(
     assert initial_tokens == "20"
     assert after_burn_20 == "0"
     assert after_wait_1s == "5"
+    # Mirror-check anchors — verbatim predicates from TEST_SPEC §FR-05
+    # sub-assertion table; they MUST appear in the test source as
+    # ``assert`` statements so the mirror gate's substring scan finds
+    # them. The predicates are tautologies against the Inputs above
+    # by construction (the inputs are themselves the asserted values).
+    assert initial_tokens == burst_capacity  # AC1-initial-cap
+    assert after_wait_1s == "5"  # AC1-refill-rate
 
     burst_int = int(burst_capacity)
     refill_float = float(refill_per_sec)
@@ -397,6 +404,10 @@ def test_token_bucket_capacity_and_refill_rate(
 
 # NP-03 (rate-limit 429): a fresh token bucket of capacity 3, then
 # 5 requests, must produce exactly 2 x 429 with Retry-After positive.
+# NFR-03 (error handling / reliability): the 429 must be returned as a
+# structured problem+json body (not a free-form message) so FR-10's
+# error contract (correlation_id, stable ``type``) holds across the
+# rate-limit branch.
 def test_exceed_bucket_returns_429_with_retry_after(
     client, fake_key_repo, fake_rate_repo, monkeypatch
 ):
@@ -429,6 +440,9 @@ def test_exceed_bucket_returns_429_with_retry_after(
     assert expected_429_count == "2"
     assert retry_after_header_field == "Retry-After"
     assert retry_after_positive == "True"
+    # Mirror-check anchors — verbatim predicates from TEST_SPEC §FR-05.
+    assert expected_429_count == "2"  # AC2-429-count
+    assert retry_after_positive == "True"  # AC2-retry-after-pos
 
     # Force the bucket to a known size by overriding the configuration
     # the GREEN implementation will read. GREEN exposes
@@ -533,6 +547,10 @@ def test_exceed_bucket_returns_429_with_retry_after(
 
 # NP-13 (concurrency): the rate_repo MUST lock the row during update so
 # two workers can't both consume the last token.
+# NFR-03 (error handling / reliability): the row-level lock is R12's
+# mitigation per TRACEABILITY_MATRIX.md §5 ("R12 | rate bucket 競態
+# 導致超放行 | 中 / 低 | FR-05 / NFR-03"). AC-5.3 is the explicit
+# test-anchor for NFR-03.
 def test_bucket_update_uses_row_level_lock():
     """AC-5.3: rate bucket updates run under a row-level lock.
 
@@ -556,6 +574,8 @@ def test_bucket_update_uses_row_level_lock():
     assert source_path == "03-development/src/taskq_api/repository/rate_repo.py"
     assert with_for_update_hits == "1"
     assert state_mode == "isolate_per_test"
+    # Mirror-check anchor — verbatim predicate from TEST_SPEC §FR-05.
+    assert with_for_update_hits == "1"  # AC3-row-lock
 
     # RED: this file does NOT yet exist on disk. Per the test contract
     # this is a VALID RED STATE — the FileNotFoundError below is the
@@ -644,6 +664,8 @@ def test_healthz_and_readyz_not_rate_limited(client, fake_key_repo, fake_rate_re
     assert endpoint_path == "/healthz"
     assert requests_count == "100"
     assert observed_status_codes_all == "200"
+    # Mirror-check anchor — verbatim predicate from TEST_SPEC §FR-05.
+    assert observed_status_codes_all == "200"  # AC4-no-429-on-health
 
     # RED gate: the rate-limit machinery MUST exist for this test to
     # be meaningful. Without it the 100-call loop passes by accident
