@@ -93,6 +93,8 @@ _FULL_SRC_DIR = _SRC_ROOT
 # (and ``models/``). We verify the invariant by scanning every Python
 # source under ``service/`` and ``api/`` for ``import sqlalchemy`` /
 # ``from sqlalchemy`` and asserting the count is zero.
+#
+# NFR-06: layers contract + forbidden sqlalchemy import (TRACEABILITY §5)
 def test_all_data_access_via_repository_layer():
     """AC-6.1: no SQLAlchemy imports above the repository layer.
 
@@ -183,6 +185,8 @@ def test_all_data_access_via_repository_layer():
 # session is opened by a context manager that commits on success and
 # rolls back on exception — this is the per-request transaction
 # boundary the FR-06 contract demands.
+#
+# NFR-03: explicit per-request transaction boundary (TRACEABILITY §5 R10)
 #
 # The runtime check inspects the GREEN ``session_mod`` module for a
 # context-manager helper (``session_scope`` is the conventional name;
@@ -375,6 +379,8 @@ def test_one_session_per_request_with_context_manager():
 # forbidden concatenation patterns: f-strings containing SQL keywords,
 # ``%``-format strings containing SQL keywords, and ``+`` concatenation
 # of strings containing SQL keywords.
+#
+# NFR-02: no string-concat SQL anywhere under ``taskq_api/`` (TRACEABILITY §5 R2)
 def test_no_string_concat_sql_uses_orm_or_param():
     """AC-6.3: no string-concatenated SQL anywhere under ``taskq_api/``.
 
@@ -517,6 +523,8 @@ def test_no_string_concat_sql_uses_orm_or_param():
 # a failure condition. The relationship-load contract
 # (``selectinload`` / ``joinedload``) is what makes the statement count
 # independent of the row count.
+#
+# NFR-01: constant-SQL-count invariant for the list endpoint (TRACEABILITY §5 R5)
 #
 # The runtime check is a SQLAlchemy event listener attached to the
 # GREEN ``session_mod.engine`` that counts ``before_cursor_execute``
