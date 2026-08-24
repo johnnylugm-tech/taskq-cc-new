@@ -65,7 +65,8 @@
         {
           "name": "taskq_api.repository.rate_repo"
         },
-        "taskq_api.repository"
+        "taskq_api.repository",
+        "taskq_api.repository.orm"
       ],
       "allowed_dependencies": [
         "models"
