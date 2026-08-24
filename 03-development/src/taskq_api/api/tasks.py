@@ -14,6 +14,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
+import taskq_api.repository.task_repo as task_repo_mod
 from taskq_api.api import deps
 from taskq_api.models.schemas import TaskCreate, TaskList, TaskOut
 
@@ -23,6 +24,15 @@ from taskq_api.models.schemas import TaskCreate, TaskList, TaskOut
 router = APIRouter(prefix="/v1/tasks", tags=["tasks"])
 
 
+# Scope dependency callables — the lambda wrapper around `deps.require_scope`
+# is intentional: the test fixture overrides the factory symbol itself, so
+# the wrapper must invoke it at request time (not at module-load time) for
+# the override to take effect.
+_require_write = lambda: deps.require_scope("write")
+_require_read = lambda: deps.require_scope("read")
+_require_admin = lambda: deps.require_scope("admin")
+
+
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
@@ -30,7 +40,7 @@ router = APIRouter(prefix="/v1/tasks", tags=["tasks"])
 )
 def create_task(
     body: TaskCreate,
-    _principal: dict = Depends(lambda: deps.require_scope("write")),
+    _principal: dict = Depends(_require_write),
 ) -> TaskOut:
     """Create a task. AC-1.1 / AC-1.2.
 
@@ -39,8 +49,6 @@ def create_task(
       - FR-01: POST /v1/tasks handler.
       - FR-06: delegates to `task_repo.task_repo.create`.
     """
-    import taskq_api.repository.task_repo as task_repo_mod
-
     try:
         row = task_repo_mod.task_repo.create(
             {"command": body.command, "name": body.name},
@@ -62,7 +70,7 @@ def create_task(
 )
 def read_task(
     task_id: UUID,
-    _principal: dict = Depends(lambda: deps.require_scope("read")),
+    _principal: dict = Depends(_require_read),
 ) -> TaskOut:
     """Fetch a single task by id. AC-1.3.
 
@@ -71,8 +79,6 @@ def read_task(
       - FR-01: GET /v1/tasks/{id} handler.
       - FR-06: delegates to `task_repo.task_repo.get`.
     """
-    import taskq_api.repository.task_repo as task_repo_mod
-
     row = task_repo_mod.task_repo.get(str(task_id))
     if row is None:
         raise HTTPException(
@@ -90,7 +96,7 @@ def list_tasks(
     status_filter: str | None = Query(default=None, alias="status"),
     cursor: str | None = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
-    _principal: dict = Depends(lambda: deps.require_scope("read")),
+    _principal: dict = Depends(_require_read),
 ) -> TaskList:
     """Cursor-paginated list. AC-1.4 / AC-1.5.
 
@@ -100,8 +106,6 @@ def list_tasks(
         default `limit=50`, upper bound `200`, exceeded -> 422.
       - FR-06: delegates to `task_repo.task_repo.list`.
     """
-    import taskq_api.repository.task_repo as task_repo_mod
-
     items, next_cursor = task_repo_mod.task_repo.list(
         status=status_filter,
         cursor=cursor,
@@ -121,7 +125,7 @@ def list_tasks(
 )
 def delete_task(
     task_id: UUID,
-    _principal: dict = Depends(lambda: deps.require_scope("admin")),
+    _principal: dict = Depends(_require_admin),
 ) -> Response:
     """Delete a task and its result rows in one tx. AC-1.6.
 
@@ -130,7 +134,5 @@ def delete_task(
       - FR-01: DELETE /v1/tasks/{id} handler — task + results in single tx.
       - FR-06: delegates to `task_repo.task_repo.delete_with_results`.
     """
-    import taskq_api.repository.task_repo as task_repo_mod
-
     task_repo_mod.task_repo.delete_with_results(str(task_id))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
