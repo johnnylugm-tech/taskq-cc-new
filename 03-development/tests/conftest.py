@@ -40,3 +40,12 @@ def pytest_collection_modifyitems(config, items):
         mod._RUNNER_SOURCE = Path(
             "03-development/src/taskq_api/service/runner.py"
         )
+
+    # [FR-03]
+    # Citations:
+    #   - FR-03 AC-3.3: Gate-1 phantom check on the auth module path.
+    auth_mod = sys.modules.get("test_fr03")
+    if auth_mod is not None and hasattr(auth_mod, "_AUTH_SOURCE"):
+        auth_mod._AUTH_SOURCE = Path(
+            "03-development/src/taskq_api/service/auth.py"
+        )

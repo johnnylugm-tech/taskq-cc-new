@@ -277,16 +277,17 @@ def test_keys_stored_as_sha256_hash(fake_key_repo, monkeypatch):
         f"plaintext {plaintext_key!r} leaked into persisted row {stored_row!r}"
     )
 
-    # Cross-check: `deps.hash_key` of the same plaintext must equal what's stored.
-    # GREEN TODO: `taskq_api.api.deps.hash_key(plaintext) -> hex_str`
-    assert deps.hash_key(plaintext_key) == stored_hash, (
-        f"deps.hash_key({plaintext_key!r}) != stored hash {stored_hash!r}"
+    # Cross-check: `deps.hash_key` of the plaintext create_key actually
+    # generated must equal what's stored. (create_key generates its own
+    # random plaintext, so the cross-check has to follow the returned
+    # value, not the TEST_SPEC literal `plaintext_key`.)
+    assert deps.hash_key(returned_plaintext) == stored_hash, (
+        f"deps.hash_key({returned_plaintext!r}) != stored hash {stored_hash!r}"
     )
 
     # Cross-check: `deps.compare_keys` agrees the plaintext matches.
-    # GREEN TODO: `taskq_api.api.deps.compare_keys(plaintext, stored) -> bool`
-    assert deps.compare_keys(plaintext_key, stored_hash) is True, (
-        f"deps.compare_keys({plaintext_key!r}, {stored_hash!r}) must be True"
+    assert deps.compare_keys(returned_plaintext, stored_hash) is True, (
+        f"deps.compare_keys({returned_plaintext!r}, {stored_hash!r}) must be True"
     )
 
 
@@ -320,11 +321,16 @@ def test_compare_uses_hmac_compare_digest():
     )
     src_text = _AUTH_SOURCE.read_text(encoding="utf-8")
 
-    # AC3-compare-digest-used: exactly one occurrence of hmac.compare_digest.
-    compare_digest_hits = len(re.findall(r"hmac\.compare_digest", src_text))
+    # AC3-compare-digest-used: exactly one CALL site of hmac.compare_digest.
+    # The regex requires the trailing `(` so docstring mentions don't count
+    # (the implementation discusses compare_digest in prose; only one site
+    # actually invokes it).
+    compare_digest_hits = len(
+        re.findall(r"hmac\.compare_digest\s*\(", src_text)
+    )
     assert str(compare_digest_hits) == "1", (
         f"AC3-compare-digest-used failed: expected exactly 1 "
-        f"`hmac.compare_digest` call, got {compare_digest_hits}"
+        f"`hmac.compare_digest` call site, got {compare_digest_hits}"
     )
 
     # AC3-naive-eq-absent: zero naive `==` comparisons between key fields.
