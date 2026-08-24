@@ -18,7 +18,8 @@
         },
         {
           "name": "taskq_api.errors"
-        }
+        },
+        "taskq_api.api"
       ],
       "allowed_dependencies": [
         "service"
@@ -61,7 +62,8 @@
         },
         {
           "name": "taskq_api.repository.rate_repo"
-        }
+        },
+        "taskq_api.repository"
       ],
       "allowed_dependencies": [
         "models"
@@ -75,7 +77,10 @@
         },
         {
           "name": "taskq_api.models.schemas"
-        }
+        },
+        "taskq_api",
+        "taskq_api.app",
+        "taskq_api.models"
       ],
       "allowed_dependencies": []
     }
