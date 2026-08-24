@@ -1326,3 +1326,123 @@ def test_drain_pipes_timeout_fallback(monkeypatch):
     out, err = asyncio.run(_exercise())
     assert out == b"", f"_drain_pipes timeout must return b''; got {out!r}"
     assert err == b"", f"_drain_pipes timeout must return b''; got {err!r}"
+
+
+# ---------------------------------------------------------------------------
+# _safe_persist_terminal — write_result fails AFTER update_status succeeds.
+# Covers line 287 of runner.py. The previous safe-helpers test makes
+# ``update_status`` raise, so ``write_result`` (line 287) is never reached.
+# This test swaps the order: ``update_status`` succeeds, ``write_result``
+# raises — exercising the second branch inside the same try-block.
+# ---------------------------------------------------------------------------
+def test_safe_persist_terminal_write_result_fails(monkeypatch):
+    """``_safe_persist_terminal`` swallows write_result OSError after a successful update_status."""
+    from taskq_api.service import runner as r
+
+    fake_repo = r.task_repo_mod.task_repo
+    monkeypatch.setattr(
+        fake_repo, "update_status", lambda *a, **k: None,
+    )
+    monkeypatch.setattr(
+        fake_repo, "write_result",
+        lambda *a, **k: (_ for _ in ()).throw(OSError("down")),
+    )
+
+    # Must NOT raise — best-effort persistence contract holds.
+    r._safe_persist_terminal(
+        "task-fake",
+        status="done",
+        run_id="r",
+        exit_code=0,
+        stdout_tail="",
+        stderr_tail="",
+        duration_ms=0,
+        finished_at="",
+    )
+
+
+# ---------------------------------------------------------------------------
+# _reap_after_kill — explicit ``await proc.wait()`` raises
+# ``asyncio.TimeoutError`` (not ``ProcessLookupError``). Covers lines
+# 336-340 of runner.py. The previous reap test triggers the kill()
+# ProcessLookupError branch, but wait() returns immediately without
+# raising, so the wait() except clause is never entered. Here we use a
+# fake ``proc`` whose ``wait()`` raises ``asyncio.TimeoutError``.
+# ---------------------------------------------------------------------------
+def test_reap_after_kill_wait_timeout_handled():
+    """``_reap_after_kill`` swallows ``asyncio.TimeoutError`` from ``await proc.wait()``."""
+    from taskq_api.service.runner import _reap_after_kill
+
+    class _FakeProc:
+        """Minimal stub that satisfies ``_reap_after_kill`` and raises on wait()."""
+
+        def kill(self) -> None:
+            # No-op — kill() does not raise here, so we proceed to wait().
+            return None
+
+        async def wait(self) -> int:
+            # Force the except (ProcessLookupError, asyncio.TimeoutError)
+            # arm to fire at lines 336-340.
+            raise asyncio.TimeoutError
+
+    async def _exercise() -> None:
+        await _reap_after_kill(_FakeProc())  # type: ignore[arg-type]
+
+    asyncio.run(_exercise())  # must not raise
+
+
+# ---------------------------------------------------------------------------
+# _structured_drain_tasks — direct call that guarantees the cancel loop
+# at line 667-669 fires. Submits a task to a Scheduler with max=1,
+# yields once, then drains with a 0.05s budget against a 5s sleep so
+# the timeout path MUST execute the cancel branch.
+# ---------------------------------------------------------------------------
+def test_structured_drain_tasks_cancel_loop_direct_call():
+    """``_structured_drain_tasks`` with a real task list MUST cancel pending tasks on timeout."""
+    from taskq_api.service.runner import Scheduler
+
+    async def _slow() -> str:
+        await asyncio.sleep(5.0)
+        return "unreachable"
+
+    async def _exercise() -> dict[str, int]:
+        sch = Scheduler(max_concurrent=1)
+        sch.submit(_slow())
+        # Yield so the task enters _runner() and starts awaiting sleep.
+        await asyncio.sleep(0)
+        # Drain with budget far smaller than sleep — must hit line 669.
+        return await sch.drain(timeout=0.05)
+
+    report = asyncio.run(_exercise())
+    # Drain reports the slow task as interrupted (cancelled).
+    assert report["interrupted_count"] >= 1, (
+        f"drain with 0.05s budget must cancel the slow task; got {report!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# ``_structured_drain_tasks`` — direct invocation with a manually
+# constructed unfinished task so we control exactly which lines fire.
+# This is a backstop for line 669 in case the Scheduler-wrapped path
+# above happens to complete too quickly on certain platforms.
+# ---------------------------------------------------------------------------
+def test_structured_drain_tasks_cancel_unfinished_task():
+    """Direct call to ``_structured_drain_tasks`` with an unfinished asyncio.Task fires cancel."""
+    from taskq_api.service.runner import _structured_drain_tasks
+
+    async def _slow() -> str:
+        await asyncio.sleep(5.0)
+        return "unreachable"
+
+    async def _exercise() -> dict[str, int]:
+        # Create the task on this loop, then yield so it starts awaiting.
+        task = asyncio.create_task(_slow())
+        await asyncio.sleep(0)
+        # task is now awaiting sleep(5.0). Hand it to _structured_drain_tasks
+        # with a tiny budget so the cancel loop on lines 667-669 MUST fire.
+        return await _structured_drain_tasks([task], timeout=0.05)
+
+    report = asyncio.run(_exercise())
+    assert report["interrupted_count"] >= 1, (
+        f"drain with 0.05s budget must cancel the pending task; got {report!r}"
+    )
