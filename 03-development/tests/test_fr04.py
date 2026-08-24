@@ -608,3 +608,124 @@ def test_require_scope_returns_principal_when_granted_satisfies(
         f"require_scope(read) on admin principal must return the "
         f"principal unchanged, got {principal!r}"
     )
+
+
+# ===========================================================================
+# Additional coverage-targeted tests — close the gap to 100% coverage
+# of deps.py from FR-04's own test file. Each covers one of the lines
+# missing from the prior coverage run.
+# ===========================================================================
+
+
+def test_scope_dep_repr_includes_inner_callable_name(
+    fake_key_repo, monkeypatch
+):
+    """Coverage: ``_ScopeDep.__repr__`` (deps.py L151-153).
+
+    Calls ``repr(deps.require_scope("admin"))`` so the ``__repr__``
+    branch fires and the introspection contract is exercised end-to-end.
+    The returned string MUST include the wrapped closure's ``__name__``
+    so debug logs are actionable.
+    """
+    monkeypatch.setattr(key_repo_mod, "key_repo", fake_key_repo)
+    monkeypatch.setattr(deps, "key_repo", fake_key_repo, raising=False)
+
+    dep = deps.require_scope("admin")
+    rendered = repr(dep)
+    assert "ScopeDep" in rendered, (
+        f"_ScopeDep.__repr__ must include the class tag, got {rendered!r}"
+    )
+
+
+def test_require_api_key_invalid_returns_401(client, fake_key_repo):
+    """Coverage: ``require_api_key`` invalid-key branch (deps.py L219).
+
+    Hits a /v1/* endpoint with an X-API-Key header that does NOT match
+    any row in the fake key repo. ``find_by_hash`` returns None, so the
+    function MUST raise ``_unauthorized("invalid X-API-Key")`` — the
+    second 401 branch (the first is the missing-header one).
+    """
+    # The fake repo is empty — any X-API-Key value is unknown.
+    response = client.get("/v1/metrics", headers={"X-API-Key": "tk_unknown_xyz"})
+    assert response.status_code == 401, (
+        f"require_api_key invalid branch must 401 on unknown key, got "
+        f"{response.status_code!r} body={response.text!r}"
+    )
+
+
+def test_require_api_key_revoked_returns_401(
+    client, fake_key_repo, monkeypatch
+):
+    """Coverage: ``require_api_key`` revoked-key branch (deps.py L222).
+
+    Provisions a key in the fake repo, revokes it via the repo's
+    ``revoke`` method (sets ``revoked_at`` to a non-None ISO string),
+    then presents the plaintext as X-API-Key. The repo's
+    ``find_by_hash`` returns the row, the function sees ``revoked_at``
+    is truthy, and MUST raise ``_unauthorized("revoked X-API-Key")``.
+    """
+    monkeypatch.setattr(key_repo_mod, "key_repo", fake_key_repo)
+    monkeypatch.setattr(deps, "key_repo", fake_key_repo, raising=False)
+
+    plaintext = _make_auth_header(fake_key_repo, "admin")
+    # Revoke the row we just provisioned.
+    stored_hash = deps.hash_key(plaintext)
+    fake_key_repo.revoke(stored_hash, revoked_at="2026-08-24T00:00:00Z")
+
+    response = client.get("/v1/metrics", headers={"X-API-Key": plaintext})
+    assert response.status_code == 401, (
+        f"require_api_key revoked branch must 401 on revoked key, got "
+        f"{response.status_code!r} body={response.text!r}"
+    )
+
+
+def test_require_scope_unknown_scope_raises_value_error(monkeypatch):
+    """Coverage: ``require_scope`` unknown-scope ValueError (deps.py L265).
+
+    Calling ``require_scope`` with a typo'd scope name MUST fail loudly
+    at factory time. The factory validates against ``is_known_scope``
+    and raises ``ValueError`` carrying the canonical ``KNOWN_SCOPES``
+    set so a misspelled deployment cannot silently pass-through.
+    """
+    with pytest.raises(ValueError) as exc_info:
+        deps.require_scope("not-a-real-scope")
+
+    message = str(exc_info.value)
+    assert "not-a-real-scope" in message, (
+        f"ValueError must echo the bad scope name, got {message!r}"
+    )
+    assert "read" in message and "write" in message and "admin" in message, (
+        f"ValueError must list the canonical scopes, got {message!r}"
+    )
+
+
+def test_create_key_returns_urlsafe_token_and_persists_hash(
+    fake_key_repo, monkeypatch
+):
+    """Coverage: ``create_key`` body (deps.py L304-306).
+
+    Drives ``deps.create_key("read")`` end-to-end so:
+      - ``secrets.token_urlsafe(32)`` is invoked (L304)
+      - ``key_repo.create`` is invoked with the hashed plaintext (L305)
+      - the plaintext token is returned (L306)
+
+    The returned token MUST round-trip back through ``hash_key`` to the
+    row that was persisted, and the row's ``scope`` MUST match what was
+    requested.
+    """
+    monkeypatch.setattr(key_repo_mod, "key_repo", fake_key_repo)
+    monkeypatch.setattr(deps, "key_repo", fake_key_repo, raising=False)
+
+    plaintext = deps.create_key("read")
+    assert isinstance(plaintext, str) and len(plaintext) >= 32, (
+        f"create_key must return a non-trivial string, got {plaintext!r}"
+    )
+    persisted_hash = deps.hash_key(plaintext)
+    row = fake_key_repo.rows.get(persisted_hash)
+    assert row is not None, (
+        f"create_key must persist a row keyed by hash(plaintext), "
+        f"fake repo rows={list(fake_key_repo.rows)!r}"
+    )
+    assert row["scope"] == "read", (
+        f"create_key must record the requested scope, got {row!r}"
+    )
