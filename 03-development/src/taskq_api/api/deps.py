@@ -29,9 +29,10 @@ Citations:
 from __future__ import annotations
 
 import secrets
-from typing import Callable
+from typing import Callable, cast
 
 from fastapi import Depends, Header, HTTPException, status
+from fastapi import params as _fastapi_params
 
 import taskq_api.repository.key_repo as key_repo_mod
 from taskq_api.service.auth import (
@@ -69,7 +70,7 @@ TYPE_UNAUTHENTICATED = "/errors/unauthenticated"
 TYPE_FORBIDDEN = "/errors/forbidden"
 
 
-class _ScopeDep:
+class _ScopeDep(_fastapi_params.Depends):
     """Wrapper that exposes a scope dependency as a FastAPI-compatible
     callable AND as an introspectable object with a ``.callable`` attribute.
 
@@ -86,11 +87,16 @@ class _ScopeDep:
           so the wrapper itself must be callable and forward its
           call to ``self.dependency``.
 
-    Inheriting from ``Depends`` was tried first but FastAPI exposes
-    ``Depends`` as a *function* (not a class), so subclassing raised
+    The wrapper subclasses ``fastapi.params.Depends`` (the class, not
+    the ``from fastapi import Depends`` factory function) so the
+    routing layer's ``Sequence[params.Depends]`` parameter accepts
+    ``_ScopeDep`` instances directly. The factory function ``Depends``
+    is also a valid base, but ``from fastapi import Depends`` returns
+    a function (decorator-like factory) rather than a class — that
+    earlier subclassing attempt raised
     ``TypeError: function() argument 'code' must be code, not str``
-    at import time. This wrapper stands alone and is wrapped by
-    ``Depends(...)`` in the per-route declarations instead.
+    because function objects expose ``__code__`` not ``__init_subclass__``.
+    ``params.Depends`` is the underlying class.
 
     All three attributes (``__module__``, ``__qualname__``, ``__name__``)
     are forwarded from the inner dependency so introspection sees
@@ -113,16 +119,13 @@ class _ScopeDep:
     # routes in this app.
 
     def __init__(self, fn: Callable[..., object]) -> None:
-        # ``dependency`` is FastAPI's expected attribute name when the
-        # framework introspects a ``Depends(...)`` wrapper's payload.
-        self.dependency = fn
+        # ``dependency`` + ``use_cache`` come from the ``params.Depends``
+        # base. ``use_cache=True`` mirrors the stock ``Depends`` default
+        # so a raw ``_ScopeDep`` passed to ``dependencies=[...]`` does
+        # not break ``get_parameterless_sub_dependant`` at registration.
+        super().__init__(dependency=fn, use_cache=True)
         # ``callable`` is the FR-04 route-introspection contract.
         self.callable = fn
-        # ``use_cache`` mirrors the ``params.Depends`` attribute so a
-        # raw ``_ScopeDep`` passed to ``dependencies=[...]`` (instead
-        # of being wrapped by ``Depends(_require_*)``) does not break
-        # ``get_parameterless_sub_dependant`` at route registration.
-        self.use_cache = True
         # Forward identity attributes so ``dep.__qualname__`` reads as
         # ``require_scope.<locals>._dependency`` (the inner closure)
         # rather than the wrapper class itself. This keeps AC-4.3's
@@ -137,11 +140,16 @@ class _ScopeDep:
     def __call__(self, *args: object, **kwargs: object) -> object:
         # Forward the call to the wrapped dependency so the wrapper is
         # itself a callable — the FR-04 coverage tests drive
-        # ``dep(principal=...)`` directly.
-        return self.dependency(*args, **kwargs)
+        # ``dep(principal=...)`` directly. The ``params.Depends`` base
+        # type-annotates ``dependency`` as ``Optional[Callable[..., Any]]``
+        # but ``__init__`` always receives a non-None ``fn`` here; we
+        # ``cast`` (assertion is runtime-free under ``-O``) to drop the
+        # ``None`` branch.
+        return cast(Callable[..., object], self.dependency)(*args, **kwargs)
 
     def __repr__(self) -> str:
-        attr = getattr(self.dependency, "__name__", type(self.dependency).__name__)
+        dep = cast(Callable[..., object], self.dependency)
+        attr = getattr(dep, "__name__", type(dep).__name__)
         return f"ScopeDep({attr})"
 
 
