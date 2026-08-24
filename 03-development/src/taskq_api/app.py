@@ -12,6 +12,8 @@ Citations:
 """
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
@@ -49,7 +51,7 @@ def _problem(
     type_uri: str,
     title: str,
     detail: object,
-    headers: dict[str, str] | None = None,
+    headers: Mapping[str, str] | None = None,
 ) -> JSONResponse:
     body = {
         "type": type_uri,
