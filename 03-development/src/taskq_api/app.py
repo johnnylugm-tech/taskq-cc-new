@@ -15,6 +15,7 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
+from fastapi.routing import APIRoute
 
 from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_UNAUTHENTICATED
 from taskq_api.api.metrics import router as metrics_router
@@ -87,17 +88,21 @@ def _inline_router(app: FastAPI, router) -> None:
         # status_code, response_class, tags, name, ...). Passing
         # ``r.endpoint`` plus the route's existing ``methods`` /
         # ``dependencies`` reproduces the registered handler exactly.
+        # Only APIRoute instances carry the attributes add_api_route needs;
+        # plain ``Route`` instances (e.g. mounted sub-apps) are skipped.
+        if not isinstance(r, APIRoute):
+            continue
         app.add_api_route(
             path=r.path,
             endpoint=r.endpoint,
-            methods=getattr(r, "methods", None),
-            dependencies=list(getattr(r, "dependencies", []) or []),
-            response_model=getattr(r, "response_model", None),
-            status_code=getattr(r, "status_code", None) or 200,
-            response_class=getattr(r, "response_class", None),
-            tags=list(getattr(r, "tags", []) or []),
-            name=getattr(r, "name", None),
-            include_in_schema=getattr(r, "include_in_schema", True),
+            methods=list(r.methods) if r.methods else None,
+            dependencies=list(r.dependencies),
+            response_model=r.response_model,
+            status_code=r.status_code or 200,
+            response_class=r.response_class,
+            tags=list(r.tags),
+            name=r.name,
+            include_in_schema=r.include_in_schema,
         )
 
 

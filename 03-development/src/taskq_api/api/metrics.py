@@ -12,7 +12,7 @@ Citations:
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Response, status
 
 from taskq_api.api import deps
 

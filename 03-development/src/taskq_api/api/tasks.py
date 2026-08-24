@@ -17,7 +17,7 @@ import asyncio
 import uuid
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response, status
 
 import taskq_api.repository.task_repo as task_repo_mod
 from taskq_api.api import deps
