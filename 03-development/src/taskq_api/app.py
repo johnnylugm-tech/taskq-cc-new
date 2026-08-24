@@ -17,7 +17,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRoute
 
-from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_UNAUTHENTICATED
+from taskq_api.api.deps import TYPE_FORBIDDEN, TYPE_RATE_LIMITED, TYPE_UNAUTHENTICATED
 from taskq_api.api.metrics import router as metrics_router
 from taskq_api.api.tasks import router as tasks_router
 
@@ -34,6 +34,7 @@ _STATUS_TYPE_URIS: dict[int, str] = {
     status.HTTP_401_UNAUTHORIZED: TYPE_UNAUTHENTICATED,
     status.HTTP_403_FORBIDDEN: TYPE_FORBIDDEN,
     status.HTTP_404_NOT_FOUND: _TYPE_NOT_FOUND,
+    status.HTTP_429_TOO_MANY_REQUESTS: TYPE_RATE_LIMITED,
 }
 
 

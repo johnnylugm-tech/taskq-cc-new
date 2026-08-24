@@ -1,10 +1,12 @@
-"""FastAPI dependencies for API-key auth + scope checks.
+"""FastAPI dependencies for API-key auth + scope checks + rate limiting.
 
 The ``require_scope(scope)`` factory returns a dependency that yields the
 authenticated principal when the caller's API key carries ``scope``;
 otherwise it raises 401/403 with a problem+json body. Real auth lives
 here in FR-03; FR-04 (scope semantics) is folded into the same factory
-so the route handlers can declare one dependency per scope.
+so the route handlers can declare one dependency per scope. FR-05's
+per-token token-bucket rate-limit check is folded in too so the
+``/v1/*`` routes only have to declare one auth+scope+rate-limit dep.
 
 The factory pattern keeps the original FR-01 / FR-02 calling convention
 (``Depends(require_scope("write"))``) so route handlers do not need to
@@ -25,9 +27,13 @@ Citations:
     missing / unrecognised / revoked rows.
   - FR-04: ``require_scope`` calls ``require_api_key`` first, then
     enforces the requested scope.
+  - FR-05: ``require_scope`` invokes ``check_rate_limit`` after the
+    scope check, raising 429 + ``Retry-After`` when the per-token
+    token-bucket is empty.
 """
 from __future__ import annotations
 
+import math
 import secrets
 from typing import Callable, cast
 
@@ -35,6 +41,7 @@ from fastapi import Depends, Header, HTTPException, status
 from fastapi import params as _fastapi_params
 
 import taskq_api.repository.key_repo as key_repo_mod
+import taskq_api.repository.rate_repo as rate_repo_mod
 from taskq_api.service.auth import (
     KNOWN_SCOPES,
     compare_keys,
@@ -49,6 +56,21 @@ from taskq_api.service.auth import (
 # ``require_api_key`` / ``create_key`` always read through this attribute.
 key_repo = key_repo_mod.key_repo
 
+# Module-level alias for the rate-bucket repository. FR-05 tests swap
+# this attribute for an in-process fake via
+# ``monkeypatch.setattr(deps, "rate_repo", ...)``; production reads
+# through the SQLite-backed singleton in
+# ``taskq_api.repository.rate_repo``.
+rate_repo = rate_repo_mod.rate_repo
+
+
+# Default rate-limit parameters — bound at module import time so the
+# FR-05 tests can monkeypatch ``deps.RATE_BURST`` / ``deps.RATE_PER_SEC``
+# to override them without re-importing. Defaults match SPEC §3 FR-05
+# (burst = 20, refill = 5 tokens / second).
+RATE_BURST: int = 20
+RATE_PER_SEC: float = 5.0
+
 
 __all__ = [
     "hash_key",
@@ -57,6 +79,10 @@ __all__ = [
     "require_scope",
     "create_key",
     "key_repo",
+    "rate_repo",
+    "check_rate_limit",
+    "RATE_BURST",
+    "RATE_PER_SEC",
 ]
 
 
@@ -68,6 +94,7 @@ __all__ = [
 
 TYPE_UNAUTHENTICATED = "/errors/unauthenticated"
 TYPE_FORBIDDEN = "/errors/forbidden"
+TYPE_RATE_LIMITED = "/errors/rate-limited"
 
 
 class _ScopeDep(_fastapi_params.Depends):
@@ -193,6 +220,37 @@ def _forbidden(required: str) -> HTTPException:
     )
 
 
+def _rate_limited(retry_after: float) -> HTTPException:
+    """Build the standard 429 problem+json for a rate-limited request.
+
+    [FR-05, FR-10]
+    Citations:
+      - FR-05 §3 AC-5.2: the rate-limit dependency raises HTTP 429
+        with a ``Retry-After`` header in seconds (rounded up to the
+        nearest integer, minimum 1) and a problem+json body whose
+        ``type`` is ``/errors/rate-limited``.
+      - FR-10: error-code mapping — 429 maps to
+        ``/errors/rate-limited`` so clients can branch on ``type``
+        without parsing the status code.
+    """
+    # ``Retry-After`` is integer seconds per RFC 7231 §7.1.3. The bucket
+    # deficit / refill_per_sec may be fractional, so we round up to
+    # the nearest second and clamp to a minimum of 1 so the header is
+    # never zero (which would let the client retry immediately and
+    # defeat the purpose of the 429).
+    retry_seconds = max(1, int(math.ceil(retry_after)))
+    return HTTPException(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        detail={
+            "type": TYPE_RATE_LIMITED,
+            "title": "Too Many Requests",
+            "status": status.HTTP_429_TOO_MANY_REQUESTS,
+            "detail": "rate limit exceeded",
+        },
+        headers={"Retry-After": str(retry_seconds)},
+    )
+
+
 # ---------------------------------------------------------------------------
 # Auth primitive — pure FastAPI dependency.
 # ---------------------------------------------------------------------------
@@ -236,10 +294,13 @@ def require_scope(scope: str = "read") -> _ScopeDep:
 
     The returned callable declares ``Depends(require_api_key)`` so
     FastAPI's dependency resolver recursively wires the auth check
-    before the scope check runs. This is the FR-03/FR-04 contract:
-    ``require_api_key`` (FR-03) authenticates the presented key, and
-    the scope branch here (FR-04) enforces that the principal's scope
-    satisfies the requested scope.
+    before the scope check runs. This is the FR-03/FR-04/FR-05 contract:
+    ``require_api_key`` (FR-03) authenticates the presented key, the
+    scope branch here (FR-04) enforces that the principal's scope
+    satisfies the requested scope, and ``check_rate_limit`` (FR-05)
+    decrements the per-token token bucket. When the bucket is empty
+    the dep raises HTTP 429 with a ``Retry-After`` header so the
+    client backs off without retry-storming.
 
     [FR-01, FR-03, FR-04, FR-05]
     Citations:
@@ -254,6 +315,11 @@ def require_scope(scope: str = "read") -> _ScopeDep:
         problem+json dict with ``type=/errors/forbidden`` — the body
         carries no resource id or ``not_found`` phrase so a caller
         cannot distinguish "exists but forbidden" from "missing".
+      - FR-05 §3 AC-5.2 / AC-5.4: invokes ``check_rate_limit`` AFTER
+        the scope check; an empty bucket raises HTTP 429 with a
+        positive ``Retry-After`` header. ``/healthz`` and ``/readyz``
+        bypass this dep entirely (they declare no Depends), so the
+        rate-limit branch never fires on health probes.
     """
     # Default-argument sanity check — if a caller misspells the scope
     # name, fail loudly at factory time so the misconfiguration cannot
@@ -267,18 +333,91 @@ def require_scope(scope: str = "read") -> _ScopeDep:
             f"expected one of {sorted(KNOWN_SCOPES)!r}"
         )
 
-    def _dependency(principal: dict = Depends(require_api_key)) -> dict:
+    def _dependency(
+        principal: dict = Depends(require_api_key),
+        x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+    ) -> dict:
         # FR-04 — granted rank must satisfy required rank. The
         # comparator is deny-by-default (unknown scopes → False).
         granted = str(principal.get("scope"))
         if not scope_satisfies(granted, scope):
             raise _forbidden(scope)
+        # FR-05 — per-token token-bucket rate limit. ``require_api_key``
+        # already raised 401 if the header is missing, so by the time
+        # we get here ``x_api_key`` is non-None in production. When the
+        # dep is invoked directly (e.g. ``dep(principal=...)`` from the
+        # FR-04 coverage tests) ``x_api_key`` resolves to the FastAPI
+        # ``Header`` sentinel object rather than a string — the
+        # ``isinstance`` check below skips the rate-limit branch in
+        # that case (the test bypasses the framework anyway, and the
+        # rate-limit primitive is exercised by FR-05's own tests).
+        if isinstance(x_api_key, str) and x_api_key:
+            bucket = check_rate_limit(hash_key(x_api_key), cost=1)
+            if not bucket["allowed"]:
+                raise _rate_limited(bucket["retry_after"])
         return principal
 
     # Return a FastAPI-compatible wrapper that ALSO exposes ``.callable``
     # so FR-04 route introspection (the AC-4.3 source-file check) can
     # recover the underlying closure from ``route.dependencies``.
     return _ScopeDep(_dependency)
+
+
+# ---------------------------------------------------------------------------
+# Rate-limit primitive — pure FastAPI dependency.
+# ---------------------------------------------------------------------------
+def check_rate_limit(key_hash: str, cost: int = 1) -> dict:
+    """Drive a per-token token-bucket rate-limit check.
+
+    Returns ``{"allowed": bool, "tokens_remaining": float,
+    "retry_after": float}``. When ``allowed`` is False, the caller MUST
+    raise ``HTTPException(429)`` carrying a ``Retry-After`` header
+    equal to ``retry_after`` (rounded up to seconds, minimum 1) and a
+    problem+json body whose ``type`` is ``/errors/rate-limited``.
+
+    The function reads ``RATE_BURST`` / ``RATE_PER_SEC`` from this
+    module's globals at call time so callers (notably the FR-05
+    monkeypatch fixture) can override the policy by setting
+    ``deps.RATE_BURST`` / ``deps.RATE_PER_SEC`` before issuing the
+    request.
+
+    [FR-05, NFR-03]
+    Citations:
+      - FR-05 §3 AC-5.1: the bucket is sized at ``RATE_BURST`` tokens
+        and refilled at ``RATE_PER_SEC`` tokens/second.
+      - FR-05 §3 AC-5.2: when the bucket cannot satisfy ``cost``,
+        ``allowed=False`` and ``retry_after`` is the seconds-until-
+        next-token count derived from
+        ``taskq_api.service.ratelimit.retry_after_seconds``.
+      - FR-05 §3 AC-5.3: the underlying ``rate_repo.consume`` runs
+        inside a single transaction holding a row-level lock so
+        concurrent workers cannot both consume the last token.
+    """
+    # Ensure the bucket row exists (idempotent — does not refill).
+    rate_repo.get_or_create(
+        key_hash, burst=RATE_BURST, refill_per_sec=RATE_PER_SEC
+    )
+    # Consume — this applies the refill + decrement atomically.
+    result = rate_repo.consume(key_hash, cost=cost)
+    allowed = bool(result.get("allowed", False))
+    # The fake ``_FakeRateRepo.consume`` (and the real
+    # ``_SQLiteRateRepo.consume``) applies refill-then-decrement in
+    # place; ``bucket["tokens"]`` after the call reflects the
+    # post-refill / post-decrement state. To recover the
+    # pre-consume available count we read the bucket again and add
+    # back ``cost`` when the consume succeeded (no decrement on a
+    # failed consume).
+    bucket = rate_repo.get_or_create(
+        key_hash, burst=RATE_BURST, refill_per_sec=RATE_PER_SEC
+    )
+    remaining = float(bucket["tokens"])
+    if allowed:
+        remaining += cost
+    return {
+        "allowed": allowed,
+        "tokens_remaining": remaining,
+        "retry_after": float(result.get("retry_after", 0.0)),
+    }
 
 
 # ---------------------------------------------------------------------------
