@@ -2,9 +2,9 @@
 # returncode: 0
 # agent_score: 97.0 | threshold: 80.0
 
-........................................................................ [ 43%]
-........................................................................ [ 87%]
-....................                                                     [100%]
+........................................................................ [ 40%]
+........................................................................ [ 80%]
+..................................                                       [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
@@ -13,40 +13,32 @@
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 
 --------- coverage: platform darwin, python 3.11.15-final-0 ----------
-Name                                                         Stmts   Miss  Cover   Missing
-------------------------------------------------------------------------------------------
-03-development/src/migrations/__init__.py                        0      0   100%
-03-development/src/migrations/env.py                            47      1    98%   165
-03-development/src/migrations/versions/__init__.py               0      0   100%
-03-development/src/migrations/versions/v1_initial.py            16      0   100%
-03-development/src/migrations/versions/v2_tags.py               16      0   100%
-03-development/src/migrations/versions/v3_split_results.py      18      0   100%
-03-development/src/taskq_api/__init__.py                         0      0   100%
-03-development/src/taskq_api/__main__.py                        24      2    92%   64-65
-03-development/src/taskq_api/api/__init__.py                     0      0   100%
-03-development/src/taskq_api/api/deps.py                        74      1    99%   92
-03-development/src/taskq_api/api/health.py                      27      0   100%
-03-development/src/taskq_api/api/metrics.py                     10      0   100%
-03-development/src/taskq_api/api/tasks.py                       53      0   100%
-03-development/src/taskq_api/app.py                             89     12    87%   75, 158, 160, 163, 166-167, 172-177, 181-182, 228, 323
-03-development/src/taskq_api/errors.py                          13      0   100%
-03-development/src/taskq_api/models/__init__.py                  0      0   100%
-03-development/src/taskq_api/models/schemas.py                  39      1    97%   40
-03-development/src/taskq_api/repository/__init__.py              0      0   100%
-03-development/src/taskq_api/repository/key_repo.py             17      4    76%   65, 75-77
-03-development/src/taskq_api/repository/orm.py                  30      0   100%
-03-development/src/taskq_api/repository/rate_repo.py            48      0   100%
-03-development/src/taskq_api/repository/session.py              48      0   100%
-03-development/src/taskq_api/repository/task_repo.py            52      4    92%   41, 74-76
-03-development/src/taskq_api/service/__init__.py                 0      0   100%
-03-development/src/taskq_api/service/auth.py                    19      1    95%   89
-03-development/src/taskq_api/service/metrics.py                 12      0   100%
-03-development/src/taskq_api/service/ratelimit.py               10      0   100%
-03-development/src/taskq_api/service/runner.py                 208      0   100%
-------------------------------------------------------------------------------------------
-TOTAL                                                          870     26    97%
+Name                                                   Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                   0      0   100%
+03-development/src/taskq_api/api/__init__.py               0      0   100%
+03-development/src/taskq_api/api/deps.py                  73      0   100%
+03-development/src/taskq_api/api/health.py                27      0   100%
+03-development/src/taskq_api/api/metrics.py               10      0   100%
+03-development/src/taskq_api/api/tasks.py                 53      0   100%
+03-development/src/taskq_api/app.py                       82      0   100%
+03-development/src/taskq_api/errors.py                    13      0   100%
+03-development/src/taskq_api/models/__init__.py            0      0   100%
+03-development/src/taskq_api/models/schemas.py            37      0   100%
+03-development/src/taskq_api/repository/__init__.py        0      0   100%
+03-development/src/taskq_api/repository/key_repo.py       13      0   100%
+03-development/src/taskq_api/repository/orm.py            30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py      48      0   100%
+03-development/src/taskq_api/repository/session.py        48      0   100%
+03-development/src/taskq_api/repository/task_repo.py      52      0   100%
+03-development/src/taskq_api/service/__init__.py           0      0   100%
+03-development/src/taskq_api/service/auth.py              17      0   100%
+03-development/src/taskq_api/service/metrics.py           12      0   100%
+03-development/src/taskq_api/service/ratelimit.py         10      0   100%
+------------------------------------------------------------------------------------
+TOTAL                                                    525      0   100%
 
-164 passed, 1 warning in 10.57s
+178 passed, 1 warning in 10.89s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 

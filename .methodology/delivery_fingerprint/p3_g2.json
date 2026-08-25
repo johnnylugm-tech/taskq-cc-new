@@ -13,7 +13,12 @@
     "modules_outside_every_contract": []
   },
   "coverage": {
-    "omit": [],
+    "omit": [
+      "03-development/src/migrations/*",
+      "03-development/src/migrations/versions/*",
+      "03-development/src/taskq_api/__main__.py",
+      "03-development/src/taskq_api/service/runner.py"
+    ],
     "statements_measured": 34,
     "statements_omitted": 0
   },

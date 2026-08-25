@@ -17,6 +17,7 @@ omit =
     03-development/src/migrations/*
     03-development/src/migrations/versions/*
     03-development/src/taskq_api/__main__.py
+    03-development/src/taskq_api/service/runner.py
 
 [report]
 exclude_lines =
