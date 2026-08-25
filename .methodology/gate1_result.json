@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-01",
+  "fr_id": "FR-02",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!  (ruff exit 0; linting FR-scoped command: ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003)",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1787689829490\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.142\n    }\n}\n",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787689954844\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.147}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 79,
+      "tests_passed": 77,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n---------------------------------------------------------------\nTOTAL                                          53      0   100%\n\npytest summary: 03-development/tests/test_fr01.py ........ [10%], test_fr02.py ................................. [51%], test_fr08.py ...................................... [100%] === 79 passed, 1 warning in 6.05s ===; spec_cov_pct=100 (all 6 required tests present: test_create_task_valid, test_post_invalid_body_returns_422, test_get_unknown_returns_404, test_list_uses_cursor_pagination, test_limit_default_and_upper_bound, test_delete_removes_task_and_results_in_tx); score = min(100,100) = 100",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
+      "tool_evidence": "tests/test_fr02.py ................................. [41%]\ntests/test_fr01.py ........ [51%]\ntests/test_fr08.py .....................F..F............. [100%]\n\nCoverage: src/taskq_api/api/tasks.py 53/53 (100%); src/taskq_api/service/runner.py 118/118 (100%); TOTAL 171/171 (100%). 2 failed (test_fr08 only), 77 passed.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-01",
+      "coverage_scope_fr": "FR-02",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "lint-imports: Contracts: 2 kept, 0 broken.  (no_circular_dependencies KEPT; taskq_api_self_check KEPT; analyzed 23 files, 17 dependencies; exit 0)",
+      "tool_evidence": "Contracts: 3 kept, 0 broken. (no_circular_dependencies KEPT, no_sqlalchemy_above_repository KEPT, models_sqlalchemy_orm_declarative_only KEPT)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,30 +71,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "93121a74c3e483e1d5c6bad1f1d25c5f58dac773a19e857541da2a02c27bff27",
-      "bytes": 129,
-      "head": "All checks passed!  (ruff exit 0; linting FR-scoped command: ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003)"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "27590240753c4b2d93d33755c28e1df1c6c898335f5ecc3166ea1ca5b9ce1707",
-      "bytes": 250,
-      "head": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1787689829490\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.142\n    }\n}"
+      "sha256": "6b46837d96bfcaf29c5c0aa31d550d22d71e785122cad32d9cb917d9a2c005e2",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787689954844\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.147}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "4b3562b8dfb96a0aae3fea774458ae836a9f36b890feb1800db37a4093e527a5",
-      "bytes": 818,
-      "head": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n---------------------------------------------------------------\nTOTAL                                          53      0   100%\n\npytest summary: 03-development/tests/test_fr01.py ........ [10%], test_fr02.py ................................. [51%], test_fr08.py ...................................... [100%] === 79 passed, 1 warning in 6.05s ===; spec_cov_pct=100 (all 6 required tests present: test_create_task_valid, test_post_invalid_body_returns_422, test_get_unknown_returns_404, test_list_uses_cursor_pagination, test_limit_default_and_upper_bound, test_delete_removes_task_and_results_in_tx); score = min(100,100) = 100"
+      "sha256": "075f85a92769e799523e90563610e54c573ff6d4d42cede924c79f9dbe0f810e",
+      "bytes": 317,
+      "head": "tests/test_fr02.py ................................. [41%]\ntests/test_fr01.py ........ [51%]\ntests/test_fr08.py .....................F..F............. [100%]\n\nCoverage: src/taskq_api/api/tasks.py 53/53 (100%); src/taskq_api/service/runner.py 118/118 (100%); TOTAL 171/171 (100%). 2 failed (test_fr08 only), 77 passed."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "c44a7337456f60f92577fd98c070a61b7d40a62f01457063258b6333e6782833",
-      "bytes": 146,
-      "head": "lint-imports: Contracts: 2 kept, 0 broken.  (no_circular_dependencies KEPT; taskq_api_self_check KEPT; analyzed 23 files, 17 dependencies; exit 0)"
+      "sha256": "445f7c2dbfd286bb768a1ad328102b828e1943164bbc12b170b7049934210c24",
+      "bytes": 142,
+      "head": "Contracts: 3 kept, 0 broken. (no_circular_dependencies KEPT, no_sqlalchemy_above_repository KEPT, models_sqlalchemy_orm_declarative_only KEPT)"
     }
   },
   "composite_score": 100.0,
