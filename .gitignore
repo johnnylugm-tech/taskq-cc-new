@@ -20,6 +20,8 @@ htmlcov/
 .mutmut-cache/
 .code-review-graph/
 .claude/worktrees/
+# taskq runtime DB (recreated by tests; not a deliverable)
+taskq.db
 # CRG default-excludes any path matching r"tests?/" — including
 # 03-development/tests/integration/*.py — and the architecture gate
 # requires `graph_files == delivered_sources`. We *run* these tests
