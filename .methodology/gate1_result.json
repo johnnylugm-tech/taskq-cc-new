@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-03",
+  "fr_id": "FR-04",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,14 +9,14 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!\n",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1787690126047\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.138}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.157}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,16 @@
       "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "23 passed, 1 warning in 2.19s\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\nFR-03 file deps.py: 75 stmts, 0 miss, 100% cover\n",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
+      "tool_evidence": "tests/test_fr04.py ..........  [ 43%]\ntests/test_fr03.py .........  [ 82%]\ntests/test_fr05.py ....       [100%]\n======================== 23 passed, 1 warning in 1.99s =========================\ncoverage deps.py: percent_covered=100.0 (75/75 statements)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-03",
+      "coverage_scope_fr": "FR-04",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 3 kept, 0 broken.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n",
+      "tool_evidence": "Analyzed 355 files, 3143 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,23 +78,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "ddeff6eab10be2a6d7fc684684a99b17b9de07c19d400a0d0b0a1852a561d91b",
-      "bytes": 170,
-      "head": "{\"version\":\"1.1.409\",\"time\":\"1787690126047\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.138}}"
+      "sha256": "1d876ab786d0d2034b4b885432e20305bcf5426ca8d6a26c36512330e3835bfa",
+      "bytes": 135,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.157}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "2130d78a84ea4a0c739b327269aeea28c99c5e785f53d91910c51c78c43eab46",
-      "bytes": 318,
-      "head": "23 passed, 1 warning in 2.19s\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\nFR-03 file deps.py: 75 stmts, 0 miss, 100% cover"
+      "sha256": "67530eef8796e321383f40752d86f41e3992f92831df007d06f1f7d4c8c13dc3",
+      "bytes": 251,
+      "head": "tests/test_fr04.py ..........  [ 43%]\ntests/test_fr03.py .........  [ 82%]\ntests/test_fr05.py ....       [100%]\n======================== 23 passed, 1 warning in 1.99s =========================\ncoverage deps.py: percent_covered=100.0 (75/75 statements)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f65e31deadab25858dcf86d543f5fbedfbbb4b11c74d22c5892ead6558859cbc",
-      "bytes": 216,
-      "head": "Contracts: 3 kept, 0 broken.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT"
+      "sha256": "0e6133380f6823983ae80e8ff0dea50097edc170b392fe0cd743649bcc9bdc71",
+      "bytes": 255,
+      "head": "Analyzed 355 files, 3143 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
