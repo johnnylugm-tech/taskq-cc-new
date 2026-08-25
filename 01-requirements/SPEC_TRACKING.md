@@ -28,7 +28,7 @@
 | FR ID | Spec Description | Intent Class | Decision Framework | Owner | Status | Notes |
 |-------|-----------------|--------------|-------------------|-------|--------|-------|
 | FR-01 | Task resource CRUD API: POST/GET/LIST/DELETE on `/v1/tasks`, cursor-based pagination, 422/404/409 problem+json | functional | FastAPI + pydantic v2 + SQLAlchemy 2.x declarative; cursor pagination (no offset); RFC 7807 error contract per FR-10 | Agent B (architecture) / Agent C (development) | DRAFT | Single FR per SRS.md §3 FR-01; AC-1.1..AC-1.6 |
-| FR-02 | Task execution endpoint: POST `/v1/tasks/{id}/run` returns 202 + `run_id`; `asyncio.create_subprocess_exec(*shlex.split(command))` with `TASKQ_TASK_TIMEOUT`; writes `task_results` row; GET `/v1/tasks/{id}/runs` history newest-first | functional | `asyncio.create_subprocess_exec` (no `shell=True`); state machine `pending → running → done|failed|timeout` | Agent B / Agent C | DRAFT | Single FR per SRS.md §3 FR-02; AC-2.1..AC-2.6 |
+| FR-02 | Task execution endpoint: POST `/v1/tasks/{id}/run` returns 202 + `run_id`; `asyncio.create_subprocess_exec(*shlex.split(command))` with `TASKQ_TASK_TIMEOUT`; writes `task_results` row; GET `/v1/tasks/{id}/runs` history newest-first | functional | `asyncio.create_subprocess_exec` (no `shell=True`); state machine `pending → running → done\|failed\|timeout` | Agent B / Agent C | DRAFT | Single FR per SRS.md §3 FR-02; AC-2.1..AC-2.6 |
 | FR-03 | API-key authentication: `X-API-Key` header, SHA-256 hash at rest, `hmac.compare_digest` constant-time compare, 401 on missing/invalid, plaintext printed once at `key create`, revoked keys invalid, `/healthz` and `/readyz` exempt | security | SHA-256 hashing; `hmac.compare_digest`; `python -m taskq_api key create --scope <scope>` admin entry | Agent B / Agent C | DRAFT | Single FR per SRS.md §3 FR-03; AC-3.1..AC-3.6 |
 | FR-04 | Scope authorization: `read < write < admin` hierarchical; insufficient scope returns 403 problem+json without leaking resource existence; single FastAPI dependency is the only authn/authz decision point | security | Hierarchical scope; single dependency at `api/deps.py`; 403 body must not leak existence | Agent B / Agent C | DRAFT | Single FR per SRS.md §3 FR-04; AC-4.1..AC-4.3 |
 | FR-05 | Rate limiting: per-token token bucket in DB with capacity `TASKQ_RATE_BURST` and refill `TASKQ_RATE_PER_SEC`; 429 + `Retry-After` on overflow; row-level lock in single transaction; `/healthz` and `/readyz` exempt | functional | Per-token token bucket persisted in DB; single transaction with row-level lock; `Retry-After` header (seconds) | Agent B / Agent C | DRAFT | Single FR per SRS.md §3 FR-05; AC-5.1..AC-5.4 |
@@ -45,7 +45,7 @@
 | NFR-01 | `GET /v1/tasks/{id}` p95 < 30ms and `GET /v1/tasks?limit=50` p95 < 80ms at 10k rows; list endpoint SQL statement count is constant (no N+1); measured via `pytest-benchmark` / ASGI transport | performance | `pytest-benchmark` over 10k-row fixture; SQLAlchemy event listener asserts constant statement count on list endpoint | Agent B / Agent C | DRAFT | SRS.md §4 NFR-01; AC-N1.1..AC-N1.3 |
 | NFR-02 | No `shell=True`/`eval(`/`exec(` in codebase (grep 0 hits); no string-concatenated SQL; API keys hashed with `hmac.compare_digest`; 403 leaks no resource existence; error body carries no stack/SQL/path; CORS deny-by-default; `bandit` 0 HIGH / 0 MEDIUM | security | grep gates + `bandit -r 03-development/src/` + CORS allowlist from `TASKQ_CORS_ORIGINS`; 403 body redaction asserted | Agent B / Agent C | DRAFT | SRS.md §4 NFR-02; AC-N2.1..AC-N2.7 |
 | NFR-03 | Explicit per-request transaction boundaries via context manager; no bare `except:` / `except Exception: pass`; `asyncio.CancelledError` always re-raised; DB-connection failure => `/readyz` 503 with detail; task timeout kills child process; migration failure rolls back transaction | reliability | `session_scope` context manager; `CancelledError` propagation test; orphan-process absence test; `/readyz` 503 fail-closed | Agent B / Agent C | DRAFT | SRS.md §4 NFR-03; AC-N3.1..AC-N3.6 |
-| NFR-04 | Lines matching `(sk-[A-Za-z0-9_-]{8,}|token=\S+|Bearer\s+\S+|postgres(ql)?://[^\s]+)` replaced with `[REDACTED]` before `stdout_tail`/`stderr_tail`/log/error-body emission; DB connection string (with password) absent from logs, errors, `/v1/metrics`; API-key plaintext printed once and not persisted | security | Redaction filter applied at each output channel; unit tests feed sample secrets and assert substitution; log/metric scan asserts no DB-URL password | Agent B / Agent C | DRAFT | SRS.md §4 NFR-04; AC-N4.1..AC-N4.3 |
+| NFR-04 | Lines matching `(sk-[A-Za-z0-9_-]{8,}\|token=\S+\|Bearer\s+\S+\|postgres(ql)?://[^\s]+)` replaced with `[REDACTED]` before `stdout_tail`/`stderr_tail`/log/error-body emission; DB connection string (with password) absent from logs, errors, `/v1/metrics`; API-key plaintext printed once and not persisted | security | Redaction filter applied at each output channel; unit tests feed sample secrets and assert substitution; log/metric scan asserts no DB-URL password | Agent B / Agent C | DRAFT | SRS.md §4 NFR-04; AC-N4.1..AC-N4.3 |
 | NFR-05 | 100% of public functions/classes have docstrings containing `[FR-XX]` or `[NFR-XX]` references; every API endpoint has `summary` + `description` in `/openapi.json` | documentation | AST-docstring scanner with `[FR-XX]`/`[NFR-XX]` pattern check; OpenAPI JSON assertion test | Agent B / Agent C | DRAFT | SRS.md §4 NFR-05; AC-N5.1..AC-N5.2 |
 | NFR-06 | `.importlinter` declares layers contract `api > service > repository > models` with `config`/`errors` independence and a forbidden contract banning `sqlalchemy` imports outside `repository/`; `lint-imports` exits 0; no contract weakening | architecture | `lint-imports` CI gate (exit 0); architecture test attempts `sqlalchemy` import from `service/` and `api/` and asserts `ImportError` | Agent B / Agent C | DRAFT | SRS.md §4 NFR-06; AC-N6.1..AC-N6.4 |
 | NFR-07 | Runtime deps pinned with `==` in `requirements.txt`; transitives pinned via `requirements.lock`; license allowlist {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}; full-tree scan via `pip-licenses --with-system`; SBOM at `08-config/SBOM.json` with `name`/`version`/`license`/`direct or transitive` per dep | licensing | `pip-licenses --format=json --with-system` assert; SBOM JSON schema validation; CI gate for non-allowlist license | Agent B / Agent C | DRAFT | SRS.md §4 NFR-07; AC-N7.1..AC-N7.4 |
@@ -59,12 +59,12 @@
 
 | Check | Target | Actual | Status |
 |-------|--------|--------|--------|
-| FR coverage in SRS.md | 10 | 10 | COMPLETE |
-| NFR coverage in SRS.md | 12 | 12 | COMPLETE |
-| FR → SRS section mapping | 100% | 100% | COMPLETE |
-| Owner assignment | 100% | 100% | COMPLETE |
-| Intent Class assigned | 100% | 100% | COMPLETE |
-| Decision Framework recorded | 100% | 100% | COMPLETE |
+| FR coverage in SRS.md | 10 | 10 | ✅ Done |
+| NFR coverage in SRS.md | 12 | 12 | ✅ Done |
+| FR → SRS section mapping | 100% | 100% | ✅ Done |
+| Owner assignment | 100% | 100% | ✅ Done |
+| Intent Class assigned | 100% | 100% | ✅ Done |
+| Decision Framework recorded | 100% | 100% | ✅ Done |
 
 ## Source Citations
 
