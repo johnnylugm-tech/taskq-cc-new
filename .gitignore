@@ -21,6 +21,8 @@ __pycache__/
 htmlcov/
 .mutmut-cache
 .mutmut-cache/
+.coverage.json
+.coverage
 .code-review-graph/
 .claude/worktrees/
 # taskq runtime DB (recreated by tests; not a deliverable)
