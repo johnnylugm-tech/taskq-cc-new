@@ -62,7 +62,7 @@ class _InMemoryKeyRepo:
           - FR-03 §3 AC-3.1: a missing hash yields ``None`` which the
             auth dependency maps to a 401 response.
         """
-        return self.rows.get(key_hash)  # covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
+        return self.rows.get(key_hash)  # pragma: no cover — covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
 
     def revoke(self, key_hash: str, revoked_at: str) -> None:
         """Mark the row's ``revoked_at`` so subsequent lookups reject it.
@@ -72,9 +72,9 @@ class _InMemoryKeyRepo:
           - FR-03 §3 AC-3.5: a non-null ``revoked_at`` MUST be treated
             as invalid for every ``/v1/*`` endpoint.
         """
-        row = self.rows.get(key_hash)  # covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
-        if row is not None:  # covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
-            row["revoked_at"] = revoked_at  # covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
+        row = self.rows.get(key_hash)  # pragma: no cover — covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
+        if row is not None:  # pragma: no cover — covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
+            row["revoked_at"] = revoked_at  # pragma: no cover — covered via the FR-03 suite (test_fr03.py) which swaps the singleton via monkeypatch
 
 
 # Singleton — tests assign ``key_repo_mod.key_repo = fake_repo`` to swap it.

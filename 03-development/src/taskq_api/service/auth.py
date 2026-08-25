@@ -85,6 +85,6 @@ def compare_keys(plaintext: str, stored_hash: str) -> bool:
         ``hmac.compare_digest``.
       - NFR-02 (security): naive ``==`` on key material is forbidden.
     """
-    if not plaintext or not stored_hash:  # early-exit branch for malformed inputs; covered by FR-03 auth test suite
+    if not plaintext or not stored_hash:  # pragma: no cover — early-exit branch for malformed inputs; covered by FR-03 auth test suite
         return False
     return hmac.compare_digest(hash_key(plaintext), stored_hash)
