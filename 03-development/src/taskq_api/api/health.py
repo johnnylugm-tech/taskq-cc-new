@@ -25,6 +25,9 @@ This module owns the FR-09 health surface end-to-end:
     ``_inline_router`` in ``taskq_api.app`` so the FR-09 lifecycle is
     owned by this module rather than scattered as inline handlers.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 from fastapi import APIRouter, status

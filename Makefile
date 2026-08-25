@@ -79,13 +79,13 @@ migrate: check-python
 	$(PYTHON) -m alembic upgrade head
 
 test: check-python
-	$(PYTHON) -m pytest 03-development/tests -q --tb=short --cov=$(COV_TARGET) --cov-report=term-missing
+	unset TASKQ_DB_URL && $(PYTHON) -m pytest 03-development/tests -q --tb=short --cov=$(COV_TARGET) --cov-report=term-missing
 
 test-unit: check-python
 	$(PYTHON) -m pytest 03-development/tests/unit -q --tb=short
 
 test-integration: check-python
-	$(PYTHON) -m pytest 03-development/tests/integration -q --tb=short --cov=$(COV_TARGET) --cov-report=term-missing
+	unset TASKQ_DB_URL && $(PYTHON) -m pytest 03-development/tests/integration -q --tb=short --cov=$(COV_TARGET) --cov-report=term-missing
 
 lint: check-python
 	$(PYTHON) -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003

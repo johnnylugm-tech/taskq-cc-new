@@ -1,12 +1,12 @@
-# Harness-executed: bandit
-# returncode: 0
-# agent_score: 99.0 | threshold: 80.0
-
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
 {
   "errors": [],
-  "generated_at": "2026-08-25T22:33:51Z",
+  "generated_at": "2026-08-25T21:21:15Z",
   "metrics": {
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/__init__.py": {
+    "03-development/src/migrations/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -19,7 +19,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/env.py": {
+    "03-development/src/migrations/env.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -32,7 +32,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/__init__.py": {
+    "03-development/src/migrations/versions/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -45,7 +45,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/v1_initial.py": {
+    "03-development/src/migrations/versions/v1_initial.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -58,7 +58,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/v2_tags.py": {
+    "03-development/src/migrations/versions/v2_tags.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -71,7 +71,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/v3_split_results.py": {
+    "03-development/src/migrations/versions/v3_split_results.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -84,7 +84,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/__init__.py": {
+    "03-development/src/taskq_api/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -97,7 +97,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/__main__.py": {
+    "03-development/src/taskq_api/__main__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -110,7 +110,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/__init__.py": {
+    "03-development/src/taskq_api/api/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -123,7 +123,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/deps.py": {
+    "03-development/src/taskq_api/api/deps.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -136,7 +136,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/health.py": {
+    "03-development/src/taskq_api/api/health.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -149,7 +149,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/metrics.py": {
+    "03-development/src/taskq_api/api/metrics.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -162,7 +162,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/tasks.py": {
+    "03-development/src/taskq_api/api/tasks.py": {
       "CONFIDENCE.HIGH": 1,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -175,7 +175,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/app.py": {
+    "03-development/src/taskq_api/app.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -188,7 +188,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/errors.py": {
+    "03-development/src/taskq_api/errors.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -201,7 +201,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/models/__init__.py": {
+    "03-development/src/taskq_api/models/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -214,7 +214,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/models/schemas.py": {
+    "03-development/src/taskq_api/models/schemas.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -227,7 +227,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/__init__.py": {
+    "03-development/src/taskq_api/repository/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -240,7 +240,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/key_repo.py": {
+    "03-development/src/taskq_api/repository/key_repo.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -253,7 +253,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/orm.py": {
+    "03-development/src/taskq_api/repository/orm.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -266,7 +266,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/rate_repo.py": {
+    "03-development/src/taskq_api/repository/rate_repo.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -279,7 +279,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/session.py": {
+    "03-development/src/taskq_api/repository/session.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -292,7 +292,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/task_repo.py": {
+    "03-development/src/taskq_api/repository/task_repo.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -305,7 +305,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/__init__.py": {
+    "03-development/src/taskq_api/service/__init__.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -318,7 +318,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/auth.py": {
+    "03-development/src/taskq_api/service/auth.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -331,7 +331,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/metrics.py": {
+    "03-development/src/taskq_api/service/metrics.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -344,7 +344,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/ratelimit.py": {
+    "03-development/src/taskq_api/service/ratelimit.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -357,7 +357,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/runner.py": {
+    "03-development/src/taskq_api/service/runner.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -370,7 +370,7 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/runner_scheduler.py": {
+    "03-development/src/taskq_api/service/runner_scheduler.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -402,7 +402,7 @@
       "code": "178         raise\n179     except Exception:\n180         # The 202 response has already been sent; surface non-cancel\n181         # failures via the persisted result row instead of crashing\n182         # the background worker.\n183         pass\n184 \n",
       "col_offset": 4,
       "end_col_offset": 12,
-      "filename": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/tasks.py",
+      "filename": "03-development/src/taskq_api/api/tasks.py",
       "issue_confidence": "HIGH",
       "issue_cwe": {
         "id": 703,

@@ -1,0 +1,23 @@
+# Harness-executed: pytest-benchmark
+# returncode: 2
+# agent_score: 100.0 | threshold: 75.0
+
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== NFR-10 coverage regression: 70.7% < 80.0% ===================
+=========================== short test summary info ============================
+ERROR harness/tests/test_delayed_blocking_members_can_fire.py - FileNotFoundE...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 warning, 1 error in 4.49s
+/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_benchmark/logger.py:46: PytestBenchmarkWarning: Not saving anything, no benchmarks have been run!
+  warner(PytestBenchmarkWarning(text))
+=== TOOL_OUTPUT_ARTIFACT ===
+

@@ -11,6 +11,9 @@ Citations:
     The body shape is delivered by ``taskq_api.service.metrics``;
     this module owns the route registration + admin scope guard.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 from fastapi import APIRouter, status

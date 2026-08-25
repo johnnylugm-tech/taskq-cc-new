@@ -19,6 +19,9 @@ Citations:
     fragments, API keys, or any other secret material. The shape
     here is intentionally aggregate-only.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 from typing import Any

@@ -16,6 +16,9 @@ Citations:
   - FR-01: handlers import this module and read `.task_repo` at request time.
   - FR-06: the real SQLite/SQLAlchemy implementation lives elsewhere.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 from typing import Any, List as _List

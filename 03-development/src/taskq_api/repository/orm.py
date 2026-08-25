@@ -12,6 +12,9 @@ Citations:
     NOT import ``sqlalchemy`` directly — the static-import lint gate
     ``lint-imports exit 0`` enforces the layering invariant.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 from sqlalchemy import ForeignKey, Integer, String

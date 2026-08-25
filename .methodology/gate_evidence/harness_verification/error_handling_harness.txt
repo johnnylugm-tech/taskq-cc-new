@@ -1,0 +1,5 @@
+# Harness-executed: ast-error-handling
+# returncode: 0
+# agent_score: 90.0 | threshold: 80.0
+
+{"total": 6, "with_handler": 6, "no_handler": [], "exempt_count": 16, "exempt_files": ["03-development/src/migrations/versions/v2_tags.py", "03-development/src/migrations/versions/v3_split_results.py", "03-development/src/migrations/versions/v1_initial.py", "03-development/src/taskq_api/errors.py", "03-development/src/taskq_api/__main__.py", "03-development/src/taskq_api/repository/rate_repo.py", "03-development/src/taskq_api/repository/orm.py", "03-development/src/taskq_api/repository/task_repo.py", "03-development/src/taskq_api/repository/key_repo.py", "03-development/src/taskq_api/models/schemas.py", "03-development/src/taskq_api/api/metrics.py", "03-development/src/taskq_api/api/deps.py", "03-development/src/taskq_api/api/health.py", "03-development/src/taskq_api/service/auth.py", "03-development/src/taskq_api/service/metrics.py", "03-development/src/taskq_api/service/ratelimit.py"], "anti_patterns": ["03-development/src/taskq_api/api/tasks.py:179::broad_swallow", "03-development/src/taskq_api/service/runner_scheduler.py:161::broad_swallow"]}

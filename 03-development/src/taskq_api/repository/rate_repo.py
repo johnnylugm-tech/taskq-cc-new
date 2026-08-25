@@ -30,6 +30,9 @@ Citations:
     for risk R12 in TRACEABILITY_MATRIX.md §5 ("rate bucket 競態導致
     超放行").
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 import time

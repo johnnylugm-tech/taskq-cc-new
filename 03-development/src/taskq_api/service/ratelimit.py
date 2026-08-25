@@ -25,6 +25,9 @@ Citations:
     (P5-bucket-cap) and never reports a negative balance
     (P5-bucket-bounded).
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 

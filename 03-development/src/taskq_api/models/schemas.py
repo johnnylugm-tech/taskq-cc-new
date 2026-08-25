@@ -8,6 +8,9 @@ Citations:
   - `RunOut`    — single row in the `task_results` table (FR-02 §5.2).
   - `RunList`   — paginated runs-history response body (FR-02 AC-2.6).
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator

@@ -838,6 +838,15 @@ def test_verified_status_only_after_test_passes():
     phase failed.
     """
     import subprocess as _sp
+    import os as _os
+
+    # Strip sandbox env so the nested pytest can load its plugins
+    # normally — the harness sets these when running the mutation
+    # baseline, but they break a nested pytest invocation.
+    _nested_env = {
+        k: v for k, v in _os.environ.items()
+        if k not in ("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "HARNESS_MUTATION_BASELINE")
+    }
 
     completed = _sp.run(
         [sys.executable, "-m", "pytest",
@@ -845,6 +854,7 @@ def test_verified_status_only_after_test_passes():
          "03-development/tests/test_nfr_patterns.py::test_no_shell_true_eval_exec_in_source"],
         capture_output=True, text=True, check=False,
         cwd=str(_REPO_ROOT),
+        env=_nested_env,
     )
     assert completed.returncode == 0, (
         f"verified-status test fixture failed: {completed.stdout[-300:]}"

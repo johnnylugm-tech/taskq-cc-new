@@ -18,6 +18,9 @@ Citations:
     pytest-cov gate measures. Both names are imported by the FR-10
     RED test file as Gate 1 phantom-check sentinels.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 import uuid

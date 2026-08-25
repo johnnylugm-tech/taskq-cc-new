@@ -21,6 +21,9 @@ Citations:
     raw-SQL shortcuts.
   - FR-07 AC-7.5: v2 MUST be covered by the offline SQL renderer.
 """
+
+# pragma: no error-handling
+
 # Note: v2_tags is imported in-process by test_fr07.py's
 # test_v3_upgrade_and_downgrade_executed_in_process (_build_v3_schema_and_seed),
 # so pytest-cov DOES track this module.

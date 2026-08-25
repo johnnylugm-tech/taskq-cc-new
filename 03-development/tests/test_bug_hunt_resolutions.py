@@ -21,14 +21,9 @@ field references these paths via ``repro_test``.
 from __future__ import annotations
 
 import asyncio
-import os
-import signal
 import subprocess as sp
-import sys
 import time
 from pathlib import Path
-
-import pytest
 
 
 _SRC_ROOT = Path(__file__).resolve().parent.parent / "src"
@@ -47,7 +42,7 @@ def test_t08_redact_covers_bearer_token():
     """
     from taskq_api.service.runner import _redact
 
-    out = _redact("Bearer ABCDEFG12345")
+    out = _redact("Bearer ABCDEFG12345")  # gitleaks:allow — test fixture, not a real secret
     assert "ABCDEFG12345" not in out, (
         f"T-08 regressed: bearer token NOT redacted. out={out!r}"
     )
@@ -74,7 +69,7 @@ def test_t08_redact_covers_api_key_form():
     """T-08: ``api_key=<secret>`` must be redacted (parallel to token=)."""
     from taskq_api.service.runner import _redact
 
-    out = _redact("api_key=ABCDEFG12345")
+    out = _redact("api_key=ABCDEFG12345")  # gitleaks:allow — test fixture, not a real secret
     assert "ABCDEFG12345" not in out, (
         f"T-08 regressed: api_key value NOT redacted. out={out!r}"
     )

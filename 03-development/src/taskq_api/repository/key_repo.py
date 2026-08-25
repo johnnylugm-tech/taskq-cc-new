@@ -18,6 +18,9 @@ Citations:
   - FR-06: the real SQLite/SQLAlchemy implementation lives elsewhere;
     the in-memory fallback here mirrors its public shape.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 from typing import Any

@@ -1,0 +1,26 @@
+Name                                         Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------------
+03-development/src/taskq_api/api/__init__.py     0      0   100%
+03-development/src/taskq_api/api/deps.py        75      0   100%
+03-development/src/taskq_api/api/health.py      27      0   100%
+03-development/src/taskq_api/api/metrics.py     10      0   100%
+03-development/src/taskq_api/api/tasks.py       53      0   100%
+03-development/src/taskq_api/app.py             82      0   100%
+03-development/src/taskq_api/errors.py          13      0   100%
+03-development/src/taskq_api/models/schemas.py  39      0   100%
+03-development/src/taskq_api/repository/__init__.py 0      0   100%
+03-development/src/taskq_api/repository/key_repo.py 17      0   100%
+03-development/src/taskq_api/repository/orm.py  30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py 48      0   100%
+03-development/src/taskq_api/repository/session.py 48      0   100%
+03-development/src/taskq_api/repository/task_repo.py 52      0   100%
+03-development/src/taskq_api/service/__init__.py 0      0   100%
+03-development/src/taskq_api/service/auth.py    19      0   100%
+03-development/src/taskq_api/service/metrics.py 12      0   100%
+03-development/src/taskq_api/service/ratelimit.py 10      0   100%
+03-development/src/taskq_api/service/runner_scheduler.py 95      0   100%
+------------------------------------------------------------------------------------------
+TOTAL                                        630      0   100%
+Coverage JSON written to file .coverage.json
+
+236 passed, 1 warning in 0.62s

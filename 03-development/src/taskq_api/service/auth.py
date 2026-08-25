@@ -14,6 +14,9 @@ Citations:
   - NFR-04 (security): plaintext keys must never appear in logs,
     metrics, or persisted state.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 import hashlib

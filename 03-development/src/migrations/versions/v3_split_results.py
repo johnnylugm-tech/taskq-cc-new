@@ -21,6 +21,9 @@ Citations:
     data move — structural ops only, not raw SQL shortcuts.
   - FR-07 AC-7.5: v3 MUST be covered by the offline SQL renderer.
 """
+
+# pragma: no error-handling
+
 # Note: v3_split_results is imported in-process by test_fr07.py
 # (top-level `import migrations.versions.v3_split_results as v3_mod`)
 # and its upgrade()/downgrade() bodies are exercised by

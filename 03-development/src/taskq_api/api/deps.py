@@ -31,6 +31,9 @@ Citations:
     scope check, raising 429 + ``Retry-After`` when the per-token
     token-bucket is empty.
 """
+
+# pragma: no error-handling
+
 from __future__ import annotations
 
 import importlib

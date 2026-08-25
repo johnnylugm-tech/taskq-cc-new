@@ -2,14 +2,18 @@
 # returncode: 0
 # agent_score: 100.0 | threshold: 80.0
 
-........................................................................ [ 31%]
-........................................................................ [ 63%]
-........................................................................ [ 94%]
-............                                                             [100%]
+........................................................................ [ 29%]
+........................................................................ [ 59%]
+........................................................................ [ 89%]
+.........................                                                [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
+
+03-development/tests/test_benchmarks.py::test_benchmark_get_by_id
+  03-development/tests/test_benchmarks.py:43: PytestBenchmarkWarning: Benchmark fixture was not used at all in this test!
+    def test_benchmark_get_by_id(benchmark):
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 
@@ -43,7 +47,20 @@ Name                                                         Stmts   Miss  Cover
 TOTAL                                                          648      0   100%
 Coverage JSON written to file .coverage.json
 
-228 passed, 1 warning in 16.57s
+
+--------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                   Max                Mean             StdDev              Median                IQR              Outliers  OPS (Mops/s)            Rounds  Iterations
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.1605 (1.0)        434.5264 (1.0)       44.6041 (1.0)       1.8846 (1.0)       44.6427 (1.0)       0.3747 (1.0)       1206;9265       22.4195 (1.0)      199999         112
+test_benchmark_refill          179.1748 (4.15)     1,533.3251 (3.53)     184.8676 (4.14)      8.7330 (4.63)     184.3742 (4.13)      2.0998 (5.60)      1250;3684        5.4093 (0.24)     126985          40
+test_benchmark_redact          250.0019 (5.79)     6,875.0232 (15.82)    356.3730 (7.99)     37.3811 (19.84)    374.9738 (8.40)     41.9677 (112.00)    2686;1000        2.8060 (0.13)     157904           1
+test_benchmark_hash_key        258.2994 (5.98)     1,191.6505 (2.74)     277.3865 (6.22)     19.2843 (10.23)    272.9503 (6.11)      6.2515 (16.68)    8747;11548        3.6051 (0.16)     167842          20
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+241 passed, 2 warnings in 25.04s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
