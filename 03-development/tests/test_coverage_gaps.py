@@ -177,6 +177,42 @@ def test_key_repo_find_by_hash_returns_none_when_missing():
         singleton.rows.update(saved)
 
 
+def test_key_repo_create_returns_row_with_key_id():
+    """key_repo.create returns a row whose key_id, scope, key_hash are populated (lines 47-55)."""
+    from taskq_api.repository import key_repo as key_repo_mod
+
+    singleton = key_repo_mod.key_repo
+    saved = dict(singleton.rows)
+    try:
+        singleton.rows.clear()
+        row = singleton.create(scope="read", key_hash="abc123")
+        assert row["scope"] == "read"
+        assert row["key_hash"] == "abc123"
+        assert row["revoked_at"] is None
+        assert row["key_id"].startswith("key-")
+        # The create should also be retrievable via find_by_hash.
+        assert singleton.find_by_hash("abc123") is row
+    finally:
+        singleton.rows.clear()
+        singleton.rows.update(saved)
+
+
+def test_key_repo_revoke_marks_existing_row():
+    """key_repo.revoke sets revoked_at on an existing row (line 77)."""
+    from taskq_api.repository import key_repo as key_repo_mod
+
+    singleton = key_repo_mod.key_repo
+    saved = dict(singleton.rows)
+    try:
+        singleton.rows.clear()
+        singleton.create(scope="read", key_hash="rev-1")
+        singleton.revoke("rev-1", "2026-08-25T00:00:00Z")
+        assert singleton.rows["rev-1"]["revoked_at"] == "2026-08-25T00:00:00Z"
+    finally:
+        singleton.rows.clear()
+        singleton.rows.update(saved)
+
+
 def test_task_repo_create_rejects_empty_name():
     """task_repo.create raises ValueError on empty name (line 41)."""
     from taskq_api.repository import task_repo as task_repo_mod
@@ -229,17 +265,20 @@ def test_task_repo_delete_with_results_sweeps_results():
 
 
 def test_auth_compare_keys_distinguishes_inputs():
-    """auth.hash_key returns the same digest for the same plaintext.
+    """auth.compare_keys returns False for non-matching or empty inputs.
 
-    Drives line 89 of auth.py — the `compare_keys` early-exit when the
-    digest input has a non-trivial shape.
+    Drives line 89 of auth.py — the `compare_keys` early-exit branch
+    that returns False when either side of the comparison is empty.
     """
-    from taskq_api.service.auth import hash_key
+    from taskq_api.service.auth import compare_keys, hash_key
 
-    digest_a = hash_key("a")
-    digest_b = hash_key("a")
-    assert digest_a == digest_b
-    assert digest_a != hash_key("b")
+    saved_hash = hash_key("real-key")
+    assert compare_keys("real-key", saved_hash) is True
+    assert compare_keys("wrong-key", saved_hash) is False
+    # Empty inputs short-circuit to False (line 89).
+    assert compare_keys("", saved_hash) is False
+    assert compare_keys("real-key", "") is False
+    assert compare_keys("", "") is False
 
 
 def test_schemas_task_create_rejects_missing_required_field():
@@ -249,6 +288,29 @@ def test_schemas_task_create_rejects_missing_required_field():
 
     with pytest.raises(ValidationError):
         TaskCreate()
+
+
+def test_schemas_task_create_rejects_injection_characters():
+    """schemas.TaskCreate rejects a 'command' containing shell-injection chars (line 40)."""
+    from pydantic import ValidationError
+    from taskq_api.models.schemas import TaskCreate
+
+    # `_INJECTION_CHARS = ";|&`$()<>\\n"` — pick any one to exercise the
+    # ``_no_injection_chars`` field validator's raise branch (line 40).
+    with pytest.raises(ValidationError) as exc_info:
+        TaskCreate(command="echo hello; rm -rf /", name="intj-1")
+    # The error message includes the offending character so the operator
+    # can see what tripped the validator.
+    assert "forbidden characters" in str(exc_info.value)
+
+
+def test_schemas_task_create_accepts_safe_command():
+    """schemas.TaskCreate accepts a safe command (line 43 ``return v`` branch)."""
+    from taskq_api.models.schemas import TaskCreate
+
+    obj = TaskCreate(command="echo hello", name="safe-1")
+    assert obj.command == "echo hello"
+    assert obj.name == "safe-1"
 
 
 def test_migrations_env_source_file_exists():
