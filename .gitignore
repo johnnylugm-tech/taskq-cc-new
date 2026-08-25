@@ -16,6 +16,8 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+*.cover
+*,cover
 htmlcov/
 .mutmut-cache/
 .code-review-graph/

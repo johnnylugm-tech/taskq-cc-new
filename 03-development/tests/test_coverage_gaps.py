@@ -143,8 +143,20 @@ def test_deps_rate_repo_attribute_resolves():
     Line 92 of deps.py is the late-bound `import_module(...)` lookup; the
     tests below swap the underlying rate_repo singleton out from under us,
     so we only assert the access path does not raise.
+
+    The earlier fixtures (test_fr01.client et al.) pre-bind ``deps.rate_repo``
+    via direct module-attribute assignment — that assignment survives past
+    the test boundary because it isn't a ``monkeypatch.setattr``. To exercise
+    the lazy ``__getattr__`` branch we must first unbind the pre-existing
+    attribute so PEP 562 falls through to the ``import_module`` call.
     """
     from taskq_api.api import deps
+
+    # Earlier fixtures may have pre-bound deps.rate_repo via direct module
+    # assignment; that shadow the lazy __getattr__ lookup, so detach it here
+    # to actually exercise line 92 in the full-suite run.
+    if hasattr(deps, "rate_repo"):
+        delattr(deps, "rate_repo")
 
     # Accessing the attribute exercises line 92 (the import_module branch).
     rate = deps.rate_repo
