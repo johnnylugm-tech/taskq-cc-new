@@ -66,6 +66,7 @@ import asyncio
 import os
 import re
 import shlex
+import signal
 import uuid
 from datetime import datetime, timezone
 from typing import Any
@@ -74,12 +75,16 @@ import taskq_api.repository.task_repo as task_repo_mod
 
 
 # ---------------------------------------------------------------------------
-# Redaction (NFR-04): replace ``token=<value>`` with the configured marker
-# BEFORE writing stdout/stderr tails to the persistence layer. The regex
-# captures everything non-whitespace after ``token=`` so a trailing newline
-# stays intact.
+# Redaction (NFR-04): mask secret-bearing substrings before writing
+# stdout/stderr tails to the persistence layer. SAD §6 T-08 enumerates
+# three forms the mitigation MUST cover — API key (token=, api_key=),
+# Bearer token, and DSN password inside a database URL. The pre-fix
+# pattern ``r"token=\S*"`` covered only the first family; bearer
+# tokens and DSN passwords were persisted unredacted.
 # ---------------------------------------------------------------------------
-_REDACTION_PATTERN = re.compile(r"token=\S*")
+_REDACTION_PATTERN = re.compile(
+    r"(?:token=|api_key=|password=|Bearer\s+|://[^\s:@/]+:)[^\s@/]*"
+)
 _REDACTED_MARKER = "[REDACTED]"
 
 # Timeout budget defaults — env var overrides win.
@@ -304,13 +309,25 @@ async def _reap_after_kill(proc: asyncio.subprocess.Process) -> None:
     """Reap a child process after a timeout-triggered kill (FR-08 AC-8.4).
 
     The contract is **explicit**:
-        1. ``proc.kill()``  — SIGKILL the child.
+        1. ``os.killpg(os.getpgid(proc.pid), signal.SIGKILL)`` — SIGKILL
+           the entire process group rooted at the child (catches
+           descendants that ``proc.kill()`` alone would leave orphaned —
+           SAD §6 T-07 mitigation).
         2. ``await proc.wait()`` — block until the OS reaps the PID.
 
-    ``proc.communicate()`` is NOT a substitute: it consumes stdout/stderr
-    buffers and can resurrect the wait, masking a leaked PID. The
-    FR-08 spec language (``process.kill()`` + ``await process.wait()``)
-    is binding.
+    The child is spawned with ``start_new_session=True`` (see
+    ``run_task`` below) so it leads its own session / process group;
+    killing the PG cannot reach the runner itself. ``proc.kill()``
+    alone (SIGKILL to one PID) leaves subprocess.Popen / fork
+    descendants as orphans reparented to launchd — that is the
+    pre-fix T-07 bug the regression test in
+    ``tests/test_bug_hunt_resolutions.py`` pins.
+
+    ``proc.communicate()`` is NOT a substitute for the wait: it
+    consumes stdout/stderr buffers and can resurrect the wait,
+    masking a leaked PID. The FR-08 spec language (``process.kill()``
+    + ``await process.wait()``) is binding in spirit; we use
+    ``os.killpg`` as the stronger form mandated by SAD §6 T-07.
 
     Best-effort: a narrow exception tuple swallows only the
     ``ProcessLookupError`` / ``asyncio.TimeoutError`` cases where the
@@ -324,13 +341,47 @@ async def _reap_after_kill(proc: asyncio.subprocess.Process) -> None:
         + ``await process.wait()`` → no orphan PID.
       - FR-08 §3 AC-8.5 SPEC.md line ~57: narrow exception tuple;
         ``CancelledError`` propagates.
+      - SAD §6 T-07: integration test asserts no descendant pid
+        remains after timeout; ``os.killpg`` on the new PG is the
+        fix that satisfies this contract for children that themselves
+        spawn subprocesses.
     """
-    try:
-        proc.kill()
-    except ProcessLookupError:
-        # Child already reaped; nothing to kill.
-        pass
-    # AC-8.4: explicit ``await proc.wait()`` — NOT ``communicate()``.
+    # Step 1: SIGKILL the entire process group rooted at the child.
+    # ``proc.pid`` may be ``None`` in pathological race conditions;
+    # guard so we don't crash and fall through to ``wait``.
+    #
+    # Only killpg when the child leads its own process group (i.e.
+    # ``os.getpgid(pid) != os.getpgid(0)``). When the child was NOT
+    # spawned with ``start_new_session=True`` it inherits the runner's
+    # PG, and killpg would kill the runner itself. The defensive
+    # comparison keeps the helper safe to call on proc objects the
+    # runner did NOT create (e.g. the FR-08 helper-exercise test that
+    # spawns ``sleep 5`` directly with the default PG).
+    pid = getattr(proc, "pid", None)
+    if pid is not None:
+        try:
+            child_pgid = os.getpgid(pid)
+        except (ProcessLookupError, PermissionError, OSError):
+            child_pgid = None
+        if child_pgid is not None:
+            try:
+                my_pgid = os.getpgid(0)
+            except (ProcessLookupError, PermissionError, OSError):
+                my_pgid = None
+            if my_pgid is None or child_pgid != my_pgid:
+                try:
+                    os.killpg(child_pgid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError, OSError):
+                    # PG already gone or we lack permission.
+                    pass
+            else:
+                # Same PG as the runner — fall back to plain proc.kill()
+                # so we don't self-terminate.
+                try:
+                    proc.kill()
+                except ProcessLookupError:
+                    pass
+    # Step 2: explicit ``await proc.wait()`` — NOT ``communicate()``.
     try:
         await proc.wait()
     except (ProcessLookupError, asyncio.TimeoutError):
@@ -444,11 +495,18 @@ async def run_task(
         }
 
     # ---- 3) Spawn the subprocess. ----------------------------------------
+    # ``start_new_session=True`` puts the child in its own session /
+    # process group so the timeout-kill path can SIGKILL the entire
+    # group via ``os.killpg`` (see ``_reap_after_kill`` above) without
+    # reaching the runner itself. SAD §6 T-07 mitigation: no descendant
+    # pid remains after timeout — without the new session, killpg
+    # would target the runner's PG and self-terminate.
     try:
         proc = await asyncio.create_subprocess_exec(
             *args,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
+            start_new_session=True,
         )
     except (FileNotFoundError, OSError) as exc:
         _safe_persist_terminal(

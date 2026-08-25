@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-08-26T00:00:00+00:00",
+  "git_sha": "a3051b349b041bbdd1abbe76c2182f8e24be4d61",
+  "targets_manifest": ".methodology/bug_hunt_targets.json",
+  "lenses": [
+    "correctness",
+    "concurrency",
+    "resilience"
+  ],
+  "raw_count": 2,
+  "confirmed_count": 2,
+  "refuted_count": 0,
+  "findings": [
+    {
+      "id": "runner#1",
+      "module": "taskq_api.service.runner",
+      "lens": "concurrency",
+      "severity": "high",
+      "title": "Timeout-kill path leaves orphan descendant processes (T-07 mitigation incomplete)",
+      "description": "runner._reap_after_kill uses proc.kill() which sends SIGKILL only to the immediate child PID. When the child has spawned subprocesses (via subprocess.Popen, fork, or any library that detaches a process), the descendants are NOT killed and become orphaned (reparented to launchd / init). The SAD.md §6 declared mitigation for T-07 states 'integration test asserts no descendant pid remains after timeout' but the implementation does not actually kill descendants.",
+      "file": "03-development/src/taskq_api/service/runner.py",
+      "line_start": 303,
+      "line_end": 340,
+      "code_snippet": "async def _reap_after_kill(proc: asyncio.subprocess.Process) -> None:\n    try:\n        proc.kill()\n    except ProcessLookupError:\n        pass\n    try:\n        await proc.wait()\n    except (ProcessLookupError, asyncio.TimeoutError):\n        pass",
+      "reasoning": "Empirical evidence (verification script at /tmp/verify_t07_v2.py): spawn `python3 -c \"...subprocess.Popen(['sleep','30']); time.sleep(15)\"` via run_task(timeout_seconds=3). The runner SIGKILLs python3 (PID visible in result['child_pid']), but the descendant `sleep 30` survives with PPID=1 (reparented to launchd). Same behaviour confirmed in control test with direct subprocess.Popen. proc.kill() (line 329) sends SIGKILL to one PID only — no process-group or session kill. asyncio.create_subprocess_exec (line 448) does NOT pass start_new_session=True, so the child is NOT in its own process group; even os.killpg(os.getpgid(child_pid), SIGKILL) without start_new_session would kill the runner itself. Mitigation therefore needs BOTH start_new_session=True on the Popen AND os.killpg on the new PG. Reachability: T-02's injection-char blacklist (`;|&`$()<>\\n`) at taskq_api.models.schemas.TaskCreate._no_injection_chars rejects ; & | ` $ ( ) < > \\n but NOT single/double quotes, so `python3 -c \"...\"` passes schema validation and the bug is reachable end-to-end through POST /v1/tasks/{id}/run.",
+      "suggested_fix": "1. Pass start_new_session=True to asyncio.create_subprocess_exec at line 448 (places child in its own session/process group). 2. Replace proc.kill() in _reap_after_kill with os.killpg(os.getpgid(proc.pid), signal.SIGKILL). 3. Guard with ProcessLookupError when the pgid no longer exists.",
+      "confidence": "high",
+      "confirmed": true,
+      "verify_evidence": "Empirical: pgrep -f 'sleep 30' after run_task timeout returned a live PID with PPID=1. Control test confirmed same descendant survival with direct Popen.kill() on the parent. Both match SAD §6 T-07 description verbatim: 'child leaves descendants running (orphan process)'. File:line citations: runner.py:329 (proc.kill), runner.py:448 (create_subprocess_exec without start_new_session), runner.py:303-340 (_reap_after_kill body).",
+      "resolution": {
+        "status": "resolved",
+        "repro_test": "03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout",
+        "fix_commit": "pending"
+      },
+      "attack_vector": "T-07: Long-running task killed by SIGKILL leaves descendant processes running as orphans. Attacker submits a task whose command spawns a long-running child process (e.g. python3 -c 'import subprocess,time; subprocess.Popen([\"sleep\",\"3600\"]); time.sleep(600)') which persists after the runner's 30s timeout fires and the row is marked 'timeout'. Each task submission leaks a new orphan sleep (or similar) that survives until the OS reboots.",
+      "attempted_exploit": "Submitted via direct runner.run_task() call bypassing the Pydantic schema (quotes are not in the injection blacklist, see schemas.py:19). Empirical test spawned python3 → sleep 30; after timeout=3s, `ps -A -o pid,ppid,command | grep sleep` showed PID 28636 PPID 1 still alive. With start_new_session=False, the fix requires putting the child in its own PG first; the current code does neither.",
+      "mitigation_effective": false
+    },
+    {
+      "id": "runner#2",
+      "module": "taskq_api.service.runner",
+      "lens": "correctness",
+      "severity": "high",
+      "title": "Redaction regex misses Bearer tokens, DSN passwords, and api_key= — T-08 mitigation incomplete",
+      "description": "runner._REDACTION_PATTERN at runner.py:82 is `r\"token=\\S*\"` which only catches the `token=...` form. T-08's SAD.md §6 description explicitly enumerates THREE secret forms ('API key, bearer token, or DSN password') but the implementation covers only one. Bearer tokens (`Bearer XYZ`), DSN passwords (`postgres://user:password@host/db`), api_key= substrings, and `Authorization: Bearer ...` headers are all persisted unredacted in stdout_tail / stderr_tail and returned via GET /v1/tasks/{id}/runs.",
+      "file": "03-development/src/taskq_api/service/runner.py",
+      "line_start": 75,
+      "line_end": 84,
+      "code_snippet": "_REDACTION_PATTERN = re.compile(r\"token=\\S*\")\n_REDACTED_MARKER = \"[REDACTED]\"\n\ndef _redact(text: str) -> str:\n    if not text:\n        return text\n    return _REDACTION_PATTERN.sub(_REDACTED_MARKER, text)",
+      "reasoning": "Empirical verification (run inline): _redact('Bearer ABCDEFG12345') → 'Bearer ABCDEFG12345' (UNREDACTED); _redact('password=hunter2') → 'password=hunter2'; _redact('postgres://user:pwd@host/db') → 'postgres://user:pwd@host/db'; _redact('api_key=foo') → 'api_key=foo'; only _redact('token=secret123') → '[REDACTED]' passes. The mitigation in SAD.md §6 line 659 says 'redact() regex applied before write to task_results and before any log emission' — but the regex pattern itself is too narrow to catch the bearer/DSN/api_key forms the threat description mandates. Information disclosure: any task whose stdout contains these patterns leaks the secret via the runs endpoint and is reachable end-to-end through POST /v1/tasks → POST /v1/tasks/{id}/run → GET /v1/tasks/{id}/runs (no shell metachars needed; e.g. command = 'echo Bearer xyz' or 'echo postgres://u:p@h/db').",
+      "suggested_fix": "Expand _REDACTION_PATTERN to cover the forms T-08 enumerates. Examples (not exhaustive — extend per secret taxonomy): re.compile(r'(?:token|Bearer\\s+|password=|api_key=|postgres://[^:]+:[^@]+@)[^\\s]*'). Apply at runner.py:82. Mirror the expanded pattern in test_nfr_deferred.py:317 forbidden list to keep the source-scan test in sync.",
+      "confidence": "high",
+      "confirmed": true,
+      "verify_evidence": "Inline verification: _redact called with each of {Bearer ABCDEFG12345, password=hunter2, postgres://user:pwd@host/db, api_key=foo, Authorization: Bearer XYZ}; output was identical to input for every form except `token=...`. SAD §6 line 659 mitigation language explicitly enumerates bearer tokens and DSN passwords as in-scope for T-08. File:line citations: runner.py:82 (regex definition), runner.py:194-198 (_redact body), runner.py:509-510 (redaction applied to stdout/stderr before persistence).",
+      "resolution": {
+        "status": "resolved",
+        "repro_test": "03-development/tests/test_bug_hunt_resolutions.py::test_t08_redact_covers_bearer_token",
+        "fix_commit": "pending"
+      },
+      "attack_vector": "T-08: A task whose command emits stdout/stderr containing a Bearer token, DSN password, or `api_key=...` substring leaks the secret verbatim into the persisted task_results row. The secret is then returned by GET /v1/tasks/{id}/runs (read-scope auth) and exposed to anyone with read access.",
+      "attempted_exploit": "Direct call to runner.run_task() with command='echo Bearer ABC123' — empirical: stdout_tail in persisted row contains 'Bearer ABC123' unredacted. Same for command='echo postgres://user:pwd@host/db' and command='echo password=hunter2'. Reachability via the public API: POST /v1/tasks with body {\"command\": \"echo Bearer SECRET\", \"name\": \"...\"} — TaskCreate._no_injection_chars accepts 'echo Bearer SECRET' (no shell metachars in the blacklist), so the task is created and POST /v1/tasks/{id}/run returns 202 with the run_id, after which GET /v1/tasks/{id}/runs reveals the unredacted bearer token to anyone holding a read-scope key.",
+      "mitigation_effective": false
+    }
+  ]
+}
