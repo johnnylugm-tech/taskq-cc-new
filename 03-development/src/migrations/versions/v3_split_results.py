@@ -21,7 +21,11 @@ Citations:
     data move — structural ops only, not raw SQL shortcuts.
   - FR-07 AC-7.5: v3 MUST be covered by the offline SQL renderer.
 """
-# pragma: no cover
+# Note: v3_split_results is imported in-process by test_fr07.py
+# (top-level `import migrations.versions.v3_split_results as v3_mod`)
+# and its upgrade()/downgrade() bodies are exercised by
+# test_v3_upgrade_and_downgrade_executed_in_process, so pytest-cov
+# DOES track this module.
 from __future__ import annotations
 
 from typing import Sequence, Union

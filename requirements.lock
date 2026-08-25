@@ -24,6 +24,14 @@ bandit==1.7.10
 radon==6.0.1
 pip-licenses==4.5.1
 pip-tools==7.4.1
+# hypothesis — property-based test driver required by TEST_SPEC.md
+# §Properties (Direction B): the spec-typed invariants (FR-04 scope
+# hierarchy, FR-05 bucket capacity, FR-07 v3 round-trip, FR-08 drain
+# budget, FR-10 factory idempotence) are exercised as @given tests in
+# 03-development/tests/test_property_invariants.py. Without hypothesis
+# the property_spec rule cannot satisfy its executing-property-test
+# requirement.
+hypothesis==6.165.10
 
 # ── Transitive (pinned to known-good versions for reproducibility) ─────────
 starlette==0.38.6

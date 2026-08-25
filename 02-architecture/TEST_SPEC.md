@@ -479,6 +479,45 @@ invariant (CRUD correctness is per-row, not per-equation). **Skipped.**
 | AC3-asgi-driver | `direct_handler_call_hits == "0"` | 3 |
 | AC4-error-coverage | `covered_count == "7/7"` | 4 |
 
+#### NFR-02 / NFR-03 / NFR-09: Unit-level NFR greps, AST scans, and bandit gate
+
+**Classification**: UNIT (static-source scanners, grep gate, bandit subprocess)
+
+> These ACs are owned by the static-source scanners / bandit subprocess that
+> the test_nfr_patterns.py module drives; their verification is the named
+> tool's exit code, not an integration assertion. Each test below is the
+> concrete case the unit suite runs to assert the named invariant.
+
+| # | Test Function | Inputs | Type | Derivation |
+|---|---|---|---|---|
+| 1 | `test_no_shell_true_eval_exec_in_source` | source_glob="03-development/src/**/*.py"; shell_true_hits="0" | static_grep | Q2 |
+| 2 | `test_no_string_concat_sql_in_source` | source_glob="03-development/src/**/*.py"; concat_sql_hits="0" | static_grep | Q2 |
+| 3 | `test_keys_hashed_and_compared_with_hmac_compare_digest` | source_path="03-development/src/taskq_api/service/auth.py"; uses_hashlib="True"; uses_hmac_compare_digest="True" | static_grep | Q2 |
+| 4 | `test_403_body_does_not_leak_resource_existence` | source_path="03-development/src/taskq_api/api/deps.py"; forbidden_markers="task_id,not found,does not exist" | static_grep | Q2 |
+| 5 | `test_error_body_no_stack_sql_or_paths` | source_path="03-development/src/taskq_api/errors.py"; forbidden_substrings="traceback,SELECT ,/Users/,/home/" | static_grep | Q2 |
+| 6 | `test_cors_denies_by_default_allowlist_only` | source_path="03-development/src/taskq_api/app.py"; allow_origins_wildcard_hits="0" | static_grep | Q2 |
+| 7 | `test_bandit_zero_high_zero_medium` | source_glob="03-development/src/"; high_count="0"; medium_count="0" | static_subprocess | Q2 |
+| 8 | `test_per_request_tx_boundary_commit_or_rollback` | source_path="03-development/src/taskq_api/repository/session.py"; commit_present="True"; rollback_present="True" | static_grep | Q2 |
+| 9 | `test_no_bare_except_or_except_exception_pass` | source_glob="03-development/src/**/*.py"; bare_except_hits="0"; broad_pass_hits="0" | static_grep | Q2 |
+| 10 | `test_cancelled_error_is_reraised` | source_path="03-development/src/taskq_api/service/runner.py"; cancellled_error_swallow_hits="0" | static_ast | Q2 |
+| 11 | `test_pytest_skipped_zero` | source_glob="03-development/tests/**/test_*.py"; skip_marker_hits="0" | static_grep | Q2 |
+
+**Sub-assertions**
+
+| rule_id | predicate | applies_to (case #) |
+|---|---|---|
+| AC-N2.1-shell-none | `shell_true_hits == "0"` | 1 |
+| AC-N2.2-concat-none | `concat_sql_hits == "0"` | 2 |
+| AC-N2.3-hash-compare | `uses_hashlib == "True" and uses_hmac_compare_digest == "True"` | 3 |
+| AC-N2.4-no-leak | `forbidden_markers_hits == "0"` | 4 |
+| AC-N2.5-no-stack | `forbidden_substring_hits == "0"` | 5 |
+| AC-N2.6-no-wildcard | `allow_origins_wildcard_hits == "0"` | 6 |
+| AC-N2.7-bandit-zero | `high_count == "0" and medium_count == "0"` | 7 |
+| AC-N3.1-tx-boundary | `commit_present == "True" and rollback_present == "True"` | 8 |
+| AC-N3.2-no-bare | `bare_except_hits == "0" and broad_pass_hits == "0"` | 9 |
+| AC-N3.3-cancel-reraise | `cancellled_error_swallow_hits == "0"` | 10 |
+| AC-N9.1-no-skip | `skip_marker_hits == "0"` | 11 |
+
 ---
 
 ### Deferred to Downstream Phases
@@ -494,46 +533,35 @@ invariant (CRUD correctness is per-row, not per-equation). **Skipped.**
 | 1 | NFR-01 | test_nfr01_perf_p95_get_by_id | unit | p95 latency on single-fetch (latency SLA, owned by pytest-benchmark) |
 | 2 | NFR-01 | test_nfr01_perf_p95_list_limit_50 | unit | p95 latency on list-fetch (latency SLA) |
 | 3 | NFR-01 | test_nfr01_constant_sql_count_event_listener | unit | constant SQL statement count via event listener |
-| 4 | NFR-02 | test_no_shell_true_eval_exec_in_source | unit | grep gate: no shell=True / eval( / exec( |
-| 5 | NFR-02 | test_no_string_concat_sql_in_source | unit | grep gate: no SQL string concatenation |
-| 6 | NFR-02 | test_keys_hashed_and_compared_with_hmac_compare_digest | unit | API key hashing + constant-time compare |
-| 7 | NFR-02 | test_403_body_does_not_leak_resource_existence | unit | 403 body does not leak resource existence |
-| 8 | NFR-02 | test_error_body_no_stack_sql_or_paths | unit | problem+json detail excludes internal fragments |
-| 9 | NFR-02 | test_cors_denies_by_default_allowlist_only | unit | CORS deny-by-default with TASKQ_CORS_ORIGINS allowlist |
-| 10 | NFR-02 | test_bandit_zero_high_zero_medium | unit | bandit returns 0 HIGH / 0 MEDIUM |
-| 11 | NFR-03 | test_per_request_tx_boundary_commit_or_rollback | unit | per-request transaction commits or rolls back |
-| 12 | NFR-03 | test_no_bare_except_or_except_exception_pass | unit | no bare except / except Exception: pass |
-| 13 | NFR-03 | test_cancelled_error_is_reraised | unit | asyncio.CancelledError is re-raised, not swallowed |
-| 14 | NFR-03 | test_readyz_503_on_db_failure | unit | /readyz returns 503 when DB is unreachable |
-| 15 | NFR-03 | test_task_timeout_terminates_child_no_orphan | unit | subprocess is killed on timeout (no orphan) |
-| 16 | NFR-03 | test_failed_migration_rolls_back_to_previous_revision | unit | failed alembic upgrade rolls back transaction |
-| 17 | NFR-04 | test_sensitive_lines_replaced_with_redacted | unit | redaction filter masks sk-/token=/Bearer/postgres:// |
-| 18 | NFR-04 | test_db_url_password_absent_from_logs_and_metrics | unit | DB URL password absent from logs and /v1/metrics body |
-| 19 | NFR-04 | test_key_plaintext_printed_once_and_not_persisted | unit | key plaintext printed exactly once, never persisted |
-| 20 | NFR-05 | test_public_fn_class_docstrings_have_fr_or_nfr_ref | unit | 100% public fn/class docstrings include [FR-XX]/[NFR-XX] |
-| 21 | NFR-05 | test_openapi_summary_and_description_populated | unit | every OpenAPI route has summary + description |
-| 22 | NFR-06 | test_importlinter_exists_with_layers_contract | unit | .importlinter declares api > service > repository > models |
-| 23 | NFR-06 | test_sqlalchemy_forbidden_outside_repository | unit | sqlalchemy forbidden outside repository/ layer |
-| 24 | NFR-06 | test_lint_imports_exits_zero | unit | lint-imports exits 0 |
-| 25 | NFR-06 | test_no_contract_weakening_or_ignore_imports_wildcards | unit | no .importlinter weakening via wildcards / ignore_imports |
-| 26 | NFR-07 | test_runtime_deps_pinned_with_eq_eq | unit | requirements.txt pins all runtime deps with == |
-| 27 | NFR-07 | test_dependency_license_in_allowlist | unit | every license ∈ allowlist (MIT/BSD/Apache/PSF) |
-| 28 | NFR-07 | test_pip_licenses_with_system_full_tree | unit | pip-licenses --with-system reports full-tree compliance |
-| 29 | NFR-07 | test_sbom_at_08_config_with_required_schema | unit | 08-config/SBOM.json schema conforms to AC-N7.4 (SBOM schema fields: name/version/license/direct|transitive) |
-| 30 | NFR-08 | test_mutation_testing_feature_enabled_in_harness_config | framework | .methodology/harness_config.json enables mutation_testing |
-| 31 | NFR-08 | test_mutation_score_ge_70 | framework | mutmut score ≥ 70 |
-| 32 | NFR-08 | test_scope_limited_to_service_and_repository | framework | mutation scope limited to service/ + repository/ |
-| 33 | NFR-09 | test_pytest_skipped_zero | unit | pytest -q reports 0 skipped |
-| 34 | NFR-09 | test_zero_assert_zero | unit | every test function has ≥ 1 assert |
-| 35 | NFR-09 | test_no_test_exclusions_via_ignore_deselect_or_testpaths | unit | no --ignore/-k/--deselect/collect_ignore/testpaths removal |
-| 36 | NFR-09 | test_fr07_migration_real_sqlite_round_trip | unit | FR-07 round-trip uses real SQLite file (not mock) |
-| 37 | NFR-09 | test_verified_status_only_after_test_passes | unit | VERIFIED status only after cited test passes |
-| 38 | NFR-11 | test_project_mi_ge_80 | unit | project MI (LLOC weighted) ≥ 80 |
-| 39 | NFR-11 | test_single_function_cc_le_10 | unit | single-function cyclomatic complexity ≤ 10 |
-| 40 | NFR-11 | test_file_and_directory_size_limits | unit | file ≤ 400 lines, dir ≤ 15 files |
-| 41 | NFR-11 | test_api_handler_le_40_lines | unit | API handler ≤ 40 lines |
-| 42 | NFR-12 | test_verify_system_chains_alembic_tests_smoke_round_trip | deployment | Makefile verify-system chains alembic + tests + smoke + round-trip |
-| 43 | NFR-12 | test_verify_system_exit_zero_prints_pass | deployment | make verify-system exits 0 and prints "verify-system: PASS" |
+| 4 | NFR-03 | test_readyz_503_on_db_failure | unit | /readyz returns 503 when DB is unreachable |
+| 5 | NFR-03 | test_task_timeout_terminates_child_no_orphan | unit | subprocess is killed on timeout (no orphan) |
+| 6 | NFR-03 | test_failed_migration_rolls_back_to_previous_revision | unit | failed alembic upgrade rolls back transaction |
+| 7 | NFR-04 | test_sensitive_lines_replaced_with_redacted | unit | redaction filter masks sk-/token=/Bearer/postgres:// |
+| 8 | NFR-04 | test_db_url_password_absent_from_logs_and_metrics | unit | DB URL password absent from logs and /v1/metrics body |
+| 9 | NFR-04 | test_key_plaintext_printed_once_and_not_persisted | unit | key plaintext printed exactly once, never persisted |
+| 10 | NFR-05 | test_public_fn_class_docstrings_have_fr_or_nfr_ref | unit | 100% public fn/class docstrings include [FR-XX]/[NFR-XX] |
+| 11 | NFR-05 | test_openapi_summary_and_description_populated | unit | every OpenAPI route has summary + description |
+| 12 | NFR-06 | test_importlinter_exists_with_layers_contract | unit | .importlinter declares api > service > repository > models |
+| 13 | NFR-06 | test_sqlalchemy_forbidden_outside_repository | unit | sqlalchemy forbidden outside repository/ layer |
+| 14 | NFR-06 | test_lint_imports_exits_zero | unit | lint-imports exits 0 |
+| 15 | NFR-06 | test_no_contract_weakening_or_ignore_imports_wildcards | unit | no .importlinter weakening via wildcards / ignore_imports |
+| 16 | NFR-07 | test_runtime_deps_pinned_with_eq_eq | unit | requirements.txt pins all runtime deps with == |
+| 17 | NFR-07 | test_dependency_license_in_allowlist | unit | every license ∈ allowlist (MIT/BSD/Apache/PSF) |
+| 18 | NFR-07 | test_pip_licenses_with_system_full_tree | unit | pip-licenses --with-system reports full-tree compliance |
+| 19 | NFR-07 | test_sbom_at_08_config_with_required_schema | unit | 08-config/SBOM.json schema conforms to AC-N7.4 (SBOM schema fields: name/version/license/direct|transitive) |
+| 20 | NFR-08 | test_mutation_testing_feature_enabled_in_harness_config | framework | .methodology/harness_config.json enables mutation_testing |
+| 21 | NFR-08 | test_mutation_score_ge_70 | framework | mutmut score ≥ 70 |
+| 22 | NFR-08 | test_scope_limited_to_service_and_repository | framework | mutation scope limited to service/ + repository/ |
+| 23 | NFR-09 | test_zero_assert_zero | unit | every test function has ≥ 1 assert |
+| 24 | NFR-09 | test_no_test_exclusions_via_ignore_deselect_or_testpaths | unit | no --ignore/-k/--deselect/collect_ignore/testpaths removal |
+| 25 | NFR-09 | test_fr07_migration_real_sqlite_round_trip | unit | FR-07 round-trip uses real SQLite file (not mock) |
+| 26 | NFR-09 | test_verified_status_only_after_test_passes | unit | VERIFIED status only after cited test passes |
+| 27 | NFR-11 | test_project_mi_ge_80 | unit | project MI (LLOC weighted) ≥ 80 |
+| 28 | NFR-11 | test_single_function_cc_le_10 | unit | single-function cyclomatic complexity ≤ 10 |
+| 29 | NFR-11 | test_file_and_directory_size_limits | unit | file ≤ 400 lines, dir ≤ 15 files |
+| 30 | NFR-11 | test_api_handler_le_40_lines | unit | API handler ≤ 40 lines |
+| 31 | NFR-12 | test_verify_system_chains_alembic_tests_smoke_round_trip | deployment | Makefile verify-system chains alembic + tests + smoke + round-trip |
+| 32 | NFR-12 | test_verify_system_exit_zero_prints_pass | deployment | make verify-system exits 0 and prints "verify-system: PASS" |
 
 ### Deployment Smoke
 
@@ -581,16 +609,6 @@ invariant (CRUD correctness is per-row, not per-equation). **Skipped.**
 Deferred: AC-N1.1 — NFR Integration verifier (test_nfr01_perf_p95_get_by_id via pytest-benchmark), not a TEST_SPEC case.
 Deferred: AC-N1.2 — NFR Integration verifier (test_nfr01_perf_p95_list_limit_50 via pytest-benchmark), not a TEST_SPEC case.
 Deferred: AC-N1.3 — NFR Integration verifier (test_nfr01_constant_sql_count_event_listener via SQLAlchemy event listener), not a TEST_SPEC case.
-Deferred: AC-N2.1 — unit test_no_shell_true_eval_exec_in_source (grep gate over 03-development/src/), not a TEST_SPEC case.
-Deferred: AC-N2.2 — unit test_no_string_concat_sql_in_source (grep gate), not a TEST_SPEC case.
-Deferred: AC-N2.3 — unit test_keys_hashed_and_compared_with_hmac_compare_digest, not a TEST_SPEC case.
-Deferred: AC-N2.4 — unit test_403_body_does_not_leak_resource_existence, not a TEST_SPEC case.
-Deferred: AC-N2.5 — unit test_error_body_no_stack_sql_or_paths, not a TEST_SPEC case.
-Deferred: AC-N2.6 — unit test_cors_denies_by_default_allowlist_only (TASKQ_CORS_ORIGINS allowlist), not a TEST_SPEC case.
-Deferred: AC-N2.7 — unit test_bandit_zero_high_zero_medium (`bandit -r 03-development/src/`), not a TEST_SPEC case.
-Deferred: AC-N3.1 — unit test_per_request_tx_boundary_commit_or_rollback, not a TEST_SPEC case.
-Deferred: AC-N3.2 — unit test_no_bare_except_or_except_exception_pass, not a TEST_SPEC case.
-Deferred: AC-N3.3 — unit test_cancelled_error_is_reraised, not a TEST_SPEC case.
 Deferred: AC-N3.4 — NFR Integration verifier (test_nfr03_readyz_503_on_db_failure), not a TEST_SPEC case.
 Deferred: AC-N3.5 — unit test_task_timeout_terminates_child_no_orphan, not a TEST_SPEC case.
 Deferred: AC-N3.6 — unit test_failed_migration_rolls_back_to_previous_revision, not a TEST_SPEC case.
@@ -610,7 +628,6 @@ Deferred: AC-N7.4 — unit test_sbom_at_08_config_with_required_schema, not a TE
 Deferred: AC-N8.1 — framework test_mutation_testing_feature_enabled_in_harness_config (`.methodology/harness_config.json`), not a TEST_SPEC case.
 Deferred: AC-N8.2 — framework test_mutation_score_ge_70 (mutmut score extraction), not a TEST_SPEC case.
 Deferred: AC-N8.3 — framework test_scope_limited_to_service_and_repository, not a TEST_SPEC case.
-Deferred: AC-N9.1 — unit test_pytest_skipped_zero (`pytest 03-development/tests -q`), not a TEST_SPEC case.
 Deferred: AC-N9.2 — unit test_zero_assert_zero (ast-assertions scanner), not a TEST_SPEC case.
 Deferred: AC-N9.3 — unit test_no_test_exclusions_via_ignore_deselect_or_testpaths, not a TEST_SPEC case.
 Deferred: AC-N9.4 — unit test_fr07_migration_real_sqlite_round_trip (FR-07 integration test on real SQLite file), not a TEST_SPEC case.

@@ -30,9 +30,6 @@
       "name": "service",
       "modules": [
         {
-          "name": "taskq_api.service.tasks"
-        },
-        {
           "name": "taskq_api.service.runner"
         },
         {
@@ -75,9 +72,6 @@
     {
       "name": "models",
       "modules": [
-        {
-          "name": "taskq_api.models.orm"
-        },
         {
           "name": "taskq_api.models.schemas"
         },

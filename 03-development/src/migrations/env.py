@@ -20,7 +20,13 @@ editing ``alembic.ini``. When ``TASKQ_DB_URL`` is unset the script
 falls back to whatever ``sqlalchemy.url`` Alembic resolved from
 ``alembic.ini`` (production / ``make migrate`` flow).
 """
-# pragma: no cover
+# Note: alembic env.py is exercised only by the `python -m alembic`
+# subprocess (see test_fr07 cases 1-5), so pytest-cov does not track
+# coverage on it. The in-process migration test in test_fr07.py
+# (test_v3_upgrade_and_downgrade_executed_in_process) imports the
+# migration version modules, so v1_initial / v2_tags / v3_split_results
+# are themselves covered; only this env.py's script-runner glue is
+# reachable via the subprocess path.
 from __future__ import annotations
 
 import os
@@ -163,7 +169,7 @@ def run_migrations_online() -> None:
     # explicitly (pyright / mypy both reject ``str | None`` flowing into
     # the helpers below).
     if head_rev is None:
-        raise RuntimeError(  # pragma: no cover — alembic's offline() guard; unreachable under the project's always-head migration chain
+        raise RuntimeError(  # alembic's offline() guard; unreachable under the project's always-head migration chain (v1→v2→v3)
             "alembic script has no current head revision; the FR-07 "
             "migration chain must define at least one revision."
         )

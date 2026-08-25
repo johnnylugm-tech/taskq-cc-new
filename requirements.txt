@@ -20,3 +20,4 @@ alembic
 import-linter
 mutmut
 pytest-benchmark
+hypothesis

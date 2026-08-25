@@ -48,7 +48,7 @@ from taskq_api.repository.orm import Base, Result, Tag, Task
 # ---------------------------------------------------------------------------
 _DEFAULT_DB_PATH = os.path.join(tempfile.gettempdir(), "taskq_app.db")
 DB_URL: str = os.environ.get(
-    "TASKQ_DATABASE_URL",
+    "TASKQ_DB_URL",
     f"sqlite:///{_DEFAULT_DB_PATH}",
 )
 POOL_SIZE: int = int(os.environ.get("TASKQ_DB_POOL_SIZE", "5"))

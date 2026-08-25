@@ -17,7 +17,9 @@ Citations:
     SQL renderer (``alembic upgrade v1_initial --sql`` produces
     non-empty DDL).
 """
-# pragma: no cover
+# Note: v1_initial is imported in-process by test_fr07.py's
+# test_v3_upgrade_and_downgrade_executed_in_process (_build_v3_schema_and_seed),
+# so pytest-cov DOES track this module.
 from __future__ import annotations
 
 from typing import Sequence, Union
