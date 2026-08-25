@@ -1,7 +1,7 @@
 {
   "schema": "harness/traceability/attestation/v1",
-  "git_sha": "d3af1c927f2e0bd92a79efa83da563cdf1e9a659",
-  "content_sha256": "199a9209b52546f681cd472d6555033e889171bc8e5e6efb85548bd1248b8055",
+  "git_sha": "cd7a4b155cfee29d1e6345b07a06e90a9792e010",
+  "content_sha256": "e00c08b5a78652120c804ff6b6fcb63da6f60c8fc35f120108cdc5d39ed0a0ae",
   "tool": "scripts/build_trace_attestation.py",
   "overlay_used": null,
   "overlay_errors": [],
@@ -14,7 +14,7 @@
       "code_coverage": "100.0%",
       "test_coverage": "100.0%",
       "verification_rate": "100.0%",
-      "total_links": 82,
+      "total_links": 85,
       "missing_mappings": {
         "fr_without_srs": [],
         "fr_without_code": [],
@@ -57,8 +57,10 @@
           "03-development/src/taskq_api/api/__init__.py",
           "03-development/src/taskq_api/api/tasks.py",
           "03-development/src/taskq_api/models/schemas.py",
+          "03-development/src/taskq_api/repository/task_repo.py",
           "03-development/src/taskq_api/service/__init__.py",
           "03-development/src/taskq_api/service/runner.py",
+          "03-development/src/taskq_api/service/runner_scheduler.py",
           "03-development/tests/conftest.py",
           "03-development/tests/test_fr02.py"
         ],
@@ -167,6 +169,7 @@
         "code_files": [
           "03-development/src/taskq_api/service/__init__.py",
           "03-development/src/taskq_api/service/runner.py",
+          "03-development/src/taskq_api/service/runner_scheduler.py",
           "03-development/tests/test_fr08.py",
           "03-development/tests/test_property_invariants.py"
         ],
