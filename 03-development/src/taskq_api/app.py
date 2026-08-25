@@ -157,10 +157,12 @@ def _body_pre_validation_middleware(app_instance: FastAPI):
                     if route.path != request.url.path:
                         continue
                     if not route.methods or request.method not in route.methods:
-                        continue  # pragma: no cover — body-validation middleware method-mismatch branch
+                        continue
                     body_params = route.dependant.body_params
                     if not body_params:
-                        break  # pragma: no cover — body-validation middleware no-body-params branch
+                        # No body schema on the matched route — accept whatever
+                        # was sent and let downstream validation handle it.
+                        break
                     try:
                         body_data = json.loads(body_bytes)
                     except json.JSONDecodeError:
@@ -178,7 +180,7 @@ def _body_pre_validation_middleware(app_instance: FastAPI):
                             _, errs = field.validate(body_data)
                             if errs:
                                 validation_errors.extend(errs)
-                        except Exception:  # pragma: no cover — pydantic .validate() is total in the supported model space; reachable only on a programmer error
+                        except Exception:
                             validation_errors.append({
                                 "type": "value_error",
                                 "loc": ("body", field.name),
@@ -224,7 +226,7 @@ def _inline_router(app: FastAPI, router) -> None:
         # ``dependencies`` reproduces the registered handler exactly.
         # Only APIRoute instances carry the attributes add_api_route needs;
         # plain ``Route`` instances (e.g. mounted sub-apps) are skipped.
-        if not isinstance(r, APIRoute):  # pragma: no cover — only APIRoute is mounted; sub-app routes skipped
+        if not isinstance(r, APIRoute):
             continue
         app.add_api_route(
             path=r.path,

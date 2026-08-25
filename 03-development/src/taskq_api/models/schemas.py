@@ -36,7 +36,7 @@ class TaskCreate(BaseModel):
     @classmethod
     def _no_injection_chars(cls, v: str) -> str:
         bad = sorted(ch for ch in v if ch in _INJECTION_CHARS)
-        if bad:  # pragma: no cover — defensive: tested via the FR-01 `rejects_injection_characters_in_command` suite
+        if bad:
             raise ValueError(
                 "command contains forbidden characters: " + " ".join(repr(c) for c in bad)
             )
