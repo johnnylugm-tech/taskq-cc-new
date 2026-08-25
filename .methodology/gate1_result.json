@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-02",
+  "fr_id": "FR-03",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "All checks passed!\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787689954844\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.147}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1787690126047\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.138}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 77,
+      "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "tests/test_fr02.py ................................. [41%]\ntests/test_fr01.py ........ [51%]\ntests/test_fr08.py .....................F..F............. [100%]\n\nCoverage: src/taskq_api/api/tasks.py 53/53 (100%); src/taskq_api/service/runner.py 118/118 (100%); TOTAL 171/171 (100%). 2 failed (test_fr08 only), 77 passed.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
+      "tool_evidence": "23 passed, 1 warning in 2.19s\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\nFR-03 file deps.py: 75 stmts, 0 miss, 100% cover\n",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-02",
+      "coverage_scope_fr": "FR-03",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 3 kept, 0 broken. (no_circular_dependencies KEPT, no_sqlalchemy_above_repository KEPT, models_sqlalchemy_orm_declarative_only KEPT)",
+      "tool_evidence": "Contracts: 3 kept, 0 broken.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,23 +78,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "6b46837d96bfcaf29c5c0aa31d550d22d71e785122cad32d9cb917d9a2c005e2",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787689954844\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.147}}"
+      "sha256": "ddeff6eab10be2a6d7fc684684a99b17b9de07c19d400a0d0b0a1852a561d91b",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1787690126047\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.138}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "075f85a92769e799523e90563610e54c573ff6d4d42cede924c79f9dbe0f810e",
-      "bytes": 317,
-      "head": "tests/test_fr02.py ................................. [41%]\ntests/test_fr01.py ........ [51%]\ntests/test_fr08.py .....................F..F............. [100%]\n\nCoverage: src/taskq_api/api/tasks.py 53/53 (100%); src/taskq_api/service/runner.py 118/118 (100%); TOTAL 171/171 (100%). 2 failed (test_fr08 only), 77 passed."
+      "sha256": "2130d78a84ea4a0c739b327269aeea28c99c5e785f53d91910c51c78c43eab46",
+      "bytes": 318,
+      "head": "23 passed, 1 warning in 2.19s\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\nFR-03 file deps.py: 75 stmts, 0 miss, 100% cover"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "445f7c2dbfd286bb768a1ad328102b828e1943164bbc12b170b7049934210c24",
-      "bytes": 142,
-      "head": "Contracts: 3 kept, 0 broken. (no_circular_dependencies KEPT, no_sqlalchemy_above_repository KEPT, models_sqlalchemy_orm_declarative_only KEPT)"
+      "sha256": "f65e31deadab25858dcf86d543f5fbedfbbb4b11c74d22c5892ead6558859cbc",
+      "bytes": 216,
+      "head": "Contracts: 3 kept, 0 broken.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT"
     }
   },
   "composite_score": 100.0,

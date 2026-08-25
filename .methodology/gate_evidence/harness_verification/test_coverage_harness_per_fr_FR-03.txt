@@ -2,9 +2,9 @@
 # dimension: test_coverage
 # fr_id: FR-03
 # scope: this FR's own modules, per fr_module_traceability
-# executed/coverable: 36/36
+# executed/coverable: 75/75
 # per-fr coverage: 100.0%
-# whole-project coverage: 74.0% (see .methodology/gate_evidence/harness_verification/test_coverage_harness.txt)
+# whole-project coverage: 100.0% (see .methodology/gate_evidence/harness_verification/test_coverage_harness.txt)
 #
 # files in scope:
 #   03-development/src/taskq_api/api/deps.py
