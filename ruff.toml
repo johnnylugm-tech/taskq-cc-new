@@ -1,0 +1,14 @@
+# ruff.toml — Project-root linting configuration for taskq-cc-new.
+#
+# The harness submodule (./harness/) carries its own [tool.ruff] block
+# inside its pyproject.toml and linting it from the consumer project
+# root pulls in pre-existing harness-tests fixtures (test_observability,
+# test_file_size_ratchet, etc.) whose module-level imports are not at
+# the file top by design — those tests live under HR-17 ownership and
+# are out of scope for the consumer-side advance-phase lint gate.
+#
+# Round 76 station 3: scope the ruff check to the consumer project.
+extend-exclude = [
+    "harness",
+    "harness/**",
+]

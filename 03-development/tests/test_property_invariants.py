@@ -22,10 +22,8 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Any
 
 import hypothesis.strategies as st
-import pytest
 import sqlalchemy as sa
 from alembic.operations import Operations
 from alembic.runtime.migration import MigrationContext

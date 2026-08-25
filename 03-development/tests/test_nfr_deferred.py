@@ -506,7 +506,7 @@ def test_sqlalchemy_forbidden_outside_repository():
             if "__pycache__" in src.parts:
                 continue
             try:
-                tree = importlib.util.find_spec(src.stem)
+                importlib.util.find_spec(src.stem)
                 continue  # placeholder, replaced below
             except (ImportError, ValueError):
                 pass
