@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-06",
+  "fr_id": "FR-07",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1787690485272\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.137}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787690626691\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.134}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 5,
+      "tests_passed": 6,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "03-development/tests/test_fr06.py ..... [100%]\n03-development/src/taskq_api/repository/session.py 48 0 100%\n5 passed, 1 warning in 0.49s",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-06.txt",
+      "tool_evidence": "collected 6 items\n\n03-development/tests/test_fr07.py ......                                 [100%]\n\n============================== 6 passed in 1.60s ===============================",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-06",
+      "coverage_scope_fr": "FR-07",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 355 files, 3143 dependencies. Downward-only layer dependencies (api → repository → models) KEPT; No sqlalchemy imports above repository layer KEPT; Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT. Contracts: 3 kept, 0 broken.",
+      "tool_evidence": "Analyzed 354 files, 3130 dependencies.\nContracts: 3 kept, 0 broken.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,23 +78,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "133ab46d863360e1f29eb87d2c23c30823367f9d29bfc2515d0379e440cfa2cc",
-      "bytes": 170,
-      "head": "{\"version\":\"1.1.409\",\"time\":\"1787690485272\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.137}}"
+      "sha256": "56ad21d61c08237bf55faf092133e986d1ed6068975cbc181cac21e134ddd378",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787690626691\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.134}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "738b35726e520b98ef2e0e3a536c783e9bd351ecb73f4ab841d56a806991a505",
-      "bytes": 136,
-      "head": "03-development/tests/test_fr06.py ..... [100%]\n03-development/src/taskq_api/repository/session.py 48 0 100%\n5 passed, 1 warning in 0.49s"
+      "sha256": "a274099a25ac1a0f15ae1129db71cd6c532cce0a418ec75e5ce6e04ae3e5500e",
+      "bytes": 180,
+      "head": "collected 6 items\n\n03-development/tests/test_fr07.py ......                                 [100%]\n\n============================== 6 passed in 1.60s ==============================="
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "d23f9848ee5f51ae67d768eb00040423357522d8cb98e8f7581b646ae6048cbd",
-      "bytes": 258,
-      "head": "Analyzed 355 files, 3143 dependencies. Downward-only layer dependencies (api → repository → models) KEPT; No sqlalchemy imports above repository layer KEPT; Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT. Contracts: 3 kept, 0 broken."
+      "sha256": "789aa876af070e81ef31a5239008e96a6b0de97b1ead529de0c7684f7a7fedea",
+      "bytes": 255,
+      "head": "Analyzed 354 files, 3130 dependencies.\nContracts: 3 kept, 0 broken.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT"
     }
   },
   "composite_score": 100.0,
