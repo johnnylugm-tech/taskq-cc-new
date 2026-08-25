@@ -238,4 +238,4 @@ def list_runs_endpoint(
       - FR-06: delegates to `task_repo.task_repo.list_runs`.
     """
     items = task_repo_mod.task_repo.list_runs(str(task_id))
-    return RunList(items=[RunOut(**row) for row in items])
+    return RunList(items=[RunOut(**row) for row in items])  # type: ignore[attr-defined]

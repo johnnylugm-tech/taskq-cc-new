@@ -63,7 +63,7 @@ import sys
 import time as time_mod
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, List as _List
 
 import pytest
 
@@ -1519,9 +1519,9 @@ def test_structured_drain_tasks_cancel_loop_fake_task_done_false():
         def __await__(self):  # type: ignore[no-untyped-def]
             return self._future.__await__()
 
-    async def _exercise() -> dict[str, int]:
+    async def _exercise() -> tuple[dict[str, int], int]:
         stub = _StubTask()
-        report = await _structured_drain_tasks([stub], timeout=0.05)
+        report = await _structured_drain_tasks([stub], timeout=0.05)  # type: ignore[list-item]
         return report, stub.cancel_count
 
     report, cancel_count = asyncio.run(_exercise())
@@ -1599,7 +1599,7 @@ class _FakeTaskRepo:
         self.results.append(fields)
         return fields
 
-    def list_runs(self, task_id: str) -> list[dict[str, Any]]:
+    def list_runs(self, task_id: str) -> _List[dict[str, Any]]:
         return [r for r in self.results if r.get("task_id") == task_id]
 
 

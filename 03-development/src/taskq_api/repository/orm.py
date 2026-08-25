@@ -40,7 +40,7 @@ Base = declarative_base()
 # relationship SELECTs) regardless of how many rows the parent SELECT
 # returns.
 # ---------------------------------------------------------------------------
-class Task(Base):
+class Task(Base):  # type: ignore[misc, valid-type]
     """Persistent task row.
 
     [FR-06]
@@ -71,7 +71,7 @@ class Task(Base):
     )
 
 
-class Result(Base):
+class Result(Base):  # type: ignore[misc, valid-type]
     """Persistent task result row — FR-02 shape carried into the FR-06 ORM.
 
     [FR-06]
@@ -100,7 +100,7 @@ class Result(Base):
     task: Mapped["Task"] = relationship("Task", back_populates="results")
 
 
-class Tag(Base):
+class Tag(Base):  # type: ignore[misc, valid-type]
     """Persistent tag row — second relationship side for the eager-load test.
 
     [FR-06]

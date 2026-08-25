@@ -18,7 +18,7 @@ Citations:
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, List as _List
 
 
 class _InMemoryTaskRepo:
@@ -106,7 +106,7 @@ class _InMemoryTaskRepo:
         self,
         task_id: str,
         limit: int = 50,
-    ) -> list[dict[str, Any]]:
+    ) -> _List[dict[str, Any]]:
         """[FR-02] Return rows whose ``task_id`` matches, newest-to-oldest.
 
         Ordering is by ``finished_at`` descending when present, falling back

@@ -48,7 +48,7 @@ from taskq_api.service.ratelimit import refill, retry_after_seconds
 _Base = declarative_base()
 
 
-class RateBucket(_Base):
+class RateBucket(_Base):  # type: ignore[misc, valid-type]
     """Persistent representation of a per-token token bucket.
 
     [FR-05]

@@ -65,6 +65,7 @@ import re
 import time as time_mod
 import uuid
 from pathlib import Path
+from typing import List as _List
 
 import pytest
 
@@ -202,7 +203,7 @@ class _FakeRepo:
     def write_result(self, **fields) -> dict:
         return self.results.write(**fields)
 
-    def list_runs(self, task_id_value: str, limit: int = 50) -> list[dict]:
+    def list_runs(self, task_id_value: str, limit: int = 50) -> _List[dict]:
         return self.results.list_for_task(task_id_value, limit)
 
 
@@ -262,8 +263,8 @@ def client(fake_repo: _FakeRepo, monkeypatch):
     _fake_key_repo.create(scope="write", key_hash=deps.hash_key("fake-write-key"))
     _fake_key_repo.create(scope="admin", key_hash=deps.hash_key("fake-admin-key"))
 
-    deps.key_repo = _fake_key_repo
-    key_repo_mod.key_repo = _fake_key_repo
+    deps.key_repo = _fake_key_repo  # type: ignore[assignment]
+    key_repo_mod.key_repo = _fake_key_repo  # type: ignore[assignment]
 
     # Rate-limit: ``check_rate_limit`` references ``rate_repo`` as a bare
     # module-global in ``deps.py`` (LEGB lookup, not attribute access),
@@ -298,7 +299,7 @@ def client(fake_repo: _FakeRepo, monkeypatch):
     deps.rate_repo = _FakeRateRepo()
 
     # Repo swap — handlers talk to the in-memory fake, not the real DB.
-    task_repo_mod.task_repo = fake_repo
+    task_repo_mod.task_repo = fake_repo  # type: ignore[assignment]
 
     from fastapi.testclient import TestClient
 

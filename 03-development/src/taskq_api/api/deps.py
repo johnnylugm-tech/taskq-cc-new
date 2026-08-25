@@ -56,6 +56,14 @@ from taskq_api.service.auth import (
 # ``require_api_key`` / ``create_key`` always read through this attribute.
 key_repo = key_repo_mod.key_repo
 
+# Forward declaration for ``rate_repo`` — the real attribute is supplied
+# lazily by ``__getattr__`` below so ``taskq_api.api`` can stay free of
+# static ``sqlalchemy`` imports (NFR-06 no-sqlalchemy-above-repository).
+# Annotating it here as ``Any`` lets mypy see a name to bind to inside
+# ``check_rate_limit`` while the runtime lookup still goes through
+# ``__getattr__``.
+rate_repo: Any  # populated lazily via __getattr__ below
+
 
 def __getattr__(name: str) -> Any:
     """Lazy module-level attribute access (PEP 562) for ``rate_repo``.
@@ -431,12 +439,12 @@ def check_rate_limit(key_hash: str, cost: int = 1) -> dict:
         concurrent workers cannot both consume the last token.
     """
     # Ensure the bucket row exists (idempotent — does not refill).
-    rate_repo.get_or_create(  # noqa: F821 — lazy attribute via __getattr__ # type: ignore[reportUndefinedVariable]
+    rate_repo.get_or_create(  # noqa: F821 — lazy attribute via __getattr__ # type: ignore[name-defined,reportUndefinedVariable]
         key_hash, burst=RATE_BURST, refill_per_sec=RATE_PER_SEC
     )
     # Consume — this applies the refill + decrement atomically and
     # returns the post-decrement token count alongside ``allowed``.
-    result = rate_repo.consume(key_hash, cost=cost)  # noqa: F821 — lazy attribute via __getattr__ # type: ignore[reportUndefinedVariable]
+    result = rate_repo.consume(key_hash, cost=cost)  # noqa: F821 — lazy attribute via __getattr__ # type: ignore[name-defined,reportUndefinedVariable]
     allowed = bool(result.get("allowed", False))
     # ``result["tokens"]`` is post-decrement. Surface the pre-consume
     # balance (the contract callers depend on) by adding ``cost`` back
