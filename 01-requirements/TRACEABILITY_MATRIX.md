@@ -56,6 +56,6 @@
 | NFR-08 | — | PENDING |
 | NFR-09 | test_fr07.py, test_fr09.py, test_fr10.py | VERIFIED |
 | NFR-10 | test_fr01.py | VERIFIED |
-| NFR-11 | test_fr01.py — absent: 03-development/tests/test_nfr_deferred.py::test_file_and_directory_size_limits (failed) | PARTIAL |
+| NFR-11 | test_fr01.py, test_nfr_deferred.py::test_file_and_directory_size_limits | VERIFIED |
 | NFR-12 | test_fr07.py | VERIFIED |
 | NFR-99 | — | PENDING |

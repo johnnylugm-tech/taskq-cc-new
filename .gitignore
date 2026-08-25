@@ -19,6 +19,7 @@ __pycache__/
 *.cover
 *,cover
 htmlcov/
+.mutmut-cache
 .mutmut-cache/
 .code-review-graph/
 .claude/worktrees/

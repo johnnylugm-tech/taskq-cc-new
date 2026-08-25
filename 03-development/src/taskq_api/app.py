@@ -241,7 +241,7 @@ def _inline_router(app: FastAPI, router) -> None:
 
 
 def create_app() -> FastAPI:
-    """Build the FastAPI app, wire routers + error handlers."""
+    """Build the FastAPI app, wire routers + error handlers. [FR-01, FR-10]"""
     app = FastAPI(
         title="taskq-api",
         version="0.1.0",

@@ -33,6 +33,7 @@ class _InMemoryTaskRepo:
         self.results: dict[str, dict[str, Any]] = {}
 
     def create(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """[FR-01] Create a new task row, assigning id + pending status."""
         import uuid
         name = payload["name"]
         if any(r["name"] == name for r in self.rows.values()):
@@ -50,6 +51,7 @@ class _InMemoryTaskRepo:
         return row
 
     def get(self, task_id: str) -> dict[str, Any] | None:
+        """[FR-01] Look up a single task row by id, returning None when absent."""
         return self.rows.get(task_id)
 
     def list(
@@ -58,6 +60,7 @@ class _InMemoryTaskRepo:
         cursor: str | None = None,
         limit: int = 50,
     ) -> tuple[list[dict[str, Any]], str | None]:
+        """[FR-01] Page through task rows; returns (items, next_cursor)."""
         all_ids = sorted(self.rows.keys())
         start = int(cursor) if cursor else 0
         end = min(start + limit, len(all_ids))
@@ -66,6 +69,7 @@ class _InMemoryTaskRepo:
         return [self.rows[i] for i in page_ids], next_cursor
 
     def delete_with_results(self, task_id: str) -> int:
+        """[FR-01] Remove a task row plus its associated result rows; returns total deleted."""
         count = 0
         if task_id in self.rows:
             count -= 1
@@ -80,13 +84,13 @@ class _InMemoryTaskRepo:
     # FR-02 surface — state-machine persistence and run-history queries.
     # ------------------------------------------------------------------
     def update_status(self, task_id: str, status: str) -> None:
-        """Set ``rows[task_id]["status"] = status`` (no-op when absent)."""
+        """[FR-02] Set ``rows[task_id]["status"] = status`` (no-op when absent)."""
         row = self.rows.get(task_id)
         if row is not None:
             row["status"] = status
 
     def write_result(self, **fields: Any) -> dict[str, Any]:
-        """Append a row to ``results`` and return it (test seam for FR-02)."""
+        """[FR-02] Append a row to ``results`` and return it (test seam for FR-02)."""
         import uuid
 
         result_id = str(uuid.uuid4())
@@ -103,7 +107,7 @@ class _InMemoryTaskRepo:
         task_id: str,
         limit: int = 50,
     ) -> list[dict[str, Any]]:
-        """Return rows whose ``task_id`` matches, newest-to-oldest.
+        """[FR-02] Return rows whose ``task_id`` matches, newest-to-oldest.
 
         Ordering is by ``finished_at`` descending when present, falling back
         to insertion order so FR-02 tests get a deterministic newest-first

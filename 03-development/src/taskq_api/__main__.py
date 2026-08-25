@@ -50,7 +50,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Dispatch subcommands. Returns the process exit code."""
+    """Dispatch subcommands. Returns the process exit code. [FR-03]"""
     parser = _build_parser()
     args = parser.parse_args(argv)
 

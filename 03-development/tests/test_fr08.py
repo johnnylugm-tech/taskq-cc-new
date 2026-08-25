@@ -93,6 +93,14 @@ _RUNNER_SOURCE = (
     / "service"
     / "runner.py"
 )
+_RUNNER_SCHEDULER_SOURCE = (
+    _REPO_ROOT
+    / "03-development"
+    / "src"
+    / "taskq_api"
+    / "service"
+    / "runner_scheduler.py"
+)
 
 
 # ===========================================================================
@@ -132,13 +140,25 @@ def test_background_uses_asyncio_task_group():  # NFR-02, NP-13
         f"AC-8.1: runner source missing at {_RUNNER_SOURCE} — "
         f"FR-08 phantom module per SAB.json `fr_module_traceability`."
     )
-    src_text = _RUNNER_SOURCE.read_text(encoding="utf-8")
+    # The FR-08 structured-concurrency surface (``Scheduler`` / drain) was
+    # split into ``runner_scheduler.py`` to keep ``runner.py`` under the
+    # NFR-11 600-line cap; both files together constitute the FR-08
+    # surface, so the AC-8.1 scan covers both.
+    src_text = (
+        _RUNNER_SOURCE.read_text(encoding="utf-8")
+        + "\n"
+        + _RUNNER_SCHEDULER_SOURCE.read_text(encoding="utf-8")
+    )
 
     # Count occurrences of ``asyncio.TaskGroup`` and ``asyncio.gather``.
     # The leading ``asyncio.`` prefix avoids false matches inside
-    # unrelated identifiers (e.g. ``task_group_hits``).
-    task_group_count = len(re.findall(r"\basyncio\.TaskGroup\b", src_text))
-    gather_count = len(re.findall(r"\basyncio\.gather\b", src_text))
+    # unrelated identifiers (e.g. ``task_group_hits``). The trailing
+    # ``(?=\()`` requires an actual call/with-statement so docstring
+    # mentions of the class do not inflate the count.
+    task_group_count = len(
+        re.findall(r"\basyncio\.TaskGroup(?=\()", src_text)
+    )
+    gather_count = len(re.findall(r"\basyncio\.gather(?=\()", src_text))
 
     assert str(task_group_count) == task_group_hits, (
         f"AC1-task-group failed: runner.py MUST use "
