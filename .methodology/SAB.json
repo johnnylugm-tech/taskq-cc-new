@@ -41,7 +41,8 @@
         {
           "name": "taskq_api.service.metrics"
         },
-        "taskq_api.service"
+        "taskq_api.service",
+        "taskq_api.service.runner_scheduler"
       ],
       "allowed_dependencies": [
         "repository"
@@ -159,7 +160,7 @@
     "NFR-07": {
       "type": "licensing",
       "dimension": "license_compliance",
-      "target": "all licenses \u2208 {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}",
+      "target": "all licenses ∈ {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}",
       "module": "taskq_api.config"
     },
     "NFR-08": {
