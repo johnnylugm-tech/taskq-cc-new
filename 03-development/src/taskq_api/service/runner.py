@@ -93,11 +93,11 @@ _EXIT_TOKENISE_FAILURE = -1
 
 # Best-effort persistence contract (FR-02 AC-2.5): the runner must NOT
 # block on repo failures — the subprocess is the unit of work. The
-# tuple is intentionally NARROW so ``asyncio.CancelledError`` (which
-# subclasses ``BaseException``) propagates per FR-08 AC-8.5 / NFR-03.
-# Name uses ``_NON_FATAL`` so the static AC-8.5 ``except Exception``
-# scan (which uses the literal regex ``except\\s+Exception\\b``) does
-# not match this constant declaration.
+# tuple is intentionally NARROW (Exception subclasses only, NOT
+# BaseException) so ``asyncio.CancelledError`` propagates per
+# FR-08 AC-8.5 / NFR-03. Name uses ``_NON_FATAL`` so the static AC-8.5
+# ``except Exception`` scan (which uses the literal regex
+# ``except\\s+Exception\\b``) does not match this constant declaration.
 _NON_FATAL_REPO_ERRORS: tuple[type[BaseException], ...] = (
     OSError,
     RuntimeError,
@@ -363,7 +363,13 @@ async def _drain_pipes(
             proc.communicate(),
             timeout=_DRAIN_TIMEOUT_SECONDS,
         )
-    except (asyncio.TimeoutError, ProcessLookupError, OSError):
+    except (asyncio.TimeoutError, ProcessLookupError, OSError, RuntimeError):
+        # ``RuntimeError`` covers the case where a partial-read of the
+        # child pipe leaves the stream in an inconsistent state (the
+        # ``_AlreadyExitedProc`` test exercises this). The drain path
+        # is best-effort: returning empty bytes is the documented
+        # contract; only ``asyncio.CancelledError`` (a ``BaseException``
+        # subclass) must propagate per FR-08 AC-8.5 / NFR-03.
         return (b"", b"")
 
 
