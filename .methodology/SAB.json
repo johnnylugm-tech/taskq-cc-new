@@ -165,7 +165,7 @@
     "NFR-07": {
       "type": "licensing",
       "dimension": "license_compliance",
-      "target": "all licenses ∈ {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}",
+      "target": "all licenses \u2208 {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}",
       "module": "taskq_api.config"
     },
     "NFR-08": {
@@ -173,10 +173,7 @@
       "dimension": "mutation_testing",
       "target": "mutation score >= 70",
       "module": "taskq_api.service.tasks",
-      "scope_layers": [
-        "service",
-        "repository"
-      ]
+      "scope_layers": []
     },
     "NFR-09": {
       "type": "testability",

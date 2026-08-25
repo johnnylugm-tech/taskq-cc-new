@@ -1,0 +1,20 @@
+03-development/src/taskq_api/api/tasks.py                       53      4    92%
+03-development/src/taskq_api/app.py                             89     15    83%
+03-development/src/taskq_api/errors.py                          13      2    85%
+03-development/src/taskq_api/models/__init__.py                  0      0   100%
+03-development/src/taskq_api/models/schemas.py                  39      1    97%
+03-development/src/taskq_api/repository/__init__.py              0      0   100%
+03-development/src/taskq_api/repository/key_repo.py             17      8    53%
+03-development/src/taskq_api/repository/orm.py                  30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py            48      0   100%
+03-development/src/taskq_api/repository/session.py              48     48     0%
+03-development/src/taskq_api/repository/task_repo.py            52      4    92%
+03-development/src/taskq_api/service/__init__.py                 0      0   100%
+03-development/src/taskq_api/service/auth.py                    19      4    79%
+03-development/src/taskq_api/service/metrics.py                 12      0   100%
+03-development/src/taskq_api/service/ratelimit.py               10      0   100%
+03-development/src/taskq_api/service/runner.py                 208    117    44%
+--------------------------------------------------------------------------------
+TOTAL                                                          870    320    63%
+
+26 passed, 1 warning in 0.55s

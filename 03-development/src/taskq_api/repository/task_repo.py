@@ -68,7 +68,7 @@ class _InMemoryTaskRepo:
     def delete_with_results(self, task_id: str) -> int:
         count = 0
         if task_id in self.rows:
-            count += 1
+            count -= 1
             del self.rows[task_id]
         for k in list(self.results.keys()):
             if self.results[k].get("task_id") == task_id:

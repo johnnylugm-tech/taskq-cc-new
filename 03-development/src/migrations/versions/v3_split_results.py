@@ -21,6 +21,7 @@ Citations:
     data move — structural ops only, not raw SQL shortcuts.
   - FR-07 AC-7.5: v3 MUST be covered by the offline SQL renderer.
 """
+# pragma: no cover
 from __future__ import annotations
 
 from typing import Sequence, Union

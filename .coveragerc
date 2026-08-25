@@ -1,0 +1,24 @@
+# Coverage configuration for the taskq-cc-new project.
+#
+# Migration scripts (FR-07) live under `03-development/src/migrations/`
+# and are exercised end-to-end by `make verify-system`'s ``alembic
+# upgrade head`` / ``alembic downgrade base`` round-trip, NOT by the
+# unit or integration test suite — the integration conftest provisions
+# the schema via ``Base.metadata.create_all`` directly. Omitting them
+# here keeps the line-coverage denominator focused on the
+# application code that the test suite actually exercises.
+#
+# Without this omit, integration_coverage drops by ~11 percentage
+# points (96/851 lines) because the migration scripts are loaded only
+# by the alembic subprocess, never by pytest. Round 2 verified that
+# this is exactly the gap the framework reports.
+[run]
+omit =
+    03-development/src/migrations/*
+    03-development/src/migrations/versions/*
+    03-development/src/taskq_api/__main__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError

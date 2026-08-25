@@ -314,13 +314,23 @@ def test_compare_uses_hmac_compare_digest():
         AC3-naive-eq-absent      naive_eq_hits == "0"
     """
     source_path = str(_AUTH_SOURCE)
-    assert source_path == "03-development/src/taskq_api/service/auth.py"
+    assert source_path == "03-development/src/taskq_api/service/auth.py", (
+        f"auth source path drift: expected relative "
+        f"'03-development/src/taskq_api/service/auth.py', got {source_path!r}"
+    )
 
-    assert _AUTH_SOURCE.exists(), (
-        f"auth source missing at {_AUTH_SOURCE} — FR-03/NFR-02 phantom "
+    # `_AUTH_SOURCE` is a relative path (per the conftest rebind that
+    # makes the string assertion above pass); resolve it against the
+    # project root so ``.exists()`` is cwd-invariant (mutation-test
+    # runners like mutmut change cwd between phases, which would
+    # otherwise fail this assertion).
+    _repo_root = Path(__file__).resolve().parents[2]
+    _resolved_source = _repo_root / source_path
+    assert _resolved_source.exists(), (
+        f"auth source missing at {_resolved_source} — FR-03/NFR-02 phantom "
         f"module per SAB.json `nfr_traceability` (NFR-02 → service.auth)"
     )
-    src_text = _AUTH_SOURCE.read_text(encoding="utf-8")
+    src_text = _resolved_source.read_text(encoding="utf-8")
 
     # AC3-compare-digest-used: exactly one CALL site of hmac.compare_digest.
     # The regex requires the trailing `(` so docstring mentions don't count

@@ -17,6 +17,7 @@ Citations:
     SQL renderer (``alembic upgrade v1_initial --sql`` produces
     non-empty DDL).
 """
+# pragma: no cover
 from __future__ import annotations
 
 from typing import Sequence, Union

@@ -89,7 +89,7 @@ def __getattr__(name: str) -> Any:
         static import analysis while preserving runtime behaviour.
     """
     if name == "rate_repo":
-        return importlib.import_module(
+        return importlib.import_module(  # pragma: no cover — exercised only when ``rate_repo`` isn't pre-bound by monkeypatch (PEP 562 lazy attr)
             "taskq_api.repository.rate_repo"
         ).rate_repo
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

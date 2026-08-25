@@ -55,7 +55,6 @@ GREEN TODO contract (must be implemented for these tests to pass):
 from __future__ import annotations
 
 import inspect
-import re
 from pathlib import Path
 
 import pytest
@@ -422,8 +421,8 @@ def test_single_fastapi_dependency_for_authz():
 
     # Locate the `require_scope` callable on the deps module.
     assert hasattr(deps, "require_scope"), (
-        f"AC-4.3: `taskq_api.api.deps.require_scope` must exist as a "
-        f"module-level callable — RED: not yet defined on deps"
+        "AC-4.3: `taskq_api.api.deps.require_scope` must exist as a "
+        "module-level callable — RED: not yet defined on deps"
     )
     scope_factory = getattr(deps, "require_scope")
 

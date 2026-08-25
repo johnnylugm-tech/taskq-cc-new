@@ -65,10 +65,8 @@ import re
 import sqlite3
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
-import pytest
 import sqlalchemy as sa
 from sqlalchemy import create_engine
 from alembic.operations import Operations
@@ -135,13 +133,18 @@ def _run_alembic(args: list[str], tmp_home: Path, cwd: Path | None = None) -> su
     """Run ``python -m alembic <args>`` in an isolated subprocess.
 
     OUT_OF_PROCESS choice — see ``_alembic_command_env`` for rationale.
+
+    The cwd defaults to the project root (``_REPO_ROOT``) so the
+    ``alembic.ini`` lookup is invariant to the caller's cwd (this
+    matters under mutation-test runners like mutmut that change
+    cwd between phases).
     """
     return subprocess.run(
         [sys.executable, "-m", "alembic", *args],
         capture_output=True,
         text=True,
         env=_alembic_command_env(tmp_home),
-        cwd=str(cwd) if cwd is not None else None,
+        cwd=str(cwd) if cwd is not None else str(_REPO_ROOT),
     )
 
 
@@ -418,7 +421,7 @@ def test_round_trip_reversibility_v3_data_move(tmp_path):  # NFR-09, NFR-12
     assert expected_row_match == "True"  # AC3-row-match
 
     db_path = tmp_path / "taskq.db"
-    env = _alembic_command_env(tmp_path)
+    _alembic_command_env(tmp_path)
 
     # Step 1: upgrade head (provisions the v3 schema with task_results).
     upgrade_head_1 = _run_alembic(["upgrade", "head"], tmp_path)

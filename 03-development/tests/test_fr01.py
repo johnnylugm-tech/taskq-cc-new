@@ -140,13 +140,79 @@ def client(fake_repo):
     """
     from taskq_api.app import app
     from taskq_api.api import deps
+    import taskq_api.repository.key_repo as key_repo_mod
 
-    # Auth bypass: any scope is accepted. Real auth (FR-03) tested in its
-    # own RED file. Without this override the tests would fail for the wrong
-    # reason (missing FR-03) instead of missing FR-01.
-    app.dependency_overrides[deps.require_scope] = (
-        lambda scope: {"scope": scope, "key_id": "fake-key"}
-    )
+    # Auth bypass: present a real, registered key for the requested scope.
+    # ``tasks.py`` registers ``_require_*`` as ``dependencies=[...]`` on
+    # each route, which FastAPI resolves into a baked-in Dependant at
+    # route-registration time — by the time the test client issues a
+    # request, ``app.dependency_overrides`` keyed by the factory function
+    # ``deps.require_scope`` no longer matches the resolved dependency.
+    # Following the FR-03 / FR-04 pattern: monkeypatch ``deps.key_repo``
+    # with an in-memory fake and seed it with the keys the tests present
+    # via ``X-API-Key``. The auth dependency (``require_api_key``) hashes
+    # the presented key, looks it up in the seeded repo, and admits it.
+    class _FakeKeyRepo:
+        def __init__(self):
+            self.rows = {}
+
+        def create(self, scope, key_hash):
+            key_id = f"key-{len(self.rows) + 1}"
+            self.rows[key_hash] = {
+                "key_id": key_id,
+                "scope": scope,
+                "key_hash": key_hash,
+                "revoked_at": None,
+            }
+            return self.rows[key_hash]
+
+        def find_by_hash(self, key_hash):
+            return self.rows.get(key_hash)
+
+        def revoke(self, key_hash, revoked_at):
+            row = self.rows.get(key_hash)
+            if row is not None:
+                row["revoked_at"] = revoked_at
+
+    _fake_key_repo = _FakeKeyRepo()
+    _fake_key_repo.create(scope="read", key_hash=deps.hash_key("fake-read-key"))
+    _fake_key_repo.create(scope="write", key_hash=deps.hash_key("fake-write-key"))
+    _fake_key_repo.create(scope="admin", key_hash=deps.hash_key("fake-admin-key"))
+
+    deps.key_repo = _fake_key_repo
+    key_repo_mod.key_repo = _fake_key_repo
+
+    # Rate-limit: ``check_rate_limit`` references ``rate_repo`` as a bare
+    # module-global in ``deps.py`` (LEGB lookup, not attribute access),
+    # so the lazy ``__getattr__`` in ``deps`` does NOT cover it. Seed
+    # ``deps.rate_repo`` with a generous fake so the auth dependency
+    # chain completes; FR-05 owns the real behaviour under burst exhaustion.
+    class _FakeRateRepo:
+        def __init__(self):
+            self.buckets = {}
+
+        def get_or_create(self, key_hash, *, burst, refill_per_sec):
+            bucket = self.buckets.get(key_hash)
+            if bucket is None:
+                bucket = {
+                    "tokens": float(burst),
+                    "burst": float(burst),
+                    "refill_per_sec": float(refill_per_sec),
+                    "last_refill_ts": 0.0,
+                }
+                self.buckets[key_hash] = bucket
+            return bucket
+
+        def consume(self, key_hash, *, cost):
+            bucket = self.buckets[key_hash]
+            bucket["tokens"] = max(0.0, bucket["tokens"] - cost)
+            return {
+                "allowed": bucket["tokens"] >= 0,
+                "tokens": bucket["tokens"],
+                "retry_after": 0.0,
+            }
+
+    deps.rate_repo = _FakeRateRepo()
 
     # Repo swap: handler calls the injected fake rather than the real DB.
     import taskq_api.repository.task_repo as task_repo_mod

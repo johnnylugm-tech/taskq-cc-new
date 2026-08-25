@@ -1,0 +1,25 @@
+03-development/src/taskq_api/__main__.py                        24      3    88%   64-65, 69
+03-development/src/taskq_api/api/__init__.py                     0      0   100%
+03-development/src/taskq_api/api/deps.py                        74     10    86%   92, 206, 209-211, 272-273, 311, 362, 388
+03-development/src/taskq_api/api/health.py                      27      7    74%   117-123
+03-development/src/taskq_api/api/metrics.py                     10      0   100%
+03-development/src/taskq_api/api/tasks.py                       53      4    92%   175-183
+03-development/src/taskq_api/app.py                             89     15    83%   75, 158, 160, 163, 166-167, 172-177, 180-182, 188, 228, 284, 323
+03-development/src/taskq_api/errors.py                          13      2    85%   61, 113
+03-development/src/taskq_api/models/__init__.py                  0      0   100%
+03-development/src/taskq_api/models/schemas.py                  39      1    97%   40
+03-development/src/taskq_api/repository/__init__.py              0      0   100%
+03-development/src/taskq_api/repository/key_repo.py             17      8    53%   47-55, 65, 75-77
+03-development/src/taskq_api/repository/orm.py                  30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py            48      0   100%
+03-development/src/taskq_api/repository/session.py              48     48     0%   30-218
+03-development/src/taskq_api/repository/task_repo.py            52      4    92%   41, 74-76
+03-development/src/taskq_api/service/__init__.py                 0      0   100%
+03-development/src/taskq_api/service/auth.py                    19      4    79%   60, 88-90
+03-development/src/taskq_api/service/metrics.py                 12      0   100%
+03-development/src/taskq_api/service/ratelimit.py               10      0   100%
+03-development/src/taskq_api/service/runner.py                 208    117    44%   150, 154, 159, 163-169, 187-190, 233, 236-239, 251-256, 284, 296-297, 328-340, 361-373, 421, 430-440, 477-485, 494-495, 570-579, 584, 597, 615-621, 651-691, 730-735, 740, 747, 763-772, 792-800, 820-824, 840-845
+------------------------------------------------------------------------------------------
+TOTAL                                                          870    320    63%
+
+26 passed, 1 warning in 0.55s

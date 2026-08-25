@@ -1,0 +1,121 @@
+# Harness-executed: system-verification
+# returncode: 0
+# agent_score: 100.0 | threshold: 100.0
+
+Python 3.11.15  [/Users/johnny/projects/taskq-cc-new/.venv/bin/python3]  OK
+python3 -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003
+All checks passed!
+python3 -m pyright 03-development/src/
+0 errors, 0 warnings, 0 informations
+WARNING: there is a new pyright version available (v1.1.409 -> v1.1.411).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+
+python3 -m pytest 03-development/tests -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
+........................................................................ [ 43%]
+........................................................................ [ 87%]
+....................                                                     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------- coverage: platform darwin, python 3.11.15-final-0 ----------
+Name                                                   Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                   0      0   100%
+03-development/src/taskq_api/__main__.py                  24      2    92%   64-65
+03-development/src/taskq_api/api/__init__.py               0      0   100%
+03-development/src/taskq_api/api/deps.py                  74      1    99%   92
+03-development/src/taskq_api/api/health.py                27      0   100%
+03-development/src/taskq_api/api/metrics.py               10      0   100%
+03-development/src/taskq_api/api/tasks.py                 53      0   100%
+03-development/src/taskq_api/app.py                       89     12    87%   75, 158, 160, 163, 166-167, 172-177, 181-182, 228, 323
+03-development/src/taskq_api/errors.py                    13      0   100%
+03-development/src/taskq_api/models/__init__.py            0      0   100%
+03-development/src/taskq_api/models/schemas.py            39      1    97%   40
+03-development/src/taskq_api/repository/__init__.py        0      0   100%
+03-development/src/taskq_api/repository/key_repo.py       17      4    76%   65, 75-77
+03-development/src/taskq_api/repository/orm.py            30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py      48      0   100%
+03-development/src/taskq_api/repository/session.py        48      0   100%
+03-development/src/taskq_api/repository/task_repo.py      52      4    92%   41, 74-76
+03-development/src/taskq_api/service/__init__.py           0      0   100%
+03-development/src/taskq_api/service/auth.py              19      1    95%   89
+03-development/src/taskq_api/service/metrics.py           12      0   100%
+03-development/src/taskq_api/service/ratelimit.py         10      0   100%
+03-development/src/taskq_api/service/runner.py           208      0   100%
+------------------------------------------------------------------------------------
+TOTAL                                                    773     25    97%
+
+164 passed, 1 warning in 10.78s
+python3 -m pytest 03-development/tests/integration -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
+..........................                                               [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------- coverage: platform darwin, python 3.11.15-final-0 ----------
+Name                                                   Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                   0      0   100%
+03-development/src/taskq_api/__main__.py                  24      3    88%   64-65, 69
+03-development/src/taskq_api/api/__init__.py               0      0   100%
+03-development/src/taskq_api/api/deps.py                  74     10    86%   92, 206, 209-211, 272-273, 311, 362, 388
+03-development/src/taskq_api/api/health.py                27      7    74%   117-123
+03-development/src/taskq_api/api/metrics.py               10      0   100%
+03-development/src/taskq_api/api/tasks.py                 53      4    92%   175-183
+03-development/src/taskq_api/app.py                       89     15    83%   75, 158, 160, 163, 166-167, 172-177, 180-182, 188, 228, 284, 323
+03-development/src/taskq_api/errors.py                    13      2    85%   61, 113
+03-development/src/taskq_api/models/__init__.py            0      0   100%
+03-development/src/taskq_api/models/schemas.py            39      1    97%   40
+03-development/src/taskq_api/repository/__init__.py        0      0   100%
+03-development/src/taskq_api/repository/key_repo.py       17      8    53%   47-55, 65, 75-77
+03-development/src/taskq_api/repository/orm.py            30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py      48      0   100%
+03-development/src/taskq_api/repository/session.py        48     48     0%   30-218
+03-development/src/taskq_api/repository/task_repo.py      52      4    92%   41, 74-76
+03-development/src/taskq_api/service/__init__.py           0      0   100%
+03-development/src/taskq_api/service/auth.py              19      4    79%   60, 88-90
+03-development/src/taskq_api/service/metrics.py           12      0   100%
+03-development/src/taskq_api/service/ratelimit.py         10      0   100%
+03-development/src/taskq_api/service/runner.py           208    116    44%   150, 154, 159, 163-169, 189-191, 233, 236-239, 251-256, 284, 296-297, 328-340, 361-373, 421, 430-440, 477-485, 494-495, 570-579, 584, 597, 615-621, 651-691, 730-735, 740, 747, 763-772, 792-800, 820-824, 840-845
+------------------------------------------------------------------------------------
+TOTAL                                                    773    222    71%
+
+26 passed, 1 warning in 0.56s
+python3 -m alembic upgrade head
+python3 -m uvicorn taskq_api.app:app --host 127.0.0.1 --port 8765 --log-level warning &
+{"status":"ok"}{"status":"ok"}smoke: PASS
+python3 -m alembic downgrade base
+python3 -m alembic upgrade head
+downgrade → upgrade round-trip: PASS
+
+All verification steps passed.
+verify-system: PASS
+/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+ERROR:    [Errno 48] error while attempting to bind on address ('127.0.0.1', 8765): address already in use
+kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade v3_split_results -> v2_tags, v3_split_results: split tasks.result_json into task_results.
+INFO  [alembic.runtime.migration] Running downgrade v2_tags -> v1_initial, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running downgrade v1_initial -> , v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> v1_initial, v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Running upgrade v1_initial -> v2_tags, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running upgrade v2_tags -> v3_split_results, v3_split_results: split tasks.result_json into task_results.

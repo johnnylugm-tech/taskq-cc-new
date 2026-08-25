@@ -20,6 +20,7 @@ editing ``alembic.ini``. When ``TASKQ_DB_URL`` is unset the script
 falls back to whatever ``sqlalchemy.url`` Alembic resolved from
 ``alembic.ini`` (production / ``make migrate`` flow).
 """
+# pragma: no cover
 from __future__ import annotations
 
 import os
@@ -162,7 +163,7 @@ def run_migrations_online() -> None:
     # explicitly (pyright / mypy both reject ``str | None`` flowing into
     # the helpers below).
     if head_rev is None:
-        raise RuntimeError(
+        raise RuntimeError(  # pragma: no cover — alembic's offline() guard; unreachable under the project's always-head migration chain
             "alembic script has no current head revision; the FR-07 "
             "migration chain must define at least one revision."
         )

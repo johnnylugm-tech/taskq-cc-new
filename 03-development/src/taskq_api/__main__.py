@@ -61,8 +61,8 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.flush()
         return 0
 
-    parser.error(f"unknown subcommand: {args.command!r} {args.key_action!r}")
-    return 2  # unreachable — parser.error exits
+    parser.error(f"unknown subcommand: {args.command!r} {args.key_action!r}")  # pragma: no cover
+    return 2  # pragma: no cover — unreachable
 
 
 if __name__ == "__main__":

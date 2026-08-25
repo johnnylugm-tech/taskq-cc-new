@@ -68,7 +68,7 @@
     "NFR-07": {
       "type": "licensing",
       "dimension": "license_compliance",
-      "target": "all licenses ∈ {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}",
+      "target": "all licenses \u2208 {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}",
       "module": "taskq_api.config"
     },
     "NFR-08": {
@@ -231,7 +231,13 @@
         "open_high": 0
       }
     },
-    "gate2": null,
+    "gate2": {
+      "score": 89.69584615384618,
+      "quality_complete": false,
+      "rounds_used": 1,
+      "open_critical": 0,
+      "open_high": 0
+    },
     "gate3": null,
     "gate4": null
   }

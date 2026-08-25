@@ -223,14 +223,79 @@ def client(fake_repo: _FakeRepo, monkeypatch):
     """
     from taskq_api.api import deps
     import taskq_api.repository.task_repo as task_repo_mod
+    import taskq_api.repository.key_repo as key_repo_mod
 
-    # Auth bypass — any scope is accepted. Real auth/scope (FR-03/04)
-    # is tested in its own RED file. Without this override the tests
-    # would fail for the wrong reason (missing FR-03) instead of
-    # missing FR-02.
-    app.dependency_overrides[deps.require_scope] = (
-        lambda scope: {"scope": scope, "key_id": "fake-key"}
-    )
+    # Auth bypass — present a real, registered key for the requested scope.
+    # ``tasks.py`` registers ``_require_*`` as ``dependencies=[...]`` on
+    # each route, which FastAPI resolves into a baked-in Dependant at
+    # route-registration time — by the time the test client issues a
+    # request, ``app.dependency_overrides`` keyed by the factory function
+    # ``deps.require_scope`` no longer matches the resolved dependency.
+    # Following the FR-03 / FR-04 pattern: monkeypatch ``deps.key_repo``
+    # with an in-memory fake and seed it with the keys the tests present
+    # via ``X-API-Key``. The auth dependency hashes the presented key,
+    # looks it up in the seeded repo, and admits it.
+    class _FakeKeyRepo:
+        def __init__(self):
+            self.rows = {}
+
+        def create(self, scope, key_hash):
+            key_id = f"key-{len(self.rows) + 1}"
+            self.rows[key_hash] = {
+                "key_id": key_id,
+                "scope": scope,
+                "key_hash": key_hash,
+                "revoked_at": None,
+            }
+            return self.rows[key_hash]
+
+        def find_by_hash(self, key_hash):
+            return self.rows.get(key_hash)
+
+        def revoke(self, key_hash, revoked_at):
+            row = self.rows.get(key_hash)
+            if row is not None:
+                row["revoked_at"] = revoked_at
+
+    _fake_key_repo = _FakeKeyRepo()
+    _fake_key_repo.create(scope="read", key_hash=deps.hash_key("fake-read-key"))
+    _fake_key_repo.create(scope="write", key_hash=deps.hash_key("fake-write-key"))
+    _fake_key_repo.create(scope="admin", key_hash=deps.hash_key("fake-admin-key"))
+
+    deps.key_repo = _fake_key_repo
+    key_repo_mod.key_repo = _fake_key_repo
+
+    # Rate-limit: ``check_rate_limit`` references ``rate_repo`` as a bare
+    # module-global in ``deps.py`` (LEGB lookup, not attribute access),
+    # so the lazy ``__getattr__`` in ``deps`` does NOT cover it. Seed
+    # ``deps.rate_repo`` with a generous fake so the auth dependency
+    # chain completes; FR-05 owns the real behaviour under burst exhaustion.
+    class _FakeRateRepo:
+        def __init__(self):
+            self.buckets = {}
+
+        def get_or_create(self, key_hash, *, burst, refill_per_sec):
+            bucket = self.buckets.get(key_hash)
+            if bucket is None:
+                bucket = {
+                    "tokens": float(burst),
+                    "burst": float(burst),
+                    "refill_per_sec": float(refill_per_sec),
+                    "last_refill_ts": 0.0,
+                }
+                self.buckets[key_hash] = bucket
+            return bucket
+
+        def consume(self, key_hash, *, cost):
+            bucket = self.buckets[key_hash]
+            bucket["tokens"] = max(0.0, bucket["tokens"] - cost)
+            return {
+                "allowed": bucket["tokens"] >= 0,
+                "tokens": bucket["tokens"],
+                "retry_after": 0.0,
+            }
+
+    deps.rate_repo = _FakeRateRepo()
 
     # Repo swap — handlers talk to the in-memory fake, not the real DB.
     task_repo_mod.task_repo = fake_repo
@@ -303,13 +368,23 @@ def test_subprocess_uses_exec_no_shell_true():
     """
     # Source path is the SAB-declared module — Gate 1 phantom check.
     source_path = str(_RUNNER_SOURCE)
-    assert source_path == "03-development/src/taskq_api/service/runner.py"
+    assert source_path == "03-development/src/taskq_api/service/runner.py", (
+        f"runner source path drift: expected relative "
+        f"'03-development/src/taskq_api/service/runner.py', got {source_path!r}"
+    )
 
-    assert _RUNNER_SOURCE.exists(), (
-        f"runner source missing at {_RUNNER_SOURCE} — "
+    # `_RUNNER_SOURCE` is a relative path (per the conftest rebind that
+    # makes the string assertion above pass); resolve it against the
+    # project root so ``.exists()`` is cwd-invariant (mutation-test
+    # runners like mutmut change cwd between phases, which would
+    # otherwise fail this assertion).
+    _repo_root = Path(__file__).resolve().parents[2]
+    _resolved_source = _repo_root / source_path
+    assert _resolved_source.exists(), (
+        f"runner source missing at {_resolved_source} — "
         f"FR-02 phantom module per SAB.json `fr_module_traceability`"
     )
-    src_text = _RUNNER_SOURCE.read_text(encoding="utf-8")
+    src_text = _resolved_source.read_text(encoding="utf-8")
 
     # Match `shell=True` as a keyword argument; the leading `\b` avoids
     # false matches inside identifiers (e.g. `shell_true_hits`).
@@ -1195,6 +1270,11 @@ def test_run_task_timeout_handles_process_already_exited(monkeypatch, tmp_path):
 
         def kill(self):
             raise ProcessLookupError("already exited")
+
+        async def wait(self):
+            # Process is already reaped by definition; the post-kill
+            # ``await proc.wait()`` in ``_reap_after_kill`` is a no-op.
+            return
 
     async def _fake_exec(*_args, **_kwargs):
         return _AlreadyExitedProc()

@@ -79,7 +79,6 @@ GREEN TODO contract (must be implemented for these tests to pass):
 """
 from __future__ import annotations
 
-import io
 import json
 import logging
 import re

@@ -201,17 +201,16 @@ def test_drain_waits_for_inflight_with_budget(monkeypatch):  # NP-07, NFR-03
 
     drain_fn = getattr(runner_mod, "drain", None)
     assert drain_fn is not None, (
-        f"AC-8.2: `taskq_api.service.runner.drain` MUST exist as a "
-        f"callable so the service can gracefully shut down. The "
-        f"current runner module does not expose it — FR-08 AC-8.2 is "
-        f"not yet implemented."
+        "AC-8.2: `taskq_api.service.runner.drain` MUST exist as a "
+        "callable so the service can gracefully shut down. The "
+        "current runner module does not expose it — FR-08 AC-8.2 is "
+        "not yet implemented."
     )
 
     # Build a scheduler that knows about three in-flight tasks; each
     # task is a short asyncio coroutine so it completes well within
     # the 10s drain budget.
     completed: list[int] = []
-    interrupted: list[int] = []
 
     async def _short_task(idx: int) -> None:
         # Short sleep so the task completes comfortably inside the
@@ -225,10 +224,10 @@ def test_drain_waits_for_inflight_with_budget(monkeypatch):  # NP-07, NFR-03
     # RED: this attribute is absent.
     schedule_fn = getattr(runner_mod, "schedule", None)
     assert schedule_fn is not None, (
-        f"AC-8.2: `taskq_api.service.runner` MUST expose a "
-        f"`schedule(coro)` entry point so drain can observe "
-        f"in-flight tasks. Missing — FR-08 AC-8.2 is not yet "
-        f"implemented."
+        "AC-8.2: `taskq_api.service.runner` MUST expose a "
+        "`schedule(coro)` entry point so drain can observe "
+        "in-flight tasks. Missing — FR-08 AC-8.2 is not yet "
+        "implemented."
     )
 
     async def _exercise_drain() -> tuple[float, int, int]:
@@ -334,9 +333,9 @@ def test_concurrency_cap_queues_surplus(monkeypatch):  # NP-13
     # so peak concurrency is bounded. RED: missing.
     Scheduler = getattr(runner_mod, "Scheduler", None)
     assert Scheduler is not None, (
-        f"AC-8.3: `taskq_api.service.runner.Scheduler` MUST exist "
-        f"to enforce TASKQ_MAX_CONCURRENT. Missing — FR-08 AC-8.3 is "
-        f"not yet implemented."
+        "AC-8.3: `taskq_api.service.runner.Scheduler` MUST exist "
+        "to enforce TASKQ_MAX_CONCURRENT. Missing — FR-08 AC-8.3 is "
+        "not yet implemented."
     )
 
     # Track in-process counters — running peak via a shared int that
@@ -701,7 +700,7 @@ def test_cancelled_error_propagates_not_swallowed(monkeypatch):  # NP-07, NFR-03
 # ---------------------------------------------------------------------------
 def test_run_task_in_process_executes_clean_command():
     """In-process ``run_task`` happy path → status_name='done', exit_code=0."""
-    from taskq_api.service.runner import run_task, _redact
+    from taskq_api.service.runner import _redact
 
     # ``_redact`` exercise — covers line 194-198 (AC-9 redaction branch).
     redacted = _redact("noise token=abc123 more noise")
@@ -738,7 +737,7 @@ def test_run_task_in_process_executes_clean_command():
 # ---------------------------------------------------------------------------
 def test_run_task_in_process_unmatched_quote_tokenise_failure():
     """Invalid shell syntax returns the ``failed`` + tokenise-failure sentinel."""
-    from taskq_api.service.runner import run_task, _EXIT_TOKENISE_FAILURE
+    from taskq_api.service.runner import _EXIT_TOKENISE_FAILURE
 
     async def _exercise() -> dict[str, Any]:
         return await run_task(command="echo 'unterminated", task_id=None)
@@ -759,7 +758,7 @@ def test_run_task_in_process_unmatched_quote_tokenise_failure():
 # ---------------------------------------------------------------------------
 def test_run_task_in_process_command_not_found():
     """Nonexistent executable returns ``failed`` + command-not-found sentinel."""
-    from taskq_api.service.runner import run_task, _EXIT_COMMAND_NOT_FOUND
+    from taskq_api.service.runner import _EXIT_COMMAND_NOT_FOUND
 
     async def _exercise() -> dict[str, Any]:
         # Use a clearly-nonexistent binary; subprocess raises
@@ -785,7 +784,6 @@ def test_run_task_in_process_command_not_found():
 # ---------------------------------------------------------------------------
 def test_run_task_in_process_non_zero_exit_marks_failed():
     """Non-zero exit code returns ``failed``; exercises state_machine path."""
-    from taskq_api.service.runner import run_task
 
     async def _exercise() -> dict[str, Any]:
         # ``false`` is the POSIX canonical "exit 1" stub.
@@ -1072,7 +1070,7 @@ def test_module_level_schedule_and_drain_path(monkeypatch):
 # ---------------------------------------------------------------------------
 def test_run_task_in_process_redacts_token_in_stdout():
     """``run_task`` redacts ``token=<value>`` from stdout before persisting."""
-    from taskq_api.service.runner import run_task, _redact, _REDACTED_MARKER
+    from taskq_api.service.runner import _redact, _REDACTED_MARKER
 
     # Direct _redact checks for completeness.
     assert _redact("plain") == "plain", "_redact must leave plain text alone"
@@ -1106,7 +1104,7 @@ def test_run_task_in_process_redacts_token_in_stdout():
 def test_run_task_in_process_timeout_branch():
     """``run_task`` fires the ``_reap_after_kill`` + ``_drain_pipes`` path
     when ``TASKQ_TASK_TIMEOUT`` fires. Lines 471-489 + 328-367 covered."""
-    from taskq_api.service.runner import run_task, _reap_after_kill, _drain_pipes
+    from taskq_api.service.runner import _reap_after_kill, _drain_pipes
 
     async def _exercise() -> dict[str, Any]:
         # 0.2s timeout against a 5s sleep → TimeoutError must fire.
@@ -1294,7 +1292,7 @@ def test_reap_after_kill_handles_already_reaped_process():
 # ---------------------------------------------------------------------------
 def test_drain_pipes_timeout_fallback(monkeypatch):
     """``_drain_pipes`` returns ``(b'', b'')`` when the drain budget fires."""
-    from taskq_api.service.runner import _drain_pipes, _DRAIN_TIMEOUT_SECONDS
+    from taskq_api.service.runner import _drain_pipes
 
     # Force the wait_for to TimeoutError by tightening the budget
     # below the child's self-termination latency. Use a process that
@@ -1601,7 +1599,6 @@ def fr08_app_client(monkeypatch):
         FR-08-scope coverage contract.
     """
     from fastapi.testclient import TestClient
-    from taskq_api.api import deps
     import taskq_api.api.tasks as tasks_mod
     import taskq_api.repository.task_repo as task_repo_mod
     from taskq_api.app import app as _app

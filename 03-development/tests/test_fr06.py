@@ -54,7 +54,6 @@ import os
 import re
 from pathlib import Path
 
-import pytest
 
 # ---------------------------------------------------------------------------
 # SAB binding — top-level imports per the test contract.

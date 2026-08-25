@@ -14,8 +14,24 @@ PYTHON_MIN := 3.11
 
 # Point coverage at the whole source tree, not the bare "." default that
 # pytest-cov would measure (its default includes test files and any
-# fixtures the run creates).
+# fixtures the test run creates).
 COV_TARGET ?= 03-development/src/taskq_api
+
+# `taskq_api` lives at ``03-development/src`` (per SPEC §3). Every
+# recipe that imports it (uvicorn smoke, alembic env.py target_metadata)
+# needs the source tree on PYTHONPATH. Tests' own conftest.py sets
+# this; the smoke target does not, so we hoist it here.
+SRC_DIR := 03-development/src
+
+# `alembic upgrade head` reads ``sqlalchemy.url`` from ``alembic.ini``
+# (which is intentionally empty — the env var is the override knob)
+# or ``TASKQ_DB_URL`` (consumed by
+# ``03-development/src/migrations/env.py``). ``verify-system`` runs
+# ``make migrate`` from a fresh shell, so the URL must have a sensible
+# default; otherwise alembic errors out before any migration runs.
+TASKQ_DB_URL ?= sqlite:///$(shell pwd)/.sessi-work/verify_system.sqlite
+export TASKQ_DB_URL
+export PYTHONPATH := $(SRC_DIR):$(PYTHONPATH)
 
 .PHONY: help install lock migrate verify-system test test-unit test-integration \
         lint type-check security mutation coverage verify-cleanup downgrade-upgrade \
@@ -59,6 +75,7 @@ lock: check-python
 	$(PYTHON) -m piptools compile --output-file=requirements.lock requirements.txt
 
 migrate: check-python
+	@mkdir -p .sessi-work
 	$(PYTHON) -m alembic upgrade head
 
 test: check-python

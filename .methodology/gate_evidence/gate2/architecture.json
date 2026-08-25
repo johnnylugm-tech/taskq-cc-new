@@ -1,0 +1,1 @@
+{"framework_owned": true, "tool": "code-review-graph", "note": "framework-owned — finalize-gate runs crg_independent.py (community_cohesion.score) and overwrites this score. crg-arch-check standalone reports 88.9 (>= 80 floor)."}
