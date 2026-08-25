@@ -11,6 +11,13 @@
 # script.py.mako) are still only loaded by the alembic subprocess and not
 # by pytest — keep them omitted so the coverage denominator reflects only
 # code the unit/integration test suite actually exercises.
+#
+# ``runner_scheduler.py`` is the FR-08 surface split off ``runner.py``
+# (which is now mostly the FR-02 executor + re-exports). The FR-08 unit
+# suite (``test_fr08.py``) drives ``Scheduler`` / ``drain`` / ``schedule``
+# directly via monkeypatch on the re-exported symbols, so the in-process
+# branches inside ``runner_scheduler.py`` are exercised by FR-08 tests —
+# keep it out of the omit list.
 [run]
 omit =
     03-development/src/migrations/env.py

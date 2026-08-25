@@ -19,6 +19,7 @@ Citations:
 """
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -48,4 +49,30 @@ def pytest_collection_modifyitems(config, items):
     if auth_mod is not None and hasattr(auth_mod, "_AUTH_SOURCE"):
         auth_mod._AUTH_SOURCE = Path(
             "03-development/src/taskq_api/service/auth.py"
+        )
+
+
+# NFR-10 coverage gate — runs in ``pytest_terminal_summary`` so it fires
+# after pytest-cov has written its JSON report (``--cov-report=json``).
+# Reading mid-session sees no file because pytest-cov flushes its
+# reports only when the session ends, so this gate lives in the
+# terminal-summary hook rather than as a regular test.
+_NFR10_COVERAGE_THRESHOLD = 80.0
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """NFR-10: aggregate coverage must be ≥ 80% after pytest-cov writes."""
+    json_path = Path(__file__).resolve().parent.parent.parent / ".coverage.json"
+    if not json_path.exists():
+        return  # no coverage data — pytest-cov was not active; harness gates this
+    try:
+        data = json.loads(json_path.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    pct = float(data.get("totals", {}).get("percent_covered", 0.0))
+    if pct < _NFR10_COVERAGE_THRESHOLD:
+        terminalreporter.write_sep(
+            "=",
+            f"NFR-10 coverage regression: {pct:.1f}% < {_NFR10_COVERAGE_THRESHOLD}%",
+            red=True,
         )

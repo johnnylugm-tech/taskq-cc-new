@@ -15,7 +15,7 @@
 | Code Coverage | 100.0% | 100% |
 | Test Coverage | 100.0% | 100% |
 | Verification Rate | 100.0% | 100% |
-| Total Links | 82 | — |
+| Total Links | 85 | — |
 
 ### ASPICE SWE.3 Compliance
 
@@ -30,13 +30,13 @@
 | Requirement | Status | Code Files | Test Files | SAD Module |
 |-------------|--------|------------|------------|------------|
 | FR-01 | verified | 03-development/src/taskq_api/__init__.py, 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/deps.py (+7) | 03-development/tests/test_fr01.py | — |
-| FR-02 | verified | 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/tasks.py, 03-development/src/taskq_api/models/schemas.py (+4) | 03-development/tests/test_fr02.py | — |
+| FR-02 | verified | 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/tasks.py, 03-development/src/taskq_api/models/schemas.py (+6) | 03-development/tests/test_fr02.py | — |
 | FR-03 | verified | 03-development/src/taskq_api/__main__.py, 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/deps.py (+4) | 03-development/tests/test_fr03.py | — |
 | FR-04 | verified | 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/deps.py, 03-development/src/taskq_api/api/metrics.py (+3) | 03-development/tests/test_fr04.py | tasks.py |
 | FR-05 | verified | 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/deps.py, 03-development/src/taskq_api/repository/rate_repo.py (+3) | 03-development/tests/test_fr05.py | — |
 | FR-06 | verified | 03-development/src/taskq_api/repository/__init__.py, 03-development/src/taskq_api/repository/key_repo.py, 03-development/src/taskq_api/repository/orm.py (+3) | 03-development/tests/test_fr06.py | *_repo.py |
 | FR-07 | verified | 03-development/src/migrations/__init__.py, 03-development/src/migrations/env.py, 03-development/src/migrations/versions/__init__.py (+4) | 03-development/tests/test_fr07.py | tests/integration/test_fr07_migration_round_trip.py |
-| FR-08 | verified | 03-development/src/taskq_api/service/__init__.py, 03-development/src/taskq_api/service/runner.py, 03-development/tests/test_fr08.py (+1) | 03-development/tests/test_fr08.py | — |
+| FR-08 | verified | 03-development/src/taskq_api/service/__init__.py, 03-development/src/taskq_api/service/runner.py, 03-development/src/taskq_api/service/runner_scheduler.py (+2) | 03-development/tests/test_fr08.py | — |
 | FR-09 | verified | 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/health.py, 03-development/src/taskq_api/api/metrics.py (+2) | 03-development/tests/test_fr09.py | — |
 | FR-10 | verified | 03-development/src/taskq_api/api/deps.py, 03-development/src/taskq_api/app.py, 03-development/src/taskq_api/errors.py (+1) | 03-development/tests/test_fr10.py | — |
 <!-- AUTO-GEN:END -->
@@ -56,6 +56,6 @@
 | NFR-08 | — | PENDING |
 | NFR-09 | test_fr07.py, test_fr09.py, test_fr10.py | VERIFIED |
 | NFR-10 | test_fr01.py | VERIFIED |
-| NFR-11 | test_fr01.py, test_nfr_deferred.py::test_file_and_directory_size_limits | VERIFIED |
+| NFR-11 | test_fr01.py, test_fr08.py, test_nfr_deferred.py | VERIFIED |
 | NFR-12 | test_fr07.py | VERIFIED |
 | NFR-99 | — | PENDING |
