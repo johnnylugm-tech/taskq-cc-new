@@ -27,6 +27,28 @@ import taskq_api.repository.key_repo  # noqa: F401  (coverage-scope)
 import taskq_api.repository.task_repo  # noqa: F401  (coverage-scope)
 import taskq_api.service.auth  # noqa: F401  (coverage-scope)
 
+# Earlier FR fixtures (test_fr01 / test_fr02 client fixtures) swap the
+# module-level ``key_repo`` singleton for an in-process fake so the unit
+# suite runs without a real DB. That swap survives past the test
+# boundary because those fixtures are return-based (no teardown). The
+# key_repo coverage tests below exercise the REAL singleton's lines (65,
+# 75-77); without this reset the fake's methods run instead and coverage
+# misses the real source lines.
+import taskq_api.repository.key_repo as _key_repo_module
+from taskq_api.repository.key_repo import _InMemoryKeyRepo as _RealKeyRepo
+
+
+def _reset_key_repo_singleton() -> None:
+    """Swap the ``key_repo`` singleton back to a real in-memory repo.
+
+    Idempotent: a second call still leaves a real repo in place. Saves
+    no state because the only thing we care about is exercising the
+    production ``_InMemoryKeyRepo`` class, not preserving the fake's
+    data — each coverage test seeds its own rows via ``create()``.
+    """
+    if not isinstance(_key_repo_module.key_repo, _RealKeyRepo):
+        _key_repo_module.key_repo = _RealKeyRepo()
+
 
 def test_correlation_id_uses_incoming_header_with_whitespace():
     """app._resolve_correlation_id returns incoming.strip() on whitespace (line 75)."""
@@ -87,6 +109,43 @@ def test_app_body_pre_validation_middleware_handles_invalid_json():
     assert resp.status_code == 422
     body = resp.json()
     assert body.get("status") == 422
+
+
+def test_app_body_pre_validation_middleware_break_on_no_body_schema():
+    """Body-validation middleware takes the ``break`` branch when the matched
+    POST/PUT/PATCH route declares no ``Body(...)`` parameter (line 163).
+
+    Earlier fixtures register POST routes with ``Body(...)`` so
+    ``body_params`` is non-empty and the middleware runs JSON validation.
+    This test registers a POST route WITHOUT a ``Body(...)`` parameter so
+    ``body_params`` is empty and the middleware falls through to ``break``
+    instead of validating — letting the request reach the route handler
+    even when the body content would otherwise fail JSON validation.
+    """
+    from taskq_api.app import create_app
+
+    app = create_app()
+
+    @app.post("/_cov/_no_body_post")
+    def _no_body_post() -> dict:
+        # No ``Body(...)`` parameter → body_params is empty → line 163
+        # break branch fires.
+        return {"ok": True}
+
+    client = TestClient(app, raise_server_exceptions=False)
+    resp = client.post(
+        "/_cov/_no_body_post",
+        content=b"{not-valid-json}",
+        headers={"content-type": "application/json"},
+    )
+    # The break branch lets the request through to the handler; the
+    # handler ignores the body content and returns 200. Status 200 (vs
+    # the 422 the JSON-invalidating branch produces) proves the break
+    # path was taken.
+    assert resp.status_code == 200, (
+        f"line 163 break branch expected (status 200); got {resp.status_code}: {resp.text[:200]}"
+    )
+    assert resp.json() == {"ok": True}
 
 
 def test_app_mount_sub_app_route_skip_branch():
@@ -167,6 +226,7 @@ def test_key_repo_find_by_hash_returns_none_when_missing():
     """key_repo.find_by_hash returns None when the key isn't present (line 65)."""
     from taskq_api.repository import key_repo as key_repo_mod
 
+    _reset_key_repo_singleton()
     singleton = key_repo_mod.key_repo
     # Wipe any state populated by earlier tests so the lookup actually misses.
     saved = dict(singleton.rows)
@@ -181,6 +241,7 @@ def test_key_repo_create_returns_row_with_key_id():
     """key_repo.create returns a row whose key_id, scope, key_hash are populated (lines 47-55)."""
     from taskq_api.repository import key_repo as key_repo_mod
 
+    _reset_key_repo_singleton()
     singleton = key_repo_mod.key_repo
     saved = dict(singleton.rows)
     try:
@@ -201,6 +262,7 @@ def test_key_repo_revoke_marks_existing_row():
     """key_repo.revoke sets revoked_at on an existing row (line 77)."""
     from taskq_api.repository import key_repo as key_repo_mod
 
+    _reset_key_repo_singleton()
     singleton = key_repo_mod.key_repo
     saved = dict(singleton.rows)
     try:
@@ -225,6 +287,7 @@ def test_key_repo_revoke_on_absent_key_is_noop():
     """key_repo.revoke on an absent key_hash is a silent no-op (lines 75-77)."""
     from taskq_api.repository import key_repo as key_repo_mod
 
+    _reset_key_repo_singleton()
     singleton = key_repo_mod.key_repo
     saved = dict(singleton.rows)
     try:
