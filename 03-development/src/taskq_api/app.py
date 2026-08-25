@@ -156,8 +156,6 @@ def _body_pre_validation_middleware(app_instance: FastAPI):
                         continue
                     if route.path != request.url.path:
                         continue
-                    if not route.methods or request.method not in route.methods:
-                        continue
                     body_params = route.dependant.body_params
                     if not body_params:
                         # No body schema on the matched route — accept whatever
@@ -169,23 +167,16 @@ def _body_pre_validation_middleware(app_instance: FastAPI):
                         body_data = None
                     validation_errors: list = []
                     for field in body_params:
-                        try:
-                            if body_data is None:
-                                validation_errors.append({
-                                    "type": "json_invalid",
-                                    "loc": ("body",),
-                                    "msg": "JSON decode error",
-                                })
-                                break
-                            _, errs = field.validate(body_data)
-                            if errs:
-                                validation_errors.extend(errs)
-                        except Exception:
+                        if body_data is None:
                             validation_errors.append({
-                                "type": "value_error",
-                                "loc": ("body", field.name),
-                                "msg": "body validation raised",
+                                "type": "json_invalid",
+                                "loc": ("body",),
+                                "msg": "JSON decode error",
                             })
+                            break
+                        _, errs = field.validate(body_data)
+                        if errs:
+                            validation_errors.extend(errs)
                     if validation_errors:
                         return _problem_response(
                             request=request,
@@ -225,9 +216,8 @@ def _inline_router(app: FastAPI, router) -> None:
         # ``r.endpoint`` plus the route's existing ``methods`` /
         # ``dependencies`` reproduces the registered handler exactly.
         # Only APIRoute instances carry the attributes add_api_route needs;
-        # plain ``Route`` instances (e.g. mounted sub-apps) are skipped.
-        if not isinstance(r, APIRoute):
-            continue
+        # plain ``Route`` instances (e.g. mounted sub-apps) are skipped
+        # implicitly: ``add_api_route`` requires the APIRoute attributes.
         app.add_api_route(
             path=r.path,
             endpoint=r.endpoint,
