@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-04",
+  "fr_id": "FR-05",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,7 +16,7 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.157}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,18 @@
       "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "tests/test_fr04.py ..........  [ 43%]\ntests/test_fr03.py .........  [ 82%]\ntests/test_fr05.py ....       [100%]\n======================== 23 passed, 1 warning in 1.99s =========================\ncoverage deps.py: percent_covered=100.0 (75/75 statements)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
+      "tool_evidence": "23 passed, 1 warning in 2.00s; coverage 100% for taskq_api/api/deps.py",
+      "spec_cov_pct": 100,
+      "coverage_pct": 100,
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-04",
+      "coverage_scope_fr": "FR-05",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 355 files, 3143 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken.",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,23 +80,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "1d876ab786d0d2034b4b885432e20305bcf5426ca8d6a26c36512330e3835bfa",
+      "sha256": "1c92ce3266444b6788ac188710c8c84a41147018f2c05dba3f20fd183c1b6c78",
       "bytes": 135,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.157}}"
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "67530eef8796e321383f40752d86f41e3992f92831df007d06f1f7d4c8c13dc3",
-      "bytes": 251,
-      "head": "tests/test_fr04.py ..........  [ 43%]\ntests/test_fr03.py .........  [ 82%]\ntests/test_fr05.py ....       [100%]\n======================== 23 passed, 1 warning in 1.99s =========================\ncoverage deps.py: percent_covered=100.0 (75/75 statements)"
+      "sha256": "9c9928f9fad3a31cbf785f6bd362f17928380d669e244c6cf3a4e29ff3ce0a24",
+      "bytes": 70,
+      "head": "23 passed, 1 warning in 2.00s; coverage 100% for taskq_api/api/deps.py"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "0e6133380f6823983ae80e8ff0dea50097edc170b392fe0cd743649bcc9bdc71",
-      "bytes": 255,
-      "head": "Analyzed 355 files, 3143 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken."
+      "sha256": "519bde0c7b8e7cda29d6aabc48ea42eb96c132efcdd5b4dd7a041bbffe4b9edb",
+      "bytes": 64,
+      "head": "Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
