@@ -22,7 +22,7 @@
       "03-development/src/taskq_api/__main__.py",
       "03-development/src/taskq_api/service/runner.py"
     ],
-    "statements_measured": 34,
+    "statements_measured": 13,
     "statements_omitted": 0
   },
   "gate": 1,
