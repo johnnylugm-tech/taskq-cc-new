@@ -20,3 +20,13 @@ htmlcov/
 .mutmut-cache/
 .code-review-graph/
 .claude/worktrees/
+# CRG default-excludes any path matching r"tests?/" — including
+# 03-development/tests/integration/*.py — and the architecture gate
+# requires `graph_files == delivered_sources`. We *run* these tests
+# (verify-system needs them; they cover the ASGI path) but we do NOT
+# count them as delivered for the architecture-graph delta, so the
+# CRG's graph_files set matches _delivered_sources. Removing them
+# from the delivered set rather than renaming the directory keeps
+# the harness's test-collection logic stable.
+03-development/tests/integration/
+03-development/tests/test_nfr_patterns.py
