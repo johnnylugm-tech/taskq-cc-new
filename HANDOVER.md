@@ -2,7 +2,7 @@
 
 **Checkpoint**: `P4-pre-gate3-20260826`  
 **Phase**: P4 — Testing  
-**Generated**: 2026-08-26T04:27:42Z
+**Generated**: 2026-08-26T04:29:48Z
 
 > ⚠️  **開始下一個工作階段前，請先執行 `/compact` 壓縮上下文**，再從「接下來的工作」繼續。
 
@@ -180,9 +180,12 @@ All 10 FR(s) Gate 1 re-eval PASS [FR-01,FR-02,FR-03,FR-04,FR-05,…+5]. Gate 3 (
   - ? / gate3-verify-r1: **complete**
 
 **Recently Committed Files:**
+  - `.methodology/degradations.jsonl`
+  - `.methodology/gate_verify.jsonl`
+  - `.methodology/state.json`
+  - `HANDOVER.md`
   - `.methodology/crg_baseline_p4.json`
   - `.methodology/decision_logs/2026-08-26/GATE_4_cd57fbce.yaml`
-  - `.methodology/degradations.jsonl`
   - `.methodology/effort_metrics.db`
   - `.methodology/gate3_result.json`
   - `.methodology/gate_evidence/harness_verification/execute_verification_target_harness.txt`
@@ -194,12 +197,9 @@ All 10 FR(s) Gate 1 re-eval PASS [FR-01,FR-02,FR-03,FR-04,FR-05,…+5]. Gate 3 (
   - `.methodology/gate_evidence/harness_verification/test_coverage_harness.txt`
   - `.methodology/gate_evidence/harness_verification/type_safety_harness.txt`
   - `.methodology/gate_timestamps.jsonl`
-  - `.methodology/gate_verify.jsonl`
-  - `.methodology/state.json`
   - `00-summary/Phase4_STAGE_PASS.md`
   - `03-development/tests/test_sec_threats.py`
   - `.methodology/bug_hunt_report.json`
-  - `.methodology/decision_logs/2026-08-26/GATE_4_20a38f73.yaml`
 
 ## 接下來的工作
 
