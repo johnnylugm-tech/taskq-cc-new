@@ -50,7 +50,7 @@
       "score_source": "framework"
     },
     "test_assertion_quality": {
-      "score": 94.7,
+      "score": 94.9,
       "threshold": 60,
       "tool_output": ".methodology/gate_evidence/gate3/test_assertion_quality.txt",
       "tool_evidence": "ast-assertions AST scan: assertion_density=2.97, zero_assert_ratio=0.076, 18 zero-assert tests; tool_score = min(100, 2.97*25 + (1-0.076)*50) = 100",
@@ -79,8 +79,8 @@
       "calibration": {
         "cohesion_healthy": 0.2,
         "community_oversized": 50,
-        "graph_files": 46,
-        "source_files": 46
+        "graph_files": 47,
+        "source_files": 47
       }
     },
     "readability": {
@@ -296,7 +296,7 @@
     ],
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 372997,
+      "saved_tokens": 373603,
       "saved_percent": 100
     }
   },
@@ -309,11 +309,11 @@
     "truncated": false,
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 373010,
+      "saved_tokens": 373616,
       "saved_percent": 100
     }
   },
-  "composite_score": 93.679,
+  "composite_score": 93.681,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [
