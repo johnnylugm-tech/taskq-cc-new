@@ -1,8 +1,8 @@
 {
   "gate": 1,
-  "phase": 4,
-  "fr_id": "FR-02",
-  "overall_score": 99.25,
+  "phase": 5,
+  "fr_id": "FR-01",
+  "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787712719859\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.157}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1787719217278\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.143}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 33,
+      "tests_passed": 79,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "6 passed, 1 warning in 0.41s — 03-development/tests/test_fr10.py 100% (6/6) — coverage 100% (13/13 lines) for taskq_api/errors.py",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_evidence": "collected 79 items\n03-development/tests/test_fr01.py ........                               [ 10%]\n03-development/tests/test_fr02.py .................................      [ 51%]\n03-development/tests/test_fr08.py ...................................... [100%]\n======================== 79 passed, 2 warnings in 6.08s ========================\ncoverage: tasks.py 100% (53/53 statements)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-02",
+      "coverage_scope_fr": "FR-01",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 3 kept, 0 broken. Downward-only layer dependencies (api → repository → models) KEPT; No sqlalchemy imports above repository layer KEPT; Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -64,9 +64,9 @@
     "test_coverage::pytest.ini": {
       "source": "pytest.ini (score-altering exclusions)",
       "kind": "file",
-      "sha256": "8cad3ebef3d009c6c3053aa46c64b265acee8ecab600e7cec5fa35aba99edbc1",
-      "bytes": 1048,
-      "head": "# pytest configuration for the taskq-cc-new project.\n#\n# The `testpaths` setting limits pytest's collection to the project's\n# own tests under `03-development/tests/`. Without this, mutmut\n# collects every test file on sys.path — including the harness's\n# own tests (`harness/tests/`) which import from the harness's\n# `core/` package and fail when the workdir cwd is not the harness\n# root. The framework-level `test_suite_run` and `spec_coverage`\n# modules already scope to `03-development/tests` directly via the\n# `resolve_targets` helper, so this file does not change the gate\n# or the per-FR evidence pipeline — only the implicit collection\n# surface that mutmut and a bare `pytest` invocation would use.\n#\n# The `pythonpath = 03-development/src` line mirrors the project-\n# level convention; the `conftest.py` under `03-development/tests/`\n# also adds the same directory to `sys.path` so this is belt-and-\n# braces.\n[pytest]\ntestpaths = 03-development/tests\npythonpath = 03-development/src"
+      "sha256": "5670780d51033c0c133d8548eae13e071f8e18c774cbf796280a1253f28a58ad",
+      "bytes": 1430,
+      "head": "# pytest configuration for the taskq-cc-new project.\n#\n# The `testpaths` setting limits pytest's collection to the project's\n# own tests under `03-development/tests/`. Without this, mutmut\n# collects every test file on sys.path — including the harness's\n# own tests (`harness/tests/`) which import from the harness's\n# `core/` package and fail when the workdir cwd is not the harness\n# root. The framework-level `test_suite_run` and `spec_coverage`\n# modules already scope to `03-development/tests` directly via the\n# `resolve_targets` helper, so this file does not change the gate\n# or the per-FR evidence pipeline — only the implicit collection\n# surface that mutmut and a bare `pytest` invocation would use.\n#\n# The `norecursedirs` line excludes `harness/` (the methodology\n# submodule) and `.git/` from collection — the harness's toolchain\n# invocations pass the project root as the test path, and without\n# this exclusion pytest tries to collect `harness/tests/*` which\n# import from `harness.core` and crash outside the harness root.\n#\n# The `pythonpath = 03-development/src` line mirrors the project-"
     },
     "test_coverage::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
@@ -85,26 +85,26 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "1ff72ddba209a05096d1f5ac95d2403b794bee95966f99b62b18bd691fc44f46",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787712719859\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.157}}"
+      "sha256": "c2b159399d6b39f6911c9e1888a0818810d28777e1e6519289a226b6224dc468",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1787719217278\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.143}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "a5d0febfd66c4c41acd74192d8b72db41420b611bb0a7f559da882cbb4597ddb",
-      "bytes": 133,
-      "head": "6 passed, 1 warning in 0.41s — 03-development/tests/test_fr10.py 100% (6/6) — coverage 100% (13/13 lines) for taskq_api/errors.py"
+      "sha256": "8b2650cad692bb7a2a9f7867dcde56c9f9c543716775b6c1c03f57ff3017a6f5",
+      "bytes": 382,
+      "head": "collected 79 items\n03-development/tests/test_fr01.py ........                               [ 10%]\n03-development/tests/test_fr02.py .................................      [ 51%]\n03-development/tests/test_fr08.py ...................................... [100%]\n======================== 79 passed, 2 warnings in 6.08s ========================\ncoverage: tasks.py 100% (53/53 statements)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "a22e98e09a4e545c2bdff16bea73f394838edb8d6037fa89a7238e9a275c35df",
-      "bytes": 218,
-      "head": "Contracts: 3 kept, 0 broken. Downward-only layer dependencies (api → repository → models) KEPT; No sqlalchemy imports above repository layer KEPT; Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT"
+      "sha256": "a40390e624cdbeb09c28745c01eaa7736f58a06c47b43658fe2aac9b369d8022",
+      "bytes": 122,
+      "head": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken."
     }
   },
-  "composite_score": 99.25,
+  "composite_score": 100.0,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
