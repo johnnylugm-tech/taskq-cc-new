@@ -1,6 +1,6 @@
 # Harness-executed: pyright
 # returncode: 0
-# agent_score: 100.0 | threshold: 85.0
+# agent_score: 100.0 | threshold: 100.0
 
 {
     "version": "1.1.409",

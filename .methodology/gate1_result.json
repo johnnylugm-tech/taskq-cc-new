@@ -1,8 +1,8 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-10",
-  "overall_score": 100.0,
+  "fr_id": "FR-02",
+  "overall_score": 99.25,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
@@ -23,13 +23,13 @@
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 33,
       "tests_failed": 0,
       "tests_skipped": 0,
       "tool_evidence": "6 passed, 1 warning in 0.41s — 03-development/tests/test_fr10.py 100% (6/6) — coverage 100% (13/13 lines) for taskq_api/errors.py",
       "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-02",
       "score_source": "framework"
     },
     "architecture_constraints": {
@@ -104,7 +104,7 @@
       "head": "Contracts: 3 kept, 0 broken. Downward-only layer dependencies (api → repository → models) KEPT; No sqlalchemy imports above repository layer KEPT; Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT"
     }
   },
-  "composite_score": 100.0,
+  "composite_score": 99.25,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
