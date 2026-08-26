@@ -193,7 +193,7 @@ class _FakeTaskRepo:
         self.results.append(row)
         return row
 
-    def list_runs(self, task_id: str, limit: int = 50) -> list[dict]:
+    def list_runs(self, task_id: str, limit: int = 50) -> list[dict]:  # type: ignore[valid-type]
         return [r for r in self.results if r.get("task_id") == task_id]
 
 
