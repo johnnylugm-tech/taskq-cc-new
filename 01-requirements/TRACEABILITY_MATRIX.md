@@ -52,8 +52,8 @@
 | NFR-04 | test_fr09.py | VERIFIED |
 | NFR-05 | test_fr01.py | VERIFIED |
 | NFR-06 | test_fr06.py | VERIFIED |
-| NFR-07 | — | PENDING |
-| NFR-08 | — | PENDING |
+| NFR-07 | test_nfr_deferred.py | VERIFIED |
+| NFR-08 | test_nfr_deferred.py | VERIFIED |
 | NFR-09 | test_fr07.py, test_fr09.py, test_fr10.py | VERIFIED |
 | NFR-10 | test_fr01.py | VERIFIED |
 | NFR-11 | test_fr01.py, test_fr08.py, test_nfr_deferred.py | VERIFIED |
