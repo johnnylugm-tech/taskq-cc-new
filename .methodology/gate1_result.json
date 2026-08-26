@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-10",
+  "fr_id": "FR-03",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,43 +16,50 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787691028751\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787709819529\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.154}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "========================= 6 passed, 1 warning in 0.41s =========================\ncollected 6 items\n03-development/tests/test_fr10.py ...... [100%]\nCoverage: 100% (13/13 statements covered) for taskq_api/errors.py",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 23 items\n\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n============================== 23 passed in 1.61s ==============================",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-03",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\nContracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT",
+      "tool_evidence": "Contracts: 3 kept, 0 broken.\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
   },
-  "enforcer_sha": "0978364c4ccc5dc0439a2b7b43627fd8e1fca0fc-dirty",
+  "enforcer_sha": "d01adf0ec3538068a73ddc0b710510b2e311e32b",
   "enforcer_surface": {
     "core/quality_gate": "e34a821fd4897b886a866a9ed25a6d04b43127ec",
     "harness/harness_bridge.py": "10a4db9ed5ae3fef97bb92ed97f1655d0dc05bfe",
     "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
   },
   "evidence_digest": {
+    "secrets_scanning::.gitleaksignore": {
+      "source": ".gitleaksignore (score-altering exclusions)",
+      "kind": "file",
+      "sha256": "97d68b0f129eabfed8fb524716cea32b6f070e2a73ad884932782c960e443bfd",
+      "bytes": 109,
+      "head": "a4a6bc5ab3833521a6bea98bf914d50067200c2c:03-development/tests/test_bug_hunt_resolutions.py:generic-api-key:77"
+    },
     "mutation_testing::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "797bc47a216c756e09584635a4fd0d932c2c154f4a494a385a9b40631b5d20b7",
-      "bytes": 1247,
-      "head": "# taskq-cc-new — mutmut scope for Gate 2 / Gate 3 / Gate 4.\n#\n# The harness's mutation-test-score reads `[mutmut] paths_to_mutate`\n# from the project-root `setup.cfg`. Scope is narrowed to\n# `runner.py` because that module has 100% line coverage in the\n# current test suite (every mutation either kills a test or is\n# equivalent). The wider service+repository scope mutates code\n# that the unit suite fakes out via monkeypatch — every mutation\n# there survives because the real implementation is never invoked\n# by a test, which is a known project architecture choice (FR-05\n# owns the real rate-limit primitive; FR-03 owns the real auth\n# path) and is not a mutmut-side regression. The Makefile target\n# `make mutation` keeps the broader scope for manual investigation;\n# the harness's path here is the one that decides the gate.\n[mutmut]\npaths_to_mutate=03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir=03-development/tests\nrunner=/Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p no:cacheprovider --no-cov --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude=\nbackup=False"
+      "sha256": "03384a04d992e1b00ff253e12ea4348fae2a6a1ac0a1cdbf1e262a4ae981777e",
+      "bytes": 639,
+      "head": "[mutmut]\npaths_to_mutate = 03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir = /Users/johnny/projects/taskq-cc-new/03-development/tests\nrunner = /Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p pytest_cov -p no:cacheprovider -p no:cov --ignore=/Users/johnny/projects/taskq-cc-new/03-development/tests/test_benchmarks.py --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude = \ndisable_mutation_types =\n\n[tool:pytest]\ntestpaths = 03-development/tests\npythonpath = 03-development/src\naddopts = -ra\n"
     },
     "test_coverage::pytest.ini": {
       "source": "pytest.ini (score-altering exclusions)",
@@ -64,9 +71,9 @@
     "test_coverage::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "797bc47a216c756e09584635a4fd0d932c2c154f4a494a385a9b40631b5d20b7",
-      "bytes": 1247,
-      "head": "# taskq-cc-new — mutmut scope for Gate 2 / Gate 3 / Gate 4.\n#\n# The harness's mutation-test-score reads `[mutmut] paths_to_mutate`\n# from the project-root `setup.cfg`. Scope is narrowed to\n# `runner.py` because that module has 100% line coverage in the\n# current test suite (every mutation either kills a test or is\n# equivalent). The wider service+repository scope mutates code\n# that the unit suite fakes out via monkeypatch — every mutation\n# there survives because the real implementation is never invoked\n# by a test, which is a known project architecture choice (FR-05\n# owns the real rate-limit primitive; FR-03 owns the real auth\n# path) and is not a mutmut-side regression. The Makefile target\n# `make mutation` keeps the broader scope for manual investigation;\n# the harness's path here is the one that decides the gate.\n[mutmut]\npaths_to_mutate=03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir=03-development/tests\nrunner=/Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p no:cacheprovider --no-cov --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude=\nbackup=False"
+      "sha256": "03384a04d992e1b00ff253e12ea4348fae2a6a1ac0a1cdbf1e262a4ae981777e",
+      "bytes": 639,
+      "head": "[mutmut]\npaths_to_mutate = 03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir = /Users/johnny/projects/taskq-cc-new/03-development/tests\nrunner = /Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p pytest_cov -p no:cacheprovider -p no:cov --ignore=/Users/johnny/projects/taskq-cc-new/03-development/tests/test_benchmarks.py --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude = \ndisable_mutation_types =\n\n[tool:pytest]\ntestpaths = 03-development/tests\npythonpath = 03-development/src\naddopts = -ra\n"
     },
     "linting": {
       "source": "tool_evidence (inline)",
@@ -78,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "3f59d17c0cc154ef9edd041ee88b38958cb97c60d0d7e07bc0c36ec7769beae3",
+      "sha256": "84333092df555ef7cf3056fb8d978d0c7a8d62429087eddfc010cf890684a3ea",
       "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787691028751\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}"
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787709819529\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.154}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "e4d12d56cdcbf2815c5e7e0558f701ee901826721df8e6c549b8db5b24ff9eb7",
-      "bytes": 212,
-      "head": "========================= 6 passed, 1 warning in 0.41s =========================\ncollected 6 items\n03-development/tests/test_fr10.py ...... [100%]\nCoverage: 100% (13/13 statements covered) for taskq_api/errors.py"
+      "sha256": "c16dcb805442022b49a9e57654097c1758592ed86590b7524421ffe8c38a3d12",
+      "bytes": 484,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 23 items\n\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n============================== 23 passed in 1.61s =============================="
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9705b129eae3fdf7377be33654056c4e7a650d07d21d0e68908e7cf8d43272eb",
-      "bytes": 127,
-      "head": "=============\nImport Linter\n=============\n\nContracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT"
+      "sha256": "58af3e8ca00b2a3c7ee3c27a6b3054bf1995ef1d3727998729826acc0adc0026",
+      "bytes": 217,
+      "head": "Contracts: 3 kept, 0 broken.\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT"
     }
   },
   "composite_score": 100.0,
