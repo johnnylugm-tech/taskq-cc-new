@@ -1,8 +1,8 @@
 # Harness-executed: pytest-cov
-# returncode: 0
+# returncode: 1
 # agent_score: 100.0 | threshold: 80.0
 
-........................................................................ [ 29%]
+....................................F................................... [ 29%]
 ........................................................................ [ 59%]
 ........................................................................ [ 89%]
 .........................                                                [100%]
@@ -48,19 +48,21 @@ TOTAL                                                          648      0   100%
 Coverage JSON written to file .coverage.json
 
 
--------------------------------------------------------------------------------------------- benchmark: 4 tests -------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                   Max                Mean             StdDev              Median               IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.5269 (1.0)        495.1606 (1.0)       44.9692 (1.0)       2.2925 (1.0)       44.6432 (1.0)      0.3752 (1.0)     3160;12794       22.2374 (1.0)      195124         112
-test_benchmark_refill          179.1486 (4.12)       852.0990 (1.72)     187.7166 (4.17)      8.3161 (3.63)     187.4985 (4.20)     2.1013 (5.60)    1527;18321        5.3272 (0.24)     152882          20
-test_benchmark_hash_key        249.9990 (5.74)       993.7503 (2.01)     268.8953 (5.98)     10.5339 (4.59)     268.7506 (6.02)     6.2515 (16.66)    8385;3934        3.7189 (0.17)     169006          20
-test_benchmark_redact          299.9994 (6.89)     2,604.1496 (5.26)     310.4665 (6.90)     14.8339 (6.47)     308.3493 (6.91)     6.2486 (16.65)    2051;4975        3.2210 (0.14)     137932          20
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------- benchmark: 4 tests ---------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                    Max                Mean              StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.5637 (1.0)         961.3635 (1.0)       47.3976 (1.0)        7.6389 (1.0)       45.8364 (1.0)       3.0273 (52.01)    7669;8595       21.0981 (1.0)      198334         110
+test_benchmark_refill          183.3017 (4.21)      2,058.2986 (2.14)     207.2324 (4.37)      21.6380 (2.83)     208.3019 (4.54)     12.5030 (214.80)   3247;2611        4.8255 (0.23)     190475          10
+test_benchmark_hash_key        254.1492 (5.83)      8,327.1007 (8.66)     291.4096 (6.15)      54.1529 (7.09)     283.3491 (6.18)     10.3988 (178.65)  7386;21675        3.4316 (0.16)     155861          20
+test_benchmark_redact          290.9801 (6.68)     31,041.0396 (32.29)    388.0880 (8.19)     147.2500 (19.28)    375.0320 (8.18)      0.0582 (1.0)     2680;51109        2.5767 (0.12)     149993           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-241 passed, 2 warnings in 25.44s
+=========================== short test summary info ============================
+FAILED 03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout
+1 failed, 240 passed, 2 warnings in 25.57s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 

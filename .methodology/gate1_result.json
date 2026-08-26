@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-03",
+  "fr_id": "FR-01",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,33 +16,33 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787709819529\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.154}}",
+      "tool_evidence": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1787711505321\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.213\n    }\n}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 23,
+      "tests_passed": 8,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 23 items\n\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n============================== 23 passed in 1.61s ==============================",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
+      "tool_evidence": "79 passed, 1 warning in 6.11s — 03-development/tests/test_fr01.py: 8 passed. 03-development/tests/test_fr02.py: 33 passed. 03-development/tests/test_fr08.py: 38 passed. Coverage report (--include=03-development/src/taskq_api/api/tasks.py):\nName                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n---------------------------------------------------------------\nTOTAL                                          53      0   100%\nSpec cov: 6/6 required tests present, all pass.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-03",
+      "coverage_scope_fr": "FR-01",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 3 kept, 0 broken.\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT",
+      "tool_evidence": "Import Linter — Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. Downward-only layer dependencies (api -> repository -> models) KEPT. No sqlalchemy imports above repository layer KEPT. Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
   },
-  "enforcer_sha": "d01adf0ec3538068a73ddc0b710510b2e311e32b",
+  "enforcer_sha": "36d8c1d651aa297b93d6532a41491a596f806299",
   "enforcer_surface": {
-    "core/quality_gate": "e34a821fd4897b886a866a9ed25a6d04b43127ec",
+    "core/quality_gate": "9927b330ba22a01b242664a3b6136dbf73394536",
     "harness/harness_bridge.py": "10a4db9ed5ae3fef97bb92ed97f1655d0dc05bfe",
     "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
   },
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "84333092df555ef7cf3056fb8d978d0c7a8d62429087eddfc010cf890684a3ea",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787709819529\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.154}}"
+      "sha256": "e11feae226c929d3b2064b73ac2bdda302b215934b86a356b0f0e83147855bff",
+      "bytes": 250,
+      "head": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1787711505321\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.213\n    }\n}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "c16dcb805442022b49a9e57654097c1758592ed86590b7524421ffe8c38a3d12",
-      "bytes": 484,
-      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 23 items\n\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n============================== 23 passed in 1.61s =============================="
+      "sha256": "54f6e6f3fcb2621801a24f5f4a641254840b4ca0c0dd952214d4ae6c63d1ce7d",
+      "bytes": 609,
+      "head": "79 passed, 1 warning in 6.11s — 03-development/tests/test_fr01.py: 8 passed. 03-development/tests/test_fr02.py: 33 passed. 03-development/tests/test_fr08.py: 38 passed. Coverage report (--include=03-development/src/taskq_api/api/tasks.py):\nName                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n---------------------------------------------------------------\nTOTAL                                          53      0   100%\nSpec cov: 6/6 required tests present, all pass."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "58af3e8ca00b2a3c7ee3c27a6b3054bf1995ef1d3727998729826acc0adc0026",
-      "bytes": 217,
-      "head": "Contracts: 3 kept, 0 broken.\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT"
+      "sha256": "696032d1f9f9af41f8a8839a1dca6a6f6c4f1341594ad8a8cb28740444d26585",
+      "bytes": 274,
+      "head": "Import Linter — Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. Downward-only layer dependencies (api -> repository -> models) KEPT. No sqlalchemy imports above repository layer KEPT. Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT."
     }
   },
   "composite_score": 100.0,
