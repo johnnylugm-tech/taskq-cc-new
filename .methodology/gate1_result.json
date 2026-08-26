@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-08",
+  "fr_id": "FR-09",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787720461430\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.166}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.153}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 79,
+      "tests_passed": 8,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "79 passed, 2 warnings in 6.10s. coverage 100% on runner.py and tasks.py. spec_cov_pct=100% (5/5 required tests present and passing)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
+      "tool_evidence": "collected 8 items\n03-development/tests/test_fr09.py ........                               [100%]\n======================== 8 passed, 2 warnings in 0.43s =========================\nCoverage totals: percent_covered=100.0, covered_lines=39, num_statements=39",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-08",
+      "coverage_scope_fr": "FR-09",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 2 kept, 0 broken. no_circular_dependencies KEPT; taskq_api_self_check KEPT.",
+      "tool_evidence": "Analyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "bea9f2a20ba582b88ef5d153dd34ee7c54a93e3ad88ece664b7bc2e8fb12fa76",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787720461430\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.166}}"
+      "sha256": "6a52d87d803a07d36c9062a582b43cdcda014e7ecb4902d0527c912c391b37de",
+      "bytes": 123,
+      "head": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.153}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "8516d6fa9d88839304827a680a742850628cebe694ef25561ec2d83f07d16129",
-      "bytes": 131,
-      "head": "79 passed, 2 warnings in 6.10s. coverage 100% on runner.py and tasks.py. spec_cov_pct=100% (5/5 required tests present and passing)"
+      "sha256": "788787b8a58ec8d46f7103d85588d6483ea2ee0b836342126851f6731304c9cc",
+      "bytes": 254,
+      "head": "collected 8 items\n03-development/tests/test_fr09.py ........                               [100%]\n======================== 8 passed, 2 warnings in 0.43s =========================\nCoverage totals: percent_covered=100.0, covered_lines=39, num_statements=39"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "2ac1c99cd3aa7b705f90b567dec469819f77668038ac107fb69bc91993c0208d",
-      "bytes": 86,
-      "head": "Contracts: 2 kept, 0 broken. no_circular_dependencies KEPT; taskq_api_self_check KEPT."
+      "sha256": "4d3493c794d74c72e835c1027b9ca3f6a0090606c974b49aa5c11298bbbf8276",
+      "bytes": 255,
+      "head": "Analyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
