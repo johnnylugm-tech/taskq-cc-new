@@ -283,12 +283,18 @@
   },
   "crg_review_context": {
     "status": "ok",
-    "summary": "Review context for 20 changed file(s):\n  - Risk: low\n  - 0 impacted nodes in 0 files",
-    "risk": "low",
-    "changed_file_count": 20,
-    "impacted_file_count": 0,
-    "key_entities": [],
-    "test_gaps": 0,
+    "summary": "Review context for 12 changed file(s):\n  - Risk: high\n  - 277 impacted nodes in 32 files",
+    "risk": "high",
+    "changed_file_count": 12,
+    "impacted_file_count": 32,
+    "key_entities": [
+      "/Users/johnny/projects/taskq-cc-new/03-development/tests/test_sec_threats.py",
+      "_FakeKeyRepo",
+      "__init__",
+      "create",
+      "find_by_hash"
+    ],
+    "test_gaps": 16,
     "next_tool_suggestions": [
       "detect_changes",
       "get_affected_flows",
@@ -296,20 +302,26 @@
     ],
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 373603,
+      "saved_tokens": 367984,
       "saved_percent": 100
     }
   },
   "crg_impact_radius": {
     "status": "ok",
-    "summary": "Blast radius for 20 changed file(s):\n  - 0 nodes directly changed\n  - 0 nodes impacted (within 2 hops)\n  - 0 additional files affected",
-    "risk": "low",
-    "impacted_file_count": 0,
-    "key_entities": [],
+    "summary": "Blast radius for 12 changed file(s):\n  - 36 nodes directly changed\n  - 277 nodes impacted (within 2 hops)\n  - 32 additional files affected",
+    "risk": "high",
+    "impacted_file_count": 32,
+    "key_entities": [
+      "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/env.py",
+      "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/__main__.py",
+      "_dependency",
+      "_rate_limited",
+      "check_rate_limit"
+    ],
     "truncated": false,
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 373616,
+      "saved_tokens": 367979,
       "saved_percent": 100
     }
   },

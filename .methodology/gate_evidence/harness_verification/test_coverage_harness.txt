@@ -1,6 +1,6 @@
 # Harness-executed: pytest-cov
-# returncode: 1
-# agent_score: 97.0 | threshold: 80.0
+# returncode: 0
+# agent_score: 100.0 | threshold: 80.0
 
 ........................................................................ [ 27%]
 ........................................................................ [ 55%]
@@ -52,19 +52,19 @@ TOTAL                                                          648      0   100%
 Coverage JSON written to file .coverage.json
 
 
---------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                   Max                Mean             StdDev              Median                IQR              Outliers  OPS (Mops/s)            Rounds  Iterations
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.5921 (1.0)        195.2220 (1.0)       45.1126 (1.0)       2.4436 (1.0)       44.7498 (1.0)       0.7686 (1.0)       4625;7926       22.1667 (1.0)      198375         108
-test_benchmark_refill          179.1486 (4.11)     1,639.5497 (8.40)     193.0239 (4.28)     17.3748 (7.11)     187.5014 (4.19)      6.2020 (8.07)    15180;16546        5.1807 (0.23)     173914          20
-test_benchmark_hash_key        249.9437 (5.73)     9,208.9758 (47.17)    334.8580 (7.42)     46.0069 (18.83)    333.0060 (7.44)      0.9895 (1.29)     5253;68629        2.9863 (0.13)     193537           1
-test_benchmark_redact          290.9801 (6.68)     5,957.9615 (30.52)    356.1888 (7.90)     41.1732 (16.85)    334.0538 (7.46)     41.9677 (54.61)     3254;1896        2.8075 (0.13)     103445           1
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------- benchmark: 4 tests ---------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                    Max                Mean             StdDev              Median                IQR              Outliers  OPS (Mops/s)            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.5263 (1.0)         207.2141 (1.0)       45.9746 (1.0)       3.4076 (1.0)       44.6432 (1.0)       2.5986 (1.0)      14114;8140       21.7511 (1.0)      198334         112
+test_benchmark_refill          181.2499 (4.16)      1,002.0507 (4.84)     192.8557 (4.19)     12.1774 (3.57)     189.5998 (4.25)      6.2486 (2.40)     9028;16662        5.1852 (0.24)     188965          20
+test_benchmark_hash_key        245.8488 (5.65)        918.7497 (4.43)     270.3639 (5.88)     16.8034 (4.93)     268.7477 (6.02)      6.2515 (2.41)      5564;9005        3.6987 (0.17)     172652          20
+test_benchmark_redact          290.9801 (6.69)     12,500.0370 (60.32)    364.5782 (7.93)     53.3290 (15.65)    374.9738 (8.40)     41.0364 (15.79)     3221;3100        2.7429 (0.13)     134844           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-259 passed, 3 warnings in 27.28s
+259 passed, 3 warnings in 28.50s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
