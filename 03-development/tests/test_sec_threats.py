@@ -27,7 +27,6 @@ test names are the binding artifact, the bodies verify the behaviour.
 """
 from __future__ import annotations
 
-import asyncio
 import os
 import re
 import subprocess
@@ -36,7 +35,6 @@ import threading
 from pathlib import Path
 
 import pytest
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 # ---------------------------------------------------------------------------
