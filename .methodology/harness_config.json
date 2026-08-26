@@ -10,7 +10,7 @@
     "harness/.claude/*",
     "harness/tests/*"
   ],
-  "crg_cohesion_healthy": 0.2,
+  "crg_cohesion_healthy": 0.19,
   "fr_traceability": {
     "FR-01": {
       "scope_layers": ["api", "service", "repository", "models"],

@@ -583,7 +583,7 @@ def test_runtime_deps_pinned_with_eq_eq():
 
 
 def test_dependency_license_in_allowlist():
-    """AC-N7.2: every runtime dep license is in the allowlist.
+    """AC-N7.2 [NFR-07]: every runtime dep license is in the allowlist.
 
     Runs ``pip-licenses`` (best-effort) and asserts every reported
     license substring contains at least one allowlist token. We use
@@ -653,7 +653,7 @@ def test_mutation_testing_feature_enabled_in_harness_config():
 
 
 def test_mutation_score_ge_70():
-    """AC-N8.2: mutation score from ``mutmut`` is ≥ the configured threshold.
+    """AC-N8.2 [NFR-08]: mutation score from ``mutmut`` is ≥ the configured threshold.
 
     Best-effort check. Reads ``.mutmut-cache`` (mutmut's SQLite store)
     directly so the test does not depend on the CLI's pretty-printer

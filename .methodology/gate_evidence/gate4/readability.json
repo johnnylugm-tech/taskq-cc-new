@@ -1,0 +1,153 @@
+{
+  "project_score": 80.9,
+  "files": [
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/env.py",
+      "mi": 65.53223638117032,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/__init__.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/v2_tags.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/__init__.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/v3_split_results.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/v1_initial.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/__init__.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/app.py",
+      "mi": 70.39718562862366,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/errors.py",
+      "mi": 75.52982412505439,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/__main__.py",
+      "mi": 84.86086538087297,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/rate_repo.py",
+      "mi": 72.30071981323938,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/orm.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/session.py",
+      "mi": 74.14931532672705,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/__init__.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/task_repo.py",
+      "mi": 69.19075760649902,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/repository/key_repo.py",
+      "mi": 67.83286884649459,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/models/__init__.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/models/schemas.py",
+      "mi": 75.59430747349775,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/metrics.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/deps.py",
+      "mi": 46.340670700709516,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/tasks.py",
+      "mi": 80.38188846833131,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/health.py",
+      "mi": 55.314513335473876,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/api/__init__.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/auth.py",
+      "mi": 44.1404791400478,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/metrics.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/runner.py",
+      "mi": 52.32431566095344,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/__init__.py",
+      "mi": 100.0,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/ratelimit.py",
+      "mi": 52.22856070177046,
+      "rank": "A"
+    },
+    {
+      "path": "/Users/johnny/projects/taskq-cc-new/03-development/src/taskq_api/service/runner_scheduler.py",
+      "mi": 60.11644317595306,
+      "rank": "A"
+    }
+  ],
+  "lloc": 29,
+  "tool": "radon-mi",
+  "note": "wrapper for readability-v2 pattern; underlying data is radon MI JSON"
+}

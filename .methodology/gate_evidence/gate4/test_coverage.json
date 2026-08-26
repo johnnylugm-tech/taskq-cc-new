@@ -1,8 +1,4 @@
-# Harness-executed: pytest-cov
-# returncode: 0
-# agent_score: 100.0 | threshold: 80.0
-
-........................................................................ [ 27%]
+............................................F........................... [ 27%]
 ........................................................................ [ 55%]
 ........................................................................ [ 83%]
 ...........................................                              [100%]
@@ -22,8 +18,8 @@
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 
 --------- coverage: platform darwin, python 3.11.15-final-0 ----------
-Name                                                         Stmts   Miss  Cover   Missing
-------------------------------------------------------------------------------------------
+Name                                                         Stmts   Miss  Cover
+--------------------------------------------------------------------------------
 03-development/src/migrations/__init__.py                        0      0   100%
 03-development/src/migrations/versions/v3_split_results.py      18      0   100%
 03-development/src/taskq_api/__init__.py                         0      0   100%
@@ -47,25 +43,23 @@ Name                                                         Stmts   Miss  Cover
 03-development/src/taskq_api/service/metrics.py                 12      0   100%
 03-development/src/taskq_api/service/ratelimit.py               10      0   100%
 03-development/src/taskq_api/service/runner_scheduler.py        95      0   100%
-------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 TOTAL                                                          648      0   100%
 Coverage JSON written to file .coverage.json
 
 
 --------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                    Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+Name (time in ns)                   Min                    Max                Mean             StdDev              Median               IQR              Outliers  OPS (Mops/s)            Rounds  Iterations
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.5783 (1.0)         443.4222 (1.0)       47.4252 (1.0)       3.7933 (1.0)       47.7890 (1.0)       3.0556 (1.0)      3026;2738       21.0859 (1.0)      196695         109
-test_benchmark_refill          179.1981 (4.11)        843.7521 (1.90)     196.2834 (4.14)     16.6778 (4.40)     197.9002 (4.14)     14.5490 (4.76)     2664;2240        5.0947 (0.24)     181817          20
-test_benchmark_redact          250.0019 (5.74)     16,542.0352 (37.31)    365.3265 (7.70)     99.6885 (26.28)    374.9738 (7.85)     41.0364 (13.43)    1383;2922        2.7373 (0.13)     146349           1
-test_benchmark_hash_key        252.0974 (5.78)      1,291.7008 (2.91)     275.1578 (5.80)     19.3594 (5.10)     272.9008 (5.71)      8.3004 (2.72)     3396;4564        3.6343 (0.17)     158957          20
+test_benchmark_retry_after      43.9185 (1.0)         219.5950 (1.0)       46.9990 (1.0)       3.4324 (1.0)       47.6757 (1.0)      3.3692 (57.88)     3822;3202       21.2771 (1.0)      195122         111
+test_benchmark_refill          179.1981 (4.08)      4,187.4999 (19.07)    198.9624 (4.23)     28.0066 (8.16)     195.7989 (4.11)     8.3004 (142.60)   5885;15231        5.0261 (0.24)     190477          10
+test_benchmark_redact          250.0019 (5.69)     17,166.0213 (78.17)    371.1574 (7.90)     83.7933 (24.41)    374.9738 (7.87)     0.0582 (1.0)      3924;49027        2.6943 (0.13)     142005           1
+test_benchmark_hash_key        256.2476 (5.83)        929.1485 (4.23)     276.8107 (5.89)     19.8227 (5.78)     274.9992 (5.77)     6.2515 (107.40)    4053;7683        3.6126 (0.17)     161082          20
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-259 passed, 3 warnings in 28.45s
-/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
-The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
-
-  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+=========================== short test summary info ============================
+FAILED 03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout
+1 failed, 258 passed, 3 warnings in 28.08s

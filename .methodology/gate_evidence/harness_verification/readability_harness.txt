@@ -1,6 +1,6 @@
 # Harness-executed: readability-v2
 # returncode: 0
-# agent_score: 93.2 | threshold: 80.0
+# agent_score: 80.9 | threshold: 80.0
 
 {
   "project_score": 93.2,

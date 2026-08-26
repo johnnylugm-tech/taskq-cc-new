@@ -1,0 +1,41 @@
+{
+  "acceptance_criteria": {
+    "parse_gap": 0,
+    "uncited_by_test_spec": 34,
+    "unnumbered": 0
+  },
+  "architecture": {
+    "declared_only": [
+      "no_sqlalchemy_above_repository",
+      "models_sqlalchemy_orm_declarative_only",
+      "downward_only_layer_dependencies"
+    ],
+    "modules_outside_every_contract": []
+  },
+  "coverage": {
+    "omit": [
+      "03-development/src/migrations/env.py",
+      "03-development/src/migrations/script.py.mako",
+      "03-development/src/migrations/versions/__init__.py",
+      "03-development/src/migrations/versions/v1_initial.py",
+      "03-development/src/migrations/versions/v2_tags.py",
+      "03-development/src/taskq_api/__main__.py",
+      "03-development/src/taskq_api/service/runner.py"
+    ],
+    "statements_measured": 13,
+    "statements_omitted": 0
+  },
+  "gate": 4,
+  "phase": 6,
+  "stubbed_boundaries": {
+    "count": 0,
+    "modules": []
+  },
+  "verify_system": {
+    "obligations_unmet": [],
+    "reach_status": "measured",
+    "status": "expanded",
+    "swallowed": 0,
+    "tautological": false
+  }
+}

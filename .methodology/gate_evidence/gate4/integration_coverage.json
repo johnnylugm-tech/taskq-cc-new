@@ -1,0 +1,25 @@
+03-development/src/taskq_api/api/__init__.py                     0      0   100%
+03-development/src/taskq_api/api/deps.py                        75     10    87%   103, 217, 220-222, 283-284, 322, 373, 399
+03-development/src/taskq_api/api/health.py                      27      7    74%   120-126
+03-development/src/taskq_api/api/metrics.py                     10      0   100%
+03-development/src/taskq_api/api/tasks.py                       53      4    92%   175-183
+03-development/src/taskq_api/app.py                             82     11    87%   75, 158, 163, 166-167, 171-176, 179, 181, 276, 315
+03-development/src/taskq_api/errors.py                          13      2    85%   64, 116
+03-development/src/taskq_api/models/__init__.py                  0      0   100%
+03-development/src/taskq_api/models/schemas.py                  39      1    97%   43
+03-development/src/taskq_api/repository/__init__.py              0      0   100%
+03-development/src/taskq_api/repository/key_repo.py             17      8    53%   50-58, 68, 78-80
+03-development/src/taskq_api/repository/orm.py                  30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py            48      0   100%
+03-development/src/taskq_api/repository/session.py              48      0   100%
+03-development/src/taskq_api/repository/task_repo.py            52      4    92%   45, 81-83
+03-development/src/taskq_api/service/__init__.py                 0      0   100%
+03-development/src/taskq_api/service/auth.py                    19      4    79%   63, 91-93
+03-development/src/taskq_api/service/metrics.py                 12      0   100%
+03-development/src/taskq_api/service/ratelimit.py               10      0   100%
+03-development/src/taskq_api/service/runner_scheduler.py        95     73    23%   52-61, 66, 79, 97-103, 133-173, 212-217, 222, 229, 245-254, 274-282, 302-306, 322-327
+------------------------------------------------------------------------------------------
+TOTAL                                                          648    124    81%
+Coverage JSON written to file .coverage.json
+
+34 passed, 2 warnings in 1.58s
