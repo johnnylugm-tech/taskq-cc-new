@@ -1,12 +1,16 @@
 # Harness-executed: pytest-cov
-# returncode: 1
+# returncode: 0
 # agent_score: 100.0 | threshold: 80.0
 
-....................................F................................... [ 29%]
-........................................................................ [ 59%]
-........................................................................ [ 89%]
-.........................                                                [100%]
+........................................................................ [ 28%]
+........................................................................ [ 57%]
+........................................................................ [ 86%]
+.................................                                        [100%]
 =============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487: UserWarning: Skipping collection of '.hypothesis' directory - this usually means you've explicitly set the `norecursedirs` pytest config option, replacing rather than extending the default ignores.
+    warnings.warn(
+
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
@@ -48,21 +52,19 @@ TOTAL                                                          648      0   100%
 Coverage JSON written to file .coverage.json
 
 
---------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                    Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.1712 (1.0)         463.5947 (1.0)       47.6322 (1.0)       3.1840 (1.0)       47.6668 (1.0)       1.8742 (1.0)     36391;7998       20.9942 (1.0)      195122         111
-test_benchmark_refill          179.1981 (4.15)      3,483.3036 (7.51)     203.9488 (4.28)     18.5770 (5.83)     200.0015 (4.20)     12.6020 (6.72)     9667;8354        4.9032 (0.23)     196735          10
-test_benchmark_hash_key        252.0974 (5.84)      1,037.4992 (2.24)     281.1856 (5.90)     24.0461 (7.55)     272.9008 (5.73)     16.6532 (8.89)    13677;9886        3.5564 (0.17)     160001          20
-test_benchmark_redact          290.9801 (6.74)     17,957.9947 (38.74)    364.2734 (7.65)     74.6518 (23.45)    374.9738 (7.87)     41.0364 (21.90)    2444;2444        2.7452 (0.13)     139529           1
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                   Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.5043 (1.0)        390.1150 (1.0)       46.0276 (1.0)       2.5314 (1.0)       44.6195 (1.0)       3.3184 (1.0)      5714;1773       21.7261 (1.0)      198373         113
+test_benchmark_refill          181.2499 (4.17)     2,718.7489 (6.97)     194.8000 (4.23)     16.3479 (6.46)     189.5998 (4.25)     12.5001 (3.77)     8259;6881        5.1335 (0.24)     177778          20
+test_benchmark_hash_key        249.9990 (5.75)     1,072.8982 (2.75)     274.5688 (5.97)     12.9166 (5.10)     272.9474 (6.12)      6.2981 (1.90)     5563;5563        3.6421 (0.17)     157904          20
+test_benchmark_redact          290.9801 (6.69)     4,916.9757 (12.60)    366.3218 (7.96)     32.0385 (12.66)    374.9738 (8.40)     41.0364 (12.37)   43498;1716        2.7298 (0.13)     134844           1
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-=========================== short test summary info ============================
-FAILED 03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout
-1 failed, 240 passed, 2 warnings in 24.99s
+249 passed, 3 warnings in 25.76s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 

@@ -29,7 +29,7 @@
       "verify_evidence": "runner.py:509 sets start_new_session=True; runner.py:360-391 uses killpg with my_pgid guard; 8/8 tests in test_bug_hunt_resolutions.py pass including test_t07_no_orphan_descendant_after_timeout.",
       "resolution": {
         "status": "resolved",
-          "repro_test": "03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout",
+          "repro_test": "03-development/tests/test_bug_hunt_resolutions.py",
           "fix_commit": "a4a6bc5ab3833521a6bea98bf914d50067200c2c"
       },
       "attack_vector": "T-07: Long-running task killed by SIGKILL leaves descendant processes running as orphans (reparented to launchd/init). Each submission leaks a new long-lived process.",
@@ -54,7 +54,7 @@
       "verify_evidence": "runner.py:85-87 expanded regex matches all four families; runner.py:567-568 applies _redact before persistence; 4/8 tests in test_bug_hunt_resolutions.py pass for T-08 forms (Bearer, DSN, api_key=, password=).",
       "resolution": {
         "status": "resolved",
-          "repro_test": "03-development/tests/test_bug_hunt_resolutions.py::test_t08_redact_covers_bearer_token",
+          "repro_test": "03-development/tests/test_bug_hunt_resolutions.py",
           "fix_commit": "a4a6bc5ab3833521a6bea98bf914d50067200c2c"
       },
       "attack_vector": "T-08: A task whose stdout/stderr contains a Bearer token, DSN password, api_key=, or password= substring persists the secret verbatim to task_results and exposes it via GET /v1/tasks/{id}/runs.",

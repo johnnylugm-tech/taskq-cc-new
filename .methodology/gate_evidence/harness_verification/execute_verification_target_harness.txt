@@ -1,21 +1,25 @@
 # Harness-executed: system-verification
-# returncode: 2
+# returncode: 0
 # agent_score: 100.0 | threshold: 100.0
 
-Python 3.11.15  [/Users/johnny/projects/taskq-cc-new/.venv/bin/python3]  OK
-python3 -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003
+Python 3.11.15  [/Users/johnny/projects/taskq-cc-new/.venv/bin/python]  OK
+.venv/bin/python -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003
 All checks passed!
-python3 -m pyright 03-development/src/
+.venv/bin/python -m pyright 03-development/src/
 0 errors, 0 warnings, 0 informations
 WARNING: there is a new pyright version available (v1.1.409 -> v1.1.411).
 Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
 
-unset TASKQ_DB_URL && python3 -m pytest 03-development/tests -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
-........................................................................ [ 29%]
-........................................................................ [ 59%]
-........................................................................ [ 89%]
-.........................                                                [100%]
+unset TASKQ_DB_URL && .venv/bin/python -m pytest 03-development/tests -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
+........................................................................ [ 28%]
+........................................................................ [ 57%]
+........................................................................ [ 86%]
+.................................                                        [100%]
 =============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487: UserWarning: Skipping collection of '.hypothesis' directory - this usually means you've explicitly set the `norecursedirs` pytest config option, replacing rather than extending the default ignores.
+    warnings.warn(
+
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
@@ -55,28 +59,31 @@ TOTAL                                                        630      0   100%
 Coverage JSON written to file .coverage.json
 
 
--------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                   Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.5263 (1.0)        249.6334 (1.0)       45.1124 (1.0)       2.7861 (1.0)       44.6427 (1.0)       0.3664 (1.0)    10152;27095       22.1669 (1.0)      198334         112
-test_benchmark_refill          180.1993 (4.14)     1,377.0739 (5.52)     186.8583 (4.14)      8.5443 (3.07)     185.4249 (4.15)      3.1258 (8.53)     3989;8602        5.3516 (0.24)     129033          40
-test_benchmark_hash_key        252.0508 (5.79)     2,118.7501 (8.49)     271.5785 (6.02)     12.7324 (4.57)     270.8024 (6.07)      8.3004 (22.65)    5297;2883        3.6822 (0.17)     153847          20
-test_benchmark_redact          290.9801 (6.69)     5,958.0198 (23.87)    363.0272 (8.05)     32.0623 (11.51)    374.9738 (8.40)     41.0364 (112.00)   5623;1252        2.7546 (0.12)     148149           1
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                    Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.8927 (1.0)         434.1517 (1.0)       46.5368 (1.0)       3.3688 (1.0)       45.3843 (1.0)       2.9821 (51.23)    8114;6388       21.4884 (1.0)      198373         112
+test_benchmark_refill          179.0992 (4.08)      1,295.9004 (2.98)     196.3369 (4.22)     13.4104 (3.98)     191.7011 (4.22)     12.4972 (214.70)   9666;3782        5.0933 (0.24)     191976          10
+test_benchmark_redact          250.0019 (5.70)     14,499.9940 (33.40)    372.3361 (8.00)     66.7130 (19.80)    374.9738 (8.26)      0.0582 (1.0)     3103;41101        2.6857 (0.12)     143721           1
+test_benchmark_hash_key        254.1987 (5.79)      1,031.2477 (2.38)     275.9123 (5.93)     12.7208 (3.78)     274.9992 (6.06)      6.2515 (107.40)   5306;5620        3.6243 (0.17)     153845          20
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-241 passed, 2 warnings in 25.83s
-unset TASKQ_DB_URL && python3 -m pytest 03-development/tests/integration -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
-..........................                                               [100%]
+249 passed, 3 warnings in 26.50s
+unset TASKQ_DB_URL && .venv/bin/python -m pytest 03-development/tests/integration -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
+..................................                                       [100%]
 =============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487: UserWarning: Skipping collection of '.hypothesis' directory - this usually means you've explicitly set the `norecursedirs` pytest config option, replacing rather than extending the default ignores.
+    warnings.warn(
+
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-================== NFR-10 coverage regression: 72.7% < 80.0% ===================
 
 --------- coverage: platform darwin, python 3.11.15-final-0 ----------
 Name                                                       Stmts   Miss  Cover   Missing
@@ -95,7 +102,7 @@ Name                                                       Stmts   Miss  Cover  
 03-development/src/taskq_api/repository/key_repo.py           17      8    53%   50-58, 68, 78-80
 03-development/src/taskq_api/repository/orm.py                30      0   100%
 03-development/src/taskq_api/repository/rate_repo.py          48      0   100%
-03-development/src/taskq_api/repository/session.py            48     48     0%   30-218
+03-development/src/taskq_api/repository/session.py            48      0   100%
 03-development/src/taskq_api/repository/task_repo.py          52      4    92%   45, 81-83
 03-development/src/taskq_api/service/__init__.py               0      0   100%
 03-development/src/taskq_api/service/auth.py                  19      4    79%   63, 91-93
@@ -103,11 +110,20 @@ Name                                                       Stmts   Miss  Cover  
 03-development/src/taskq_api/service/ratelimit.py             10      0   100%
 03-development/src/taskq_api/service/runner_scheduler.py      95     73    23%   52-61, 66, 79, 97-103, 133-173, 212-217, 222, 229, 245-254, 274-282, 302-306, 322-327
 ----------------------------------------------------------------------------------------
-TOTAL                                                        630    172    73%
+TOTAL                                                        630    124    80%
 Coverage JSON written to file .coverage.json
 
-26 passed, 1 warning in 0.67s
-python3 -m alembic upgrade head
+34 passed, 2 warnings in 1.65s
+rm -f .sessi-work/verify_system.sqlite
+.venv/bin/python -m alembic upgrade head
+.venv/bin/python -m uvicorn taskq_api.app:app --host 127.0.0.1 --port 8765 --log-level warning &
+{"status":"ok"}{"status":"ok"}smoke: PASS
+.venv/bin/python -m alembic downgrade base
+.venv/bin/python -m alembic upgrade head
+downgrade → upgrade round-trip: PASS
+
+All verification steps passed.
+verify-system: PASS
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
@@ -116,99 +132,21 @@ The event loop scope for asynchronous fixtures will default to the fixture cachi
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+migrate: TASKQ_DB_URL=sqlite:////Users/johnny/projects/taskq-cc-new/.sessi-work/verify_system.sqlite
 INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
 INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
 INFO  [alembic.runtime.migration] Running upgrade  -> v1_initial, v1_initial: initial schema.
-Traceback (most recent call last):
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
-    self.dialect.do_execute(
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
-    cursor.execute(statement, parameters)
-sqlite3.OperationalError: table tasks already exists
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/__main__.py", line 4, in <module>
-    main(prog="alembic")
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/config.py", line 636, in main
-    CommandLine(prog=prog).main(argv=argv)
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/config.py", line 626, in main
-    self.run_cmd(cfg, options)
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/config.py", line 603, in run_cmd
-    fn(
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/command.py", line 406, in upgrade
-    script.run_env()
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/script/base.py", line 586, in run_env
-    util.load_python_file(self.dir, "env.py")
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/util/pyfiles.py", line 95, in load_python_file
-    module = load_module_py(module_id, path)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/util/pyfiles.py", line 113, in load_module_py
-    spec.loader.exec_module(module)  # type: ignore
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
-  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
-  File "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/env.py", line 189, in <module>
-    run_migrations_online()
-  File "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/env.py", line 181, in run_migrations_online
-    context.run_migrations()
-  File "<string>", line 8, in run_migrations
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/runtime/environment.py", line 946, in run_migrations
-    self.get_context().run_migrations(**kw)
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/runtime/migration.py", line 628, in run_migrations
-    step.migration_fn(**kw)
-  File "/Users/johnny/projects/taskq-cc-new/03-development/src/migrations/versions/v1_initial.py", line 57, in upgrade
-    op.create_table(
-  File "<string>", line 8, in create_table
-  File "<string>", line 3, in create_table
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/operations/ops.py", line 1318, in create_table
-    return operations.invoke(op)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/operations/base.py", line 442, in invoke
-    return fn(self, operation)
-           ^^^^^^^^^^^^^^^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/operations/toimpl.py", line 143, in create_table
-    operations.impl.create_table(table, **kw)
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/ddl/impl.py", line 369, in create_table
-    self._exec(schema.CreateTable(table, **kw))
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/alembic/ddl/impl.py", line 210, in _exec
-    return conn.execute(construct, params)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
-    return meth(
-           ^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 180, in _execute_on_connection
-    return connection._execute_ddl(
-           ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1529, in _execute_ddl
-    ret = self._execute_context(
-          ^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
-    return self._exec_single_context(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
-    self._handle_dbapi_exception(
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
-    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
-    self.dialect.do_execute(
-  File "/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
-    cursor.execute(statement, parameters)
-sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table tasks already exists
-[SQL: 
-CREATE TABLE tasks (
-	id VARCHAR NOT NULL, 
-	command VARCHAR NOT NULL, 
-	name VARCHAR NOT NULL, 
-	status VARCHAR, 
-	created_at VARCHAR, 
-	result_json VARCHAR, 
-	PRIMARY KEY (id)
-)
-
-]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)
-make: *** [migrate] Error 1
+INFO  [alembic.runtime.migration] Running upgrade v1_initial -> v2_tags, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running upgrade v2_tags -> v3_split_results, v3_split_results: split tasks.result_json into task_results.
+ERROR:    [Errno 48] error while attempting to bind on address ('127.0.0.1', 8765): address already in use
+kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade v3_split_results -> v2_tags, v3_split_results: split tasks.result_json into task_results.
+INFO  [alembic.runtime.migration] Running downgrade v2_tags -> v1_initial, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running downgrade v1_initial -> , v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> v1_initial, v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Running upgrade v1_initial -> v2_tags, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running upgrade v2_tags -> v3_split_results, v3_split_results: split tasks.result_json into task_results.

@@ -10,6 +10,16 @@
 # and a downgrade→upgrade round-trip proving FR-07 reversibility.
 
 PYTHON     ?= python3
+# Default to the project virtualenv when present so harness invocations of
+# `make verify-system` (which pass no PYTHON= override) pick up
+# project-scoped modules (piplicenses, etc.) that the system python3 lacks.
+# Override with `make PYTHON=/path/to/python3 verify-system` to use a
+# different interpreter.
+ifeq (,$(wildcard .venv/bin/python))
+PYTHON     := python3
+else
+PYTHON     := .venv/bin/python
+endif
 PYTHON_MIN := 3.11
 
 # Point coverage at the whole source tree, not the bare "." default that
@@ -29,7 +39,19 @@ SRC_DIR := 03-development/src
 # ``03-development/src/migrations/env.py``). ``verify-system`` runs
 # ``make migrate`` from a fresh shell, so the URL must have a sensible
 # default; otherwise alembic errors out before any migration runs.
-TASKQ_DB_URL ?= sqlite:///$(shell pwd)/.sessi-work/verify_system.sqlite
+#
+# We use ``=`` (NOT ``?=``) because the harness loads ``.env`` at
+# startup which sets ``TASKQ_DB_URL=sqlite:///./taskq.db`` — a relative
+# path that survives from a previous run and makes ``alembic upgrade
+# head`` fail with "table tasks already exists". The
+# ``harness_cli.py`` ``.env`` loader is the framework, so we cannot
+# stop it; pinning the default here forces every alembic invocation
+# in this Makefile to use the verify-system SQLite path. Recipes that
+# need a different DB ``unset TASKQ_DB_URL`` locally before invoking
+# pytest (the existing ``test`` and ``test-integration`` targets do
+# this), and the unset removes the exported value for that recipe's
+# shell only — the make process still has the default.
+TASKQ_DB_URL = sqlite:///$(shell pwd)/.sessi-work/verify_system.sqlite
 export TASKQ_DB_URL
 export PYTHONPATH := $(SRC_DIR):$(PYTHONPATH)
 
@@ -76,6 +98,7 @@ lock: check-python
 
 migrate: check-python
 	@mkdir -p .sessi-work
+	@echo "migrate: TASKQ_DB_URL=$$TASKQ_DB_URL" >&2
 	$(PYTHON) -m alembic upgrade head
 
 test: check-python
@@ -86,6 +109,12 @@ test-unit: check-python
 
 test-integration: check-python
 	unset TASKQ_DB_URL && $(PYTHON) -m pytest 03-development/tests/integration -q --tb=short --cov=$(COV_TARGET) --cov-report=term-missing
+
+# Used by verify-system to ensure alembic upgrade head has a fresh DB.
+# Without this, a leftover .sessi-work/verify_system.sqlite (from a prior
+# run) makes `make migrate` fail with "table tasks already exists".
+verify-cleanup: check-python
+	rm -f .sessi-work/verify_system.sqlite
 
 lint: check-python
 	$(PYTHON) -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003
@@ -111,7 +140,7 @@ coverage: check-python
 # suite, then the integration suite (which spins up an httpx ASGI client),
 # then a real alembic round-trip, then a uvicorn boot + health smoke.
 # The `verify-system: PASS` line is REQUIRED — the harness grep-checks it.
-verify-system: lint type-check test test-integration migrate smoke downgrade-upgrade
+verify-system: lint type-check test test-integration verify-cleanup migrate smoke downgrade-upgrade
 	@echo ""
 	@echo "All verification steps passed."
 	@echo "verify-system: PASS"
