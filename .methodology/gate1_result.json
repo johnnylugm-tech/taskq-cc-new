@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-04",
+  "fr_id": "FR-05",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,14 +9,14 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!\n",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.153}, \"generalDiagnostics\": []}\n",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1787719887822\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.154}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,16 @@
       "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.3.3, pluggy-1.5.0\nconfigfile: pytest.ini\nplugins: asyncio-0.24.0, cov-5.0.0, anyio-4.6.0, benchmark-4.0.0, hypothesis-6.165.10\ncollected 23 items\n\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n======================== 23 passed, 2 warnings in 2.02s ========================\n",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
+      "tool_evidence": "23 passed, 2 warnings in 2.22s. deps.py coverage: 100% (75/75 stmts). All 4 required FR-05 tests present and passing.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-04",
+      "coverage_scope_fr": "FR-05",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 23 files, 17 dependencies.\n-----------------------------------\n\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken.\n",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 356 files, 3144 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "1221712850383a0d62fcc4d3bcdea9a533b861f96f408c834f5c8e904252ff9b",
-      "bytes": 161,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.153}, \"generalDiagnostics\": []}"
+      "sha256": "15f8b5b69072ff957d1e5639f44949c86e3ce35b990a04d9491acc7c3ea2ee02",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1787719887822\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.154}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "1928dec8e282c502376b2980c67d4b8564c78ad4a594ec38367ad7ecfe2184f4",
-      "bytes": 593,
-      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.3.3, pluggy-1.5.0\nconfigfile: pytest.ini\nplugins: asyncio-0.24.0, cov-5.0.0, anyio-4.6.0, benchmark-4.0.0, hypothesis-6.165.10\ncollected 23 items\n\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n======================== 23 passed, 2 warnings in 2.02s ========================"
+      "sha256": "6927dbaf777acd26104012a53fab99d0e198fc38b06220fa1eb1f9d73d472f88",
+      "bytes": 117,
+      "head": "23 passed, 2 warnings in 2.22s. deps.py coverage: 100% (75/75 stmts). All 4 required FR-05 tests present and passing."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "128cc01bc6a2e7e6f672f3782f15b7e645d2818d562f8b6ee0d018cc11e4c9d2",
-      "bytes": 232,
-      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 23 files, 17 dependencies.\n-----------------------------------\n\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken."
+      "sha256": "7addb57847f83d4b24a0dabb36e4525c994435bdc8cdc17acd67e8a10189bcf1",
+      "bytes": 370,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 356 files, 3144 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
