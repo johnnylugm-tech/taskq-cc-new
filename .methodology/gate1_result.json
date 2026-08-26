@@ -1,42 +1,41 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-02",
-  "overall_score": 99.2,
-  "overall_score_note": "(100+100+96.8+100)/4 = 99.2; test_coverage recorded as 96.8 (raw) -> 97 (rounded-down to integer per typical conventions; composite kept at 99.2 = (100+100+96.8+100)/4)",
+  "fr_id": "FR-04",
+  "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "EXIT=0\nAll checks passed!",
+      "tool_evidence": "All checks passed!\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787711642546\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.137}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787711860417\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.136}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 33,
+      "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "--------- coverage: platform darwin, python 3.11.15-final-0 ----------\nName                              Stmts   Miss  Cover   Missing\n---------------------------------------------------------------\nsrc/taskq_api/api/tasks.py           53      0   100%\nsrc/taskq_api/service/runner.py     135      6    96%   369-370, 374-376, 382-383\n---------------------------------------------------------------\nTOTAL                               188      6    97%\n2 failed, 77 passed (combined test_fr02+test_fr01+test_fr08 run; the 2 failures are in test_fr08.py — NOT FR-02's own tests and excluded per scoring rules); 33 passed for FR-02 alone (test_fr02.py only); coverage_pct=97; spec_cov_pct=100 (all 10 required tests exist and pass); score=min(97,100)=97",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
+      "tool_evidence": "23 passed, 1 warning in 2.20s\ncoverage: 03-development/src/taskq_api/api/deps.py — 75 stmts, 0 miss, 100%\nTOTAL 648 289 55%\nAll 3 required tests present and passing: test_scope_hierarchy_read_lt_write_lt_admin, test_insufficient_scope_returns_403_without_leak, test_single_fastapi_dependency_for_authz",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-02",
+      "coverage_scope_fr": "FR-04",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "EXIT=0\n=============\nImport Linter\n=============\nAnalyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.",
+      "tool_evidence": "Contracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -79,33 +78,33 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "01d9a827c6d3130c1c25b43d1c58ddf3c8524c025d6a143fd67e56a15466d3c7",
-      "bytes": 25,
-      "head": "EXIT=0\nAll checks passed!"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "4a3e4ab1233bf6469a78d3772c16084325cb1a1d40e600654e21a258b33ca8e3",
+      "sha256": "ef8f80147e24a7aeb8d15dff92c490f6cf3da1a1bf65cb5a2bc483e18cb79ab4",
       "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787711642546\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.137}}"
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787711860417\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.136}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "de00f8cbb6b3963a3b4921cc1fc29929f934d043eaaea507faac5cce816fd2c3",
-      "bytes": 753,
-      "head": "--------- coverage: platform darwin, python 3.11.15-final-0 ----------\nName                              Stmts   Miss  Cover   Missing\n---------------------------------------------------------------\nsrc/taskq_api/api/tasks.py           53      0   100%\nsrc/taskq_api/service/runner.py     135      6    96%   369-370, 374-376, 382-383\n---------------------------------------------------------------\nTOTAL                               188      6    97%\n2 failed, 77 passed (combined test_fr02+test_fr01+test_fr08 run; the 2 failures are in test_fr08.py — NOT FR-02's own tests and excluded per scoring rules); 33 passed for FR-02 alone (test_fr02.py only); coverage_pct=97; spec_cov_pct=100 (all 10 required tests exist and pass); score=min(97,100)=97"
+      "sha256": "4a8944c231465b891018b9eb8957c3b94f6b9d0fecc8c2eb0aea8408ba9ebade",
+      "bytes": 303,
+      "head": "23 passed, 1 warning in 2.20s\ncoverage: 03-development/src/taskq_api/api/deps.py — 75 stmts, 0 miss, 100%\nTOTAL 648 289 55%\nAll 3 required tests present and passing: test_scope_hierarchy_read_lt_write_lt_admin, test_insufficient_scope_returns_403_without_leak, test_single_fastapi_dependency_for_authz"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f45f68ac32a5d7332851550c3d52b215d2abe2807089713fb903e6276c08d6a5",
-      "bytes": 169,
-      "head": "EXIT=0\n=============\nImport Linter\n=============\nAnalyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken."
+      "sha256": "9137d1a278c851afb54a9d0f7e82aa70660c59b84f70b2e3fb136152e96b3e8c",
+      "bytes": 84,
+      "head": "Contracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT"
     }
   },
-  "composite_score": 99.2,
+  "composite_score": 100.0,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
