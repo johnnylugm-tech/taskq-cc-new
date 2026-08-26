@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-04",
+  "fr_id": "FR-05",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,14 +9,14 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!\n",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787711860417\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.136}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,16 @@
       "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "23 passed, 1 warning in 2.20s\ncoverage: 03-development/src/taskq_api/api/deps.py — 75 stmts, 0 miss, 100%\nTOTAL 648 289 55%\nAll 3 required tests present and passing: test_scope_hierarchy_read_lt_write_lt_admin, test_insufficient_scope_returns_403_without_leak, test_single_fastapi_dependency_for_authz",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
+      "tool_evidence": "Coverage term report: 03-development/src/taskq_api/api/deps.py  75  0  100% | TOTAL 648 289 55% | 23 passed, 0 failed, 0 skipped. FR-05 source deps.py: percent_covered=100.0, covered_lines=75, num_statements=75, missing_lines=0. Spec coverage: 4/4 required tests (test_token_bucket_capacity_and_refill_rate, test_exceed_bucket_returns_429_with_retry_after, test_bucket_update_uses_row_level_lock, test_healthz_and_readyz_not_rate_limited) all present and passing.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-04",
+      "coverage_scope_fr": "FR-05",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT",
+      "tool_evidence": "Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. (downward-only-layer-dependencies KEPT, no-sqlalchemy-above-repository KEPT, models-use-sqlalchemy-orm-only KEPT)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "ef8f80147e24a7aeb8d15dff92c490f6cf3da1a1bf65cb5a2bc483e18cb79ab4",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787711860417\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.136}}"
+      "sha256": "5464c04b5fecb6db36b8aca76cb1cf5490511adc1201acf3d6de844106a7cbc5",
+      "bytes": 115,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "4a8944c231465b891018b9eb8957c3b94f6b9d0fecc8c2eb0aea8408ba9ebade",
-      "bytes": 303,
-      "head": "23 passed, 1 warning in 2.20s\ncoverage: 03-development/src/taskq_api/api/deps.py — 75 stmts, 0 miss, 100%\nTOTAL 648 289 55%\nAll 3 required tests present and passing: test_scope_hierarchy_read_lt_write_lt_admin, test_insufficient_scope_returns_403_without_leak, test_single_fastapi_dependency_for_authz"
+      "sha256": "9718232723324ccb260cd9f177d33196dc4ae0071e2752fa6b94152f6383592a",
+      "bytes": 463,
+      "head": "Coverage term report: 03-development/src/taskq_api/api/deps.py  75  0  100% | TOTAL 648 289 55% | 23 passed, 0 failed, 0 skipped. FR-05 source deps.py: percent_covered=100.0, covered_lines=75, num_statements=75, missing_lines=0. Spec coverage: 4/4 required tests (test_token_bucket_capacity_and_refill_rate, test_exceed_bucket_returns_429_with_retry_after, test_bucket_update_uses_row_level_lock, test_healthz_and_readyz_not_rate_limited) all present and passing."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9137d1a278c851afb54a9d0f7e82aa70660c59b84f70b2e3fb136152e96b3e8c",
-      "bytes": 84,
-      "head": "Contracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT"
+      "sha256": "cb11c04d56d09fc8fd7c8519767ea2c1391ab0cd1bf52d47a6d7d2d24c486277",
+      "bytes": 181,
+      "head": "Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. (downward-only-layer-dependencies KEPT, no-sqlalchemy-above-repository KEPT, models-use-sqlalchemy-orm-only KEPT)"
     }
   },
   "composite_score": 100.0,
