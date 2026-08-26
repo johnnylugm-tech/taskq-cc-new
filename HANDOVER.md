@@ -1,8 +1,8 @@
 # Harness Methodology — Session Handover
 
-**Checkpoint**: `P5-exit-20260826`  
-**Phase**: P5 — Review Baseline  
-**Generated**: 2026-08-26T05:12:06Z
+**Checkpoint**: `P6-entry-20260826`  
+**Phase**: P6 — Full Review / Gate 4  
+**Generated**: 2026-08-26T05:16:57Z
 
 > ⚠️  **開始下一個工作階段前，請先執行 `/compact` 壓縮上下文**，再從「接下來的工作」繼續。
 
@@ -14,9 +14,9 @@
 # 1. Clone (if working directory cleared)
 git clone --recurse-submodules https://github.com/johnnylugm-tech/taskq-cc-new && cd taskq-cc-new
 
-# 2. Read plan and start Phase 6
+# 2. Read plan and continue Phase 6
 cat .methodology/phase6_plan.md
-# Follow SKILL.md §0.1 Phase 6 entry check, then execute
+# Follow the active plan and continue from where you left off
 ```
 
 ---
@@ -31,7 +31,7 @@ git clone --recurse-submodules https://github.com/johnnylugm-tech/taskq-cc-new /
 git log --oneline -3
 
 # Confirm FSM state
-cat .methodology/state.json   # expected: phase=5 state=RUNNING last_gate=1 last_fr=FR-10
+cat .methodology/state.json   # expected: phase=6 state=RUNNING last_gate=3 last_fr=FR-10
 
 # Read active plan
 cat .methodology/phase6_plan.md
@@ -41,24 +41,23 @@ cat .methodology/phase6_plan.md
 |------|----|
 | Remote | `https://github.com/johnnylugm-tech/taskq-cc-new` |
 | Branch | `main` |
-| State | `phase=5 state=RUNNING last_gate=1 last_fr=FR-10` |
+| State | `phase=6 state=RUNNING last_gate=3 last_fr=FR-10` |
 | Plan | `.methodology/phase6_plan.md` |
 
 ---
 
 ## 任務背景
 
-P5 Review Baseline: BASELINE.md generated.
+Phase 5 complete (10/10 FRs Gate 1 PASS). Gate 3 (score=93.68). Advancing to Phase 6.
 
 ## 目前執行狀況
 
-BASELINE.md committed. P5 Review Baseline complete.
+Phase 5: 10/10 FRs Gate 1 PASS. Gate 3 (score=93.68) — quality_complete. Ready to begin Phase 6.
 
 ## 接下來的工作
 
-1. Proceed to P6: Full Review / Gate 4
-2. Run full Gate 4 review (target ≥ 85)
-3. On Gate 4 APPROVE → call commit_and_push_gate(gate_num=4, ...)
+1. Follow SKILL.md §0.1 Phase 6 entry checklist
+2. Read the Phase 6 plan and execute
 
 ## 注意事項
 
