@@ -2,14 +2,18 @@
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
   warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
-........................................................................ [ 31%]
-........................................................................ [ 63%]
-........................................................................ [ 94%]
-............                                                             [100%]
+........................................................................ [ 29%]
+........................................................................ [ 59%]
+........................................................................ [ 89%]
+.........................                                                [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
+
+03-development/tests/test_benchmarks.py::test_benchmark_get_by_id
+  03-development/tests/test_benchmarks.py:43: PytestBenchmarkWarning: Benchmark fixture was not used at all in this test!
+    def test_benchmark_get_by_id(benchmark):
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 
@@ -43,4 +47,17 @@ Name                                                         Stmts   Miss  Cover
 TOTAL                                                          648      0   100%
 Coverage JSON written to file .coverage.json
 
-228 passed, 1 warning in 16.46s
+
+--------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                    Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.9362 (1.0)         423.1088 (1.0)       47.8505 (1.0)       4.6158 (1.0)       46.9731 (1.0)       3.0363 (1.0)      6822;6007       20.8984 (1.0)      198373         110
+test_benchmark_refill          191.5963 (4.36)      3,387.4996 (8.01)     211.3915 (4.42)     30.5712 (6.62)     204.2041 (4.35)     12.6020 (4.15)     6189;7200        4.7306 (0.23)     195122          10
+test_benchmark_hash_key        256.2476 (5.83)      2,783.3477 (6.58)     284.7081 (5.95)     31.4305 (6.81)     279.2018 (5.94)     10.3988 (3.42)    5895;13563        3.5124 (0.17)     153847          20
+test_benchmark_redact          290.9801 (6.62)     12,833.9743 (30.33)    371.9236 (7.77)     89.1986 (19.32)    374.9738 (7.98)     40.9782 (13.50)    3023;4488        2.6887 (0.13)     138735           1
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+241 passed, 2 warnings in 25.09s
