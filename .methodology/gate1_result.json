@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-05",
+  "fr_id": "FR-06",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787712163427\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.22}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 23,
+      "tests_passed": 5,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "Coverage term report: 03-development/src/taskq_api/api/deps.py  75  0  100% | TOTAL 648 289 55% | 23 passed, 0 failed, 0 skipped. FR-05 source deps.py: percent_covered=100.0, covered_lines=75, num_statements=75, missing_lines=0. Spec coverage: 4/4 required tests (test_token_bucket_capacity_and_refill_rate, test_exceed_bucket_returns_429_with_retry_after, test_bucket_update_uses_row_level_lock, test_healthz_and_readyz_not_rate_limited) all present and passing.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
+      "tool_evidence": "5 passed, 1 warning in 0.52s. coverage: session.py 100% (48/48 statements). All 5 required tests exist and pass: test_all_data_access_via_repository_layer, test_one_session_per_request_with_context_manager, test_no_string_concat_sql_uses_orm_or_param, test_selectinload_or_joinedload_constant_sql_count, test_pool_size_and_pool_pre_ping.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-06.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-05",
+      "coverage_scope_fr": "FR-06",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. (downward-only-layer-dependencies KEPT, no-sqlalchemy-above-repository KEPT, models-use-sqlalchemy-orm-only KEPT)",
+      "tool_evidence": "Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5464c04b5fecb6db36b8aca76cb1cf5490511adc1201acf3d6de844106a7cbc5",
-      "bytes": 115,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
+      "sha256": "1a29e23bf229992764a94a5336a1899af2a6e30dc2a95455d1861db77f6b13c0",
+      "bytes": 185,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787712163427\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.22}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9718232723324ccb260cd9f177d33196dc4ae0071e2752fa6b94152f6383592a",
-      "bytes": 463,
-      "head": "Coverage term report: 03-development/src/taskq_api/api/deps.py  75  0  100% | TOTAL 648 289 55% | 23 passed, 0 failed, 0 skipped. FR-05 source deps.py: percent_covered=100.0, covered_lines=75, num_statements=75, missing_lines=0. Spec coverage: 4/4 required tests (test_token_bucket_capacity_and_refill_rate, test_exceed_bucket_returns_429_with_retry_after, test_bucket_update_uses_row_level_lock, test_healthz_and_readyz_not_rate_limited) all present and passing."
+      "sha256": "facb27d51cc3daf35d23b680380d99c41d4da09236ceb5f5ebe5665ae0343d84",
+      "bytes": 337,
+      "head": "5 passed, 1 warning in 0.52s. coverage: session.py 100% (48/48 statements). All 5 required tests exist and pass: test_all_data_access_via_repository_layer, test_one_session_per_request_with_context_manager, test_no_string_concat_sql_uses_orm_or_param, test_selectinload_or_joinedload_constant_sql_count, test_pool_size_and_pool_pre_ping."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "cb11c04d56d09fc8fd7c8519767ea2c1391ab0cd1bf52d47a6d7d2d24c486277",
-      "bytes": 181,
-      "head": "Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. (downward-only-layer-dependencies KEPT, no-sqlalchemy-above-repository KEPT, models-use-sqlalchemy-orm-only KEPT)"
+      "sha256": "f4bf1805cdcaeaa443e9bcf12e7f8094db98cd1103f0e0dbca12c53cea6e395a",
+      "bytes": 87,
+      "head": "Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)"
     }
   },
   "composite_score": 100.0,
