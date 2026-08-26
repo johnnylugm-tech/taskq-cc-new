@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-07",
+  "fr_id": "FR-08",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "ruff check: All checks passed!",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.208}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.131}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 79,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "03-development/tests/test_fr07.py ...... [100%]\n============================== 6 passed in 1.78s ===============================\nCoverage: 03-development/src/migrations/versions/v3_split_results.py percent_covered=100.0 (18/18 statements)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
+      "tool_evidence": "79 passed, 1 warning in 6.09s. Coverage 100% on FR-08 files (53/53 statements in tasks.py). All 5 required FR-08 tests exist and pass: test_background_uses_asyncio_task_group, test_drain_waits_for_inflight_with_budget, test_concurrency_cap_queues_surplus, test_wait_for_kills_child_no_orphan, test_cancelled_error_propagates_not_swallowed.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-07",
+      "coverage_scope_fr": "FR-08",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Import Linter: Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT. taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,30 +78,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "d1b8fdeadf07a4179c1e2efb83ccead59bdad7354815f2ba50a6b2b8cf4a51fe",
-      "bytes": 30,
-      "head": "ruff check: All checks passed!"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "0f2635b509c9bccf53efaea240a9413385c91fc07ed7dd70b3db20a143865e67",
-      "bytes": 161,
-      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.208}}"
+      "sha256": "52e4138c36ac4e20781e4d15804ca7fb780bd1f9257589e8ba15713d4e672500",
+      "bytes": 135,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.131}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "e1627e64abd8a853c827621073d58bf942eca695b9d4250c98a206f18bd4117f",
-      "bytes": 238,
-      "head": "03-development/tests/test_fr07.py ...... [100%]\n============================== 6 passed in 1.78s ===============================\nCoverage: 03-development/src/migrations/versions/v3_split_results.py percent_covered=100.0 (18/18 statements)"
+      "sha256": "5fd617e41352bf7ad1336c0b9478a7bd906cd7fc25e9b77bbd5f6dee601e2b2a",
+      "bytes": 339,
+      "head": "79 passed, 1 warning in 6.09s. Coverage 100% on FR-08 files (53/53 statements in tasks.py). All 5 required FR-08 tests exist and pass: test_background_uses_asyncio_task_group, test_drain_waits_for_inflight_with_budget, test_concurrency_cap_queues_surplus, test_wait_for_kills_child_no_orphan, test_cancelled_error_propagates_not_swallowed."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f7974de89495ed2dcf40dda5e817c97efebb2d17678c83f25077ebdd31f8bc1c",
-      "bytes": 138,
-      "head": "Import Linter: Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)"
+      "sha256": "1a1d0c847aa86e7e7e5c9c4f2addb5a3f9e6045d90cb72a2da960b697b1066e4",
+      "bytes": 122,
+      "head": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT. taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
