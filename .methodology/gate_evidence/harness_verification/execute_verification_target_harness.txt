@@ -55,19 +55,19 @@ TOTAL                                                        630      0   100%
 Coverage JSON written to file .coverage.json
 
 
--------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                   Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.5263 (1.0)        249.6334 (1.0)       45.1124 (1.0)       2.7861 (1.0)       44.6427 (1.0)       0.3664 (1.0)    10152;27095       22.1669 (1.0)      198334         112
-test_benchmark_refill          180.1993 (4.14)     1,377.0739 (5.52)     186.8583 (4.14)      8.5443 (3.07)     185.4249 (4.15)      3.1258 (8.53)     3989;8602        5.3516 (0.24)     129033          40
-test_benchmark_hash_key        252.0508 (5.79)     2,118.7501 (8.49)     271.5785 (6.02)     12.7324 (4.57)     270.8024 (6.07)      8.3004 (22.65)    5297;2883        3.6822 (0.17)     153847          20
-test_benchmark_redact          290.9801 (6.69)     5,958.0198 (23.87)    363.0272 (8.05)     32.0623 (11.51)    374.9738 (8.40)     41.0364 (112.00)   5623;1252        2.7546 (0.12)     148149           1
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                    Max                Mean             StdDev              Median               IQR              Outliers  OPS (Mops/s)            Rounds  Iterations
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.5263 (1.0)         165.1788 (1.0)       44.9521 (1.0)       2.5672 (1.0)       44.6427 (1.0)      0.0005 (1.0)      2466;86571       22.2459 (1.0)      198334         112
+test_benchmark_refill          179.1748 (4.12)        611.4497 (3.70)     186.3452 (4.15)      7.0010 (2.73)     184.3757 (4.13)     4.1502 (>1000.0)   8192;8191        5.3664 (0.24)     126311          40
+test_benchmark_hash_key        256.2505 (5.89)      2,437.5011 (14.76)    275.8830 (6.14)     18.9986 (7.40)     272.9008 (6.11)     6.2515 (>1000.0)  9264;11541        3.6247 (0.16)     175162          20
+test_benchmark_redact          290.9801 (6.69)     12,165.9832 (73.65)    368.6973 (8.20)     47.6738 (18.57)    374.9738 (8.40)     0.0582 (112.00)   4025;45168        2.7123 (0.12)     151907           1
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-241 passed, 2 warnings in 25.83s
+241 passed, 2 warnings in 26.05s
 unset TASKQ_DB_URL && python3 -m pytest 03-development/tests/integration -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
 ..........................                                               [100%]
 =============================== warnings summary ===============================
@@ -106,7 +106,9 @@ Name                                                       Stmts   Miss  Cover  
 TOTAL                                                        630    172    73%
 Coverage JSON written to file .coverage.json
 
-26 passed, 1 warning in 0.67s
+26 passed, 1 warning in 0.68s
+rm -f .sessi-work/verify_system.sqlite
+rm -f /var/folders/9s/865m2mg544z72d_5q423mlmm0000gn/T/taskq_app.db
 python3 -m alembic upgrade head
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"

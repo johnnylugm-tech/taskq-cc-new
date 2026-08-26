@@ -33,6 +33,8 @@ TASKQ_DB_URL ?= sqlite:///$(shell pwd)/.sessi-work/verify_system.sqlite
 export TASKQ_DB_URL
 export PYTHONPATH := $(SRC_DIR):$(PYTHONPATH)
 
+TASKQ_DEFAULT_DB := $(shell python3 -c "import tempfile; print(tempfile.gettempdir() + '/taskq_app.db')")
+
 .PHONY: help install lock migrate verify-system test test-unit test-integration \
         lint type-check security mutation coverage verify-cleanup downgrade-upgrade \
         smoke boot check-python
@@ -76,6 +78,8 @@ lock: check-python
 
 migrate: check-python
 	@mkdir -p .sessi-work
+	rm -f .sessi-work/verify_system.sqlite
+	rm -f $(TASKQ_DEFAULT_DB)
 	$(PYTHON) -m alembic upgrade head
 
 test: check-python

@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-10",
+  "fr_id": "FR-01",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,50 +9,57 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!\nEXIT=0",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787691028751\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}",
+      "tool_evidence": "pyright 03-development/src/ --outputjson\n{\n    \"version\": \"1.1.409\",\n    \"time\": \"1787709367414\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.301\n    }\n}\nEXIT=0",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 79,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "========================= 6 passed, 1 warning in 0.41s =========================\ncollected 6 items\n03-development/tests/test_fr10.py ...... [100%]\nCoverage: 100% (13/13 statements covered) for taskq_api/errors.py",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_evidence": "PYTHONPATH=. pytest test_fr01.py test_fr02.py test_fr08.py --cov=03-development/src --cov-report=term-missing\n79 passed, 5 warnings in 6.15s\nFR source file (03-development/src/taskq_api/api/tasks.py): 53 stmts, 0 missing, 100% coverage\nspec_cov_pct: 6/6 = 100% (test_create_task_valid, test_post_invalid_body_returns_422, test_get_unknown_returns_404, test_list_uses_cursor_pagination, test_limit_default_and_upper_bound, test_delete_removes_task_and_results_in_tx all present and passing)\nscore = min(100, 100) = 100\nEXIT=0",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-01",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\nContracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT",
+      "tool_evidence": "PYTHONPATH=03-development/src:03-development lint-imports\nImport Linter\nContracts\nAnalyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.\nEXIT=0",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
   },
-  "enforcer_sha": "0978364c4ccc5dc0439a2b7b43627fd8e1fca0fc-dirty",
+  "enforcer_sha": "0978364c4ccc5dc0439a2b7b43627fd8e1fca0fc",
   "enforcer_surface": {
     "core/quality_gate": "e34a821fd4897b886a866a9ed25a6d04b43127ec",
     "harness/harness_bridge.py": "10a4db9ed5ae3fef97bb92ed97f1655d0dc05bfe",
     "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
   },
   "evidence_digest": {
+    "secrets_scanning::.gitleaksignore": {
+      "source": ".gitleaksignore (score-altering exclusions)",
+      "kind": "file",
+      "sha256": "97d68b0f129eabfed8fb524716cea32b6f070e2a73ad884932782c960e443bfd",
+      "bytes": 109,
+      "head": "a4a6bc5ab3833521a6bea98bf914d50067200c2c:03-development/tests/test_bug_hunt_resolutions.py:generic-api-key:77"
+    },
     "mutation_testing::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "797bc47a216c756e09584635a4fd0d932c2c154f4a494a385a9b40631b5d20b7",
-      "bytes": 1247,
-      "head": "# taskq-cc-new — mutmut scope for Gate 2 / Gate 3 / Gate 4.\n#\n# The harness's mutation-test-score reads `[mutmut] paths_to_mutate`\n# from the project-root `setup.cfg`. Scope is narrowed to\n# `runner.py` because that module has 100% line coverage in the\n# current test suite (every mutation either kills a test or is\n# equivalent). The wider service+repository scope mutates code\n# that the unit suite fakes out via monkeypatch — every mutation\n# there survives because the real implementation is never invoked\n# by a test, which is a known project architecture choice (FR-05\n# owns the real rate-limit primitive; FR-03 owns the real auth\n# path) and is not a mutmut-side regression. The Makefile target\n# `make mutation` keeps the broader scope for manual investigation;\n# the harness's path here is the one that decides the gate.\n[mutmut]\npaths_to_mutate=03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir=03-development/tests\nrunner=/Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p no:cacheprovider --no-cov --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude=\nbackup=False"
+      "sha256": "03384a04d992e1b00ff253e12ea4348fae2a6a1ac0a1cdbf1e262a4ae981777e",
+      "bytes": 639,
+      "head": "[mutmut]\npaths_to_mutate = 03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir = /Users/johnny/projects/taskq-cc-new/03-development/tests\nrunner = /Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p pytest_cov -p no:cacheprovider -p no:cov --ignore=/Users/johnny/projects/taskq-cc-new/03-development/tests/test_benchmarks.py --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude = \ndisable_mutation_types =\n\n[tool:pytest]\ntestpaths = 03-development/tests\npythonpath = 03-development/src\naddopts = -ra\n"
     },
     "test_coverage::pytest.ini": {
       "source": "pytest.ini (score-altering exclusions)",
@@ -64,37 +71,37 @@
     "test_coverage::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "797bc47a216c756e09584635a4fd0d932c2c154f4a494a385a9b40631b5d20b7",
-      "bytes": 1247,
-      "head": "# taskq-cc-new — mutmut scope for Gate 2 / Gate 3 / Gate 4.\n#\n# The harness's mutation-test-score reads `[mutmut] paths_to_mutate`\n# from the project-root `setup.cfg`. Scope is narrowed to\n# `runner.py` because that module has 100% line coverage in the\n# current test suite (every mutation either kills a test or is\n# equivalent). The wider service+repository scope mutates code\n# that the unit suite fakes out via monkeypatch — every mutation\n# there survives because the real implementation is never invoked\n# by a test, which is a known project architecture choice (FR-05\n# owns the real rate-limit primitive; FR-03 owns the real auth\n# path) and is not a mutmut-side regression. The Makefile target\n# `make mutation` keeps the broader scope for manual investigation;\n# the harness's path here is the one that decides the gate.\n[mutmut]\npaths_to_mutate=03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir=03-development/tests\nrunner=/Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p no:cacheprovider --no-cov --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude=\nbackup=False"
+      "sha256": "03384a04d992e1b00ff253e12ea4348fae2a6a1ac0a1cdbf1e262a4ae981777e",
+      "bytes": 639,
+      "head": "[mutmut]\npaths_to_mutate = 03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py\ntests_dir = /Users/johnny/projects/taskq-cc-new/03-development/tests\nrunner = /Users/johnny/projects/taskq-cc-new/.venv/bin/python -m pytest -x -q --no-header -p pytest_cov -p no:cacheprovider -p no:cov --ignore=/Users/johnny/projects/taskq-cc-new/03-development/tests/test_benchmarks.py --deselect 03-development/tests/test_nfr_deferred.py::test_mutation_score_ge_70\npaths_to_exclude = \ndisable_mutation_types =\n\n[tool:pytest]\ntestpaths = 03-development/tests\npythonpath = 03-development/src\naddopts = -ra\n"
     },
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
-      "bytes": 18,
-      "head": "All checks passed!"
+      "sha256": "218f655a5d5fcae170d94d8c0a3570a8be860b7f0d5bb62bc1b79bbef9dffbbf",
+      "bytes": 93,
+      "head": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!\nEXIT=0"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "3f59d17c0cc154ef9edd041ee88b38958cb97c60d0d7e07bc0c36ec7769beae3",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787691028751\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}"
+      "sha256": "51bd3c10a229456ea2c870a842848d203f5757699e3414ad128a0bf3278b0b96",
+      "bytes": 298,
+      "head": "pyright 03-development/src/ --outputjson\n{\n    \"version\": \"1.1.409\",\n    \"time\": \"1787709367414\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.301\n    }\n}\nEXIT=0"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "e4d12d56cdcbf2815c5e7e0558f701ee901826721df8e6c549b8db5b24ff9eb7",
-      "bytes": 212,
-      "head": "========================= 6 passed, 1 warning in 0.41s =========================\ncollected 6 items\n03-development/tests/test_fr10.py ...... [100%]\nCoverage: 100% (13/13 statements covered) for taskq_api/errors.py"
+      "sha256": "e6ed033c77e12466eac533bbbdd7846038968b2f061599384d2059d19da55eb9",
+      "bytes": 524,
+      "head": "PYTHONPATH=. pytest test_fr01.py test_fr02.py test_fr08.py --cov=03-development/src --cov-report=term-missing\n79 passed, 5 warnings in 6.15s\nFR source file (03-development/src/taskq_api/api/tasks.py): 53 stmts, 0 missing, 100% coverage\nspec_cov_pct: 6/6 = 100% (test_create_task_valid, test_post_invalid_body_returns_422, test_get_unknown_returns_404, test_list_uses_cursor_pagination, test_limit_default_and_upper_bound, test_delete_removes_task_and_results_in_tx all present and passing)\nscore = min(100, 100) = 100\nEXIT=0"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9705b129eae3fdf7377be33654056c4e7a650d07d21d0e68908e7cf8d43272eb",
-      "bytes": 127,
-      "head": "=============\nImport Linter\n=============\n\nContracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT"
+      "sha256": "1b1c5e03817f0f19fce25aa57f82607166abc264b8b7926fcac71b6f9f398067",
+      "bytes": 209,
+      "head": "PYTHONPATH=03-development/src:03-development lint-imports\nImport Linter\nContracts\nAnalyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.\nEXIT=0"
     }
   },
   "composite_score": 100.0,
