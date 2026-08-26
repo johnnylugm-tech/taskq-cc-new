@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-03",
+  "fr_id": "FR-04",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,14 +9,14 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "All checks passed!\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.14}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.153}, \"generalDiagnostics\": []}\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,16 @@
       "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 23 items\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.03s ========================\nCoverage for 03-development/src/taskq_api/api/deps.py: 100% (75/75 statements)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.3.3, pluggy-1.5.0\nconfigfile: pytest.ini\nplugins: asyncio-0.24.0, cov-5.0.0, anyio-4.6.0, benchmark-4.0.0, hypothesis-6.165.10\ncollected 23 items\n\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n======================== 23 passed, 2 warnings in 2.02s ========================\n",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-03",
+      "coverage_scope_fr": "FR-04",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 23 files, 17 dependencies.\n-----------------------------------\n\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken.\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f40d9700f3aa846e2a4ca3cfba63a9e4ebc36390b85aefeef9eae411fe28a7b3",
-      "bytes": 160,
-      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.14}}"
+      "sha256": "1221712850383a0d62fcc4d3bcdea9a533b861f96f408c834f5c8e904252ff9b",
+      "bytes": 161,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.153}, \"generalDiagnostics\": []}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "6c28ff00e1b87a03ab7ec0b3c53b36a4c662d9fd31419536ba605059ad0b48fe",
-      "bytes": 418,
-      "head": "collected 23 items\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.03s ========================\nCoverage for 03-development/src/taskq_api/api/deps.py: 100% (75/75 statements)"
+      "sha256": "1928dec8e282c502376b2980c67d4b8564c78ad4a594ec38367ad7ecfe2184f4",
+      "bytes": 593,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.3.3, pluggy-1.5.0\nconfigfile: pytest.ini\nplugins: asyncio-0.24.0, cov-5.0.0, anyio-4.6.0, benchmark-4.0.0, hypothesis-6.165.10\ncollected 23 items\n\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n\n======================== 23 passed, 2 warnings in 2.02s ========================"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "dae66c31c0cab52f6463d9e373e86345d3d7b1ab6268aa4ff42940ca9e23e6f6",
-      "bytes": 120,
-      "head": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken."
+      "sha256": "128cc01bc6a2e7e6f672f3782f15b7e645d2818d562f8b6ee0d018cc11e4c9d2",
+      "bytes": 232,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 23 files, 17 dependencies.\n-----------------------------------\n\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
