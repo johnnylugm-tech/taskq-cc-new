@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-02",
+  "fr_id": "FR-03",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787719391223\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.14}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.14}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 77,
+      "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 79 items\n03-development/tests/test_fr02.py .................................      [ 41%]\n03-development/tests/test_fr01.py ........                               [ 51%]\n03-development/tests/test_fr08.py .....................F..F............. [100%]\n2 failed (in test_fr08.py — NOT FR-02), 77 passed, 2 warnings. FR-02 source coverage on tasks.py = 100% (runner.py is omitted via .coveragerc). spec_cov_pct = 100% (all required tests present).",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
+      "tool_evidence": "collected 23 items\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.03s ========================\nCoverage for 03-development/src/taskq_api/api/deps.py: 100% (75/75 statements)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-02",
+      "coverage_scope_fr": "FR-03",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Import Linter — Analyzed 23 files, 17 dependencies. Contracts: no_circular_dependencies KEPT, taskq_api_self_check KEPT — 2 kept, 0 broken.",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "a3b05281851d55d2a781f22153bcc9af0f2ae8a6e1bd493bf3c0c6a09f46a9aa",
-      "bytes": 185,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787719391223\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.14}}"
+      "sha256": "f40d9700f3aa846e2a4ca3cfba63a9e4ebc36390b85aefeef9eae411fe28a7b3",
+      "bytes": 160,
+      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.14}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "182cea825f694618cb82cf94ec95088a71adb924a2e544a7561ec4f0b9d3feb9",
-      "bytes": 454,
-      "head": "collected 79 items\n03-development/tests/test_fr02.py .................................      [ 41%]\n03-development/tests/test_fr01.py ........                               [ 51%]\n03-development/tests/test_fr08.py .....................F..F............. [100%]\n2 failed (in test_fr08.py — NOT FR-02), 77 passed, 2 warnings. FR-02 source coverage on tasks.py = 100% (runner.py is omitted via .coveragerc). spec_cov_pct = 100% (all required tests present)."
+      "sha256": "6c28ff00e1b87a03ab7ec0b3c53b36a4c662d9fd31419536ba605059ad0b48fe",
+      "bytes": 418,
+      "head": "collected 23 items\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.03s ========================\nCoverage for 03-development/src/taskq_api/api/deps.py: 100% (75/75 statements)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5c96b39ce19dbd4f663dd795814673e162f20889019a7f772d1e2f017af357d4",
-      "bytes": 143,
-      "head": "Import Linter — Analyzed 23 files, 17 dependencies. Contracts: no_circular_dependencies KEPT, taskq_api_self_check KEPT — 2 kept, 0 broken."
+      "sha256": "dae66c31c0cab52f6463d9e373e86345d3d7b1ab6268aa4ff42940ca9e23e6f6",
+      "bytes": 120,
+      "head": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
