@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-07",
+  "fr_id": "FR-08",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787720279418\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.155}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787720461430\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.166}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 79,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.3.3, pluggy-1.5.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=1 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-cc-new\nconfigfile: pytest.ini\nplugins: asyncio-0.24.0, cov-5.0.0, anyio-4.6.0, benchmark-4.0.0, hypothesis-6.165.10\nasyncio: mode=Mode.STRICT, default_loop_scope=None\ncollected 6 items\n\n03-development/tests/test_fr07.py ......                                 [100%]\n\n========================= 6 passed, 1 warning in 1.67s =========================",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
+      "tool_evidence": "79 passed, 2 warnings in 6.10s. coverage 100% on runner.py and tasks.py. spec_cov_pct=100% (5/5 required tests present and passing)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-07",
+      "coverage_scope_fr": "FR-08",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 356 files, 3144 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken.",
+      "tool_evidence": "Contracts: 2 kept, 0 broken. no_circular_dependencies KEPT; taskq_api_self_check KEPT.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "39ce242665fde3cc0fe8a16eea5a0099d6764b2de3381da90ee51ac37a4b6c02",
+      "sha256": "bea9f2a20ba582b88ef5d153dd34ee7c54a93e3ad88ece664b7bc2e8fb12fa76",
       "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1787720279418\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.155}}"
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787720461430\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.166}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f255def7df178b0ca9e6d70a404e5e50111db8945fdcedf65cac634657800172",
-      "bytes": 705,
-      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.3.3, pluggy-1.5.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=1 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-cc-new\nconfigfile: pytest.ini\nplugins: asyncio-0.24.0, cov-5.0.0, anyio-4.6.0, benchmark-4.0.0, hypothesis-6.165.10\nasyncio: mode=Mode.STRICT, default_loop_scope=None\ncollected 6 items\n\n03-development/tests/test_fr07.py ......                                 [100%]\n\n========================= 6 passed, 1 warning in 1.67s ========================="
+      "sha256": "8516d6fa9d88839304827a680a742850628cebe694ef25561ec2d83f07d16129",
+      "bytes": 131,
+      "head": "79 passed, 2 warnings in 6.10s. coverage 100% on runner.py and tasks.py. spec_cov_pct=100% (5/5 required tests present and passing)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "7addb57847f83d4b24a0dabb36e4525c994435bdc8cdc17acd67e8a10189bcf1",
-      "bytes": 370,
-      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 356 files, 3144 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken."
+      "sha256": "2ac1c99cd3aa7b705f90b567dec469819f77668038ac107fb69bc91993c0208d",
+      "bytes": 86,
+      "head": "Contracts: 2 kept, 0 broken. no_circular_dependencies KEPT; taskq_api_self_check KEPT."
     }
   },
   "composite_score": 100.0,
