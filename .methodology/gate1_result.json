@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 8,
-  "fr_id": "FR-07",
+  "fr_id": "FR-08",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.125}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 82,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "6 passed, 1 warning in 1.60s. Coverage 100% on 03-development/src/migrations/versions/v3_split_results.py (18/18 statements). All 5 required test functions exist and pass.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
+      "tool_evidence": "82 passed, 2 warnings in 6.26s — coverage: platform darwin, python 3.11.15. Name Stmts Miss Cover. 03-development/src/taskq_api/api/tasks.py 53 0 100%. 03-development/src/taskq_api/service/runner.py 135 0 100%. TOTAL 188 0 100%. Spec coverage: 5/5 required tests present and passing (test_background_uses_asyncio_task_group, test_drain_waits_for_inflight_with_budget, test_concurrency_cap_queues_surplus, test_wait_for_kills_child_no_orphan, test_cancelled_error_propagates_not_swallowed).",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-07",
+      "coverage_scope_fr": "FR-08",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 2 kept, 0 broken. Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "fc863f756c2349c1d937ea1b287998696548f9e2e5d1ffcb0f2dd0bfa7ebdedb",
-      "bytes": 135,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.125}}"
+      "sha256": "5464c04b5fecb6db36b8aca76cb1cf5490511adc1201acf3d6de844106a7cbc5",
+      "bytes": 115,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "77b4389cf71f88204045c3688e42260cb30c736c8c50bd53beeb85c4c41aeec1",
-      "bytes": 171,
-      "head": "6 passed, 1 warning in 1.60s. Coverage 100% on 03-development/src/migrations/versions/v3_split_results.py (18/18 statements). All 5 required test functions exist and pass."
+      "sha256": "30205107adf5dd5d4348900067908ccaab4f446406155fc89a43ccad23921762",
+      "bytes": 491,
+      "head": "82 passed, 2 warnings in 6.26s — coverage: platform darwin, python 3.11.15. Name Stmts Miss Cover. 03-development/src/taskq_api/api/tasks.py 53 0 100%. 03-development/src/taskq_api/service/runner.py 135 0 100%. TOTAL 188 0 100%. Spec coverage: 5/5 required tests present and passing (test_background_uses_asyncio_task_group, test_drain_waits_for_inflight_with_budget, test_concurrency_cap_queues_surplus, test_wait_for_kills_child_no_orphan, test_cancelled_error_propagates_not_swallowed)."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "dc63e5b106b276df524750739c007afcb5f741c1176c02f1698e23a0ab4b5fae",
-      "bytes": 121,
-      "head": "Contracts: 2 kept, 0 broken. Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT"
+      "sha256": "6fb37a2e0e2250cf80dcb4b07b471811ca3f32a34e39ac76d3291426534dee1b",
+      "bytes": 123,
+      "head": "Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)"
     }
   },
   "composite_score": 100.0,
