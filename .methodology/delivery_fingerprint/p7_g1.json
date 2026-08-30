@@ -13,15 +13,7 @@
     "modules_outside_every_contract": []
   },
   "coverage": {
-    "omit": [
-      "03-development/src/migrations/env.py",
-      "03-development/src/migrations/script.py.mako",
-      "03-development/src/migrations/versions/__init__.py",
-      "03-development/src/migrations/versions/v1_initial.py",
-      "03-development/src/migrations/versions/v2_tags.py",
-      "03-development/src/taskq_api/__main__.py",
-      "03-development/src/taskq_api/service/runner.py"
-    ],
+    "omit": [],
     "statements_measured": 13,
     "statements_omitted": 0
   },

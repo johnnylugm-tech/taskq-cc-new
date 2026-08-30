@@ -3,9 +3,9 @@
 # agent_score: 100.0 | threshold: 80.0
 
 ............................................F........................... [ 27%]
-........................................................................ [ 55%]
-........................................................................ [ 83%]
-...........................................                              [100%]
+........................................................................ [ 54%]
+........................................................................ [ 82%]
+..............................................                           [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487
   /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487: UserWarning: Skipping collection of '.hypothesis' directory - this usually means you've explicitly set the `norecursedirs` pytest config option, replacing rather than extending the default ignores.
@@ -25,8 +25,13 @@
 Name                                                         Stmts   Miss  Cover   Missing
 ------------------------------------------------------------------------------------------
 03-development/src/migrations/__init__.py                        0      0   100%
+03-development/src/migrations/env.py                            47      1    98%   172
+03-development/src/migrations/versions/__init__.py               0      0   100%
+03-development/src/migrations/versions/v1_initial.py            16      0   100%
+03-development/src/migrations/versions/v2_tags.py               16      0   100%
 03-development/src/migrations/versions/v3_split_results.py      18      0   100%
 03-development/src/taskq_api/__init__.py                         0      0   100%
+03-development/src/taskq_api/__main__.py                        24      2    92%   67-68
 03-development/src/taskq_api/api/__init__.py                     0      0   100%
 03-development/src/taskq_api/api/deps.py                        75      0   100%
 03-development/src/taskq_api/api/health.py                      27      0   100%
@@ -46,27 +51,28 @@ Name                                                         Stmts   Miss  Cover
 03-development/src/taskq_api/service/auth.py                    19      0   100%
 03-development/src/taskq_api/service/metrics.py                 12      0   100%
 03-development/src/taskq_api/service/ratelimit.py               10      0   100%
+03-development/src/taskq_api/service/runner.py                 135      0   100%
 03-development/src/taskq_api/service/runner_scheduler.py        95      0   100%
 ------------------------------------------------------------------------------------------
-TOTAL                                                          648      0   100%
+TOTAL                                                          886      3    99%
 Coverage JSON written to file .coverage.json
 
 
---------------------------------------------------------------------------------------------- benchmark: 4 tests ---------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                    Max                Mean             StdDev              Median                IQR              Outliers  OPS (Mops/s)            Rounds  Iterations
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.6476 (1.0)         420.6286 (1.0)       46.1321 (1.0)       5.0002 (1.0)       44.8381 (1.0)       1.1810 (1.18)    12477;21723       21.6769 (1.0)      200000         105
-test_benchmark_refill          183.3500 (4.20)      1,235.4500 (2.94)     195.8610 (4.25)     20.3220 (4.06)     191.6500 (4.27)      4.1500 (4.15)     8016;14936        5.1057 (0.24)     158958          20
-test_benchmark_hash_key        249.9999 (5.73)     13,540.9998 (32.19)    334.8926 (7.26)     65.9798 (13.20)    333.0001 (7.43)      1.0002 (1.0)      7443;71772        2.9860 (0.14)     181819           1
-test_benchmark_redact          290.9999 (6.67)      9,750.0001 (23.18)    357.1774 (7.74)     83.4955 (16.70)    334.0001 (7.45)     41.9998 (41.99)     4386;4386        2.7997 (0.13)     145455           1
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                   Max                Mean              StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.5636 (1.0)        189.0182 (1.0)       44.9900 (1.0)        3.6235 (1.0)       44.3182 (1.0)       0.3818 (1.0)     3734;15344       22.2271 (1.0)      198334         110
+test_benchmark_refill          179.2000 (4.11)     1,650.0000 (8.73)     192.9738 (4.29)      25.9910 (7.17)     191.6000 (4.32)      4.2000 (11.00)    2805;9206        5.1821 (0.23)     193536          10
+test_benchmark_hash_key        247.9000 (5.69)     1,089.6000 (5.76)     269.2187 (5.98)      18.3008 (5.05)     266.6500 (6.02)      8.3500 (21.87)    4225;5870        3.7145 (0.17)     170213          20
+test_benchmark_redact          290.9997 (6.68)     6,333.0003 (33.50)    367.8738 (8.18)     104.6188 (28.87)    375.0001 (8.46)     41.0000 (107.38)   1812;2620        2.7183 (0.12)     151884           1
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
 =========================== short test summary info ============================
 FAILED 03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout
-1 failed, 258 passed, 3 warnings in 27.43s
+1 failed, 261 passed, 3 warnings in 28.30s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
