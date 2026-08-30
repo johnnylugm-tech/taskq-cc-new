@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-05",
+  "fr_id": "FR-06",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "All checks passed!\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.137}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788081566232\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.145}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 23,
+      "tests_passed": 5,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 23 items; 03-development/tests/test_fr05.py .... (4 passed); 03-development/tests/test_fr03.py ......... (9 passed); 03-development/tests/test_fr04.py .......... (10 passed); 23 passed, 2 warnings in 2.02s. Coverage deps.py: 100% (75/75 statements).",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
+      "tool_evidence": "5 passed, 2 warnings in 0.48s\nName                                                 Stmts   Miss  Cover\n------------------------------------------------------------------------\n03-development/src/taskq_api/repository/session.py      48      0   100%\n------------------------------------------------------------------------\nTOTAL                                                   48      0   100%",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-06.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-05",
+      "coverage_scope_fr": "FR-06",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken.",
+      "tool_evidence": "Contracts: 2 kept, 0 broken.\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "05e0c55ebc13481a8e8ae9b1c0884a183cfa7c8ccffe93f3ac316349462b989c",
-      "bytes": 135,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.137}}"
+      "sha256": "2c9b32844511abc733cec59dcc80ee2ee50e94d7eb22548dd1bc0bd22e776622",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788081566232\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.145}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9ffe89fd6861176cb1c06483629e103f166c42f6526ed50a3b0d4eb39fbac3bf",
-      "bytes": 259,
-      "head": "collected 23 items; 03-development/tests/test_fr05.py .... (4 passed); 03-development/tests/test_fr03.py ......... (9 passed); 03-development/tests/test_fr04.py .......... (10 passed); 23 passed, 2 warnings in 2.02s. Coverage deps.py: 100% (75/75 statements)."
+      "sha256": "3bcefae25e6424a1e6cc4f7c14e3e9105d00ba05b6a07b6c03106af7e8c62b6c",
+      "bytes": 394,
+      "head": "5 passed, 2 warnings in 0.48s\nName                                                 Stmts   Miss  Cover\n------------------------------------------------------------------------\n03-development/src/taskq_api/repository/session.py      48      0   100%\n------------------------------------------------------------------------\nTOTAL                                                   48      0   100%"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "a40390e624cdbeb09c28745c01eaa7736f58a06c47b43658fe2aac9b369d8022",
-      "bytes": 122,
-      "head": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken."
+      "sha256": "a9ff8c5affc43f204d87a06a71499fa14f71617b071e2d960ccf995500dc2310",
+      "bytes": 28,
+      "head": "Contracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
