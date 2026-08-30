@@ -1,5 +1,5 @@
 # Harness-executed: ruff
 # returncode: 0
-# agent_score: 100.0 | threshold: 90.0
+# agent_score: 100.0 | threshold: 100.0
 
 []

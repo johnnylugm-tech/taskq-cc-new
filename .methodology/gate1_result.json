@@ -1,7 +1,7 @@
 {
   "gate": 1,
-  "phase": 5,
-  "fr_id": "FR-10",
+  "phase": 7,
+  "fr_id": "FR-01",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,41 +9,41 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "$ python3 -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!\n(exit 0, 0 violations)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.164}}",
+      "tool_evidence": "$ python3 -m pyright 03-development/src/ --outputjson\n{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.235}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 79,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 6 items\n03-development/tests/test_fr10.py ......                                 [100%]\n======================== 6 passed, 2 warnings in 0.42s =========================\nCoverage: percent=100.0 (errors.py: 13/13 statements)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_evidence": "$ coverage run -m pytest test_fr01.py test_fr02.py test_fr08.py\ncollected 79 items\n03-development/tests/test_fr01.py ........ [ 10%]\n03-development/tests/test_fr02.py ................................. [ 51%]\n03-development/tests/test_fr08.py ...................................... [100%]\n79 passed, 2 warnings in 6.16s\ncoverage json --include=03-development/src/taskq_api/api/tasks.py: totals percent_covered=100.0 (53/53 statements, 0 missing). spec_cov=6/6 required tests present and passing -> 100%.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-01",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken.",
+      "tool_evidence": "$ PYTHONPATH=src lint-imports\nAnalyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api -> repository -> models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken. (exit 0)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
   },
-  "enforcer_sha": "36d8c1d651aa297b93d6532a41491a596f806299",
+  "enforcer_sha": "90e9ef48e4be6ab0b6de004fac8398d5e266f1ae",
   "enforcer_surface": {
-    "core/quality_gate": "9927b330ba22a01b242664a3b6136dbf73394536",
-    "harness/harness_bridge.py": "10a4db9ed5ae3fef97bb92ed97f1655d0dc05bfe",
+    "core/quality_gate": "430555a4d5c7d7a714e9576715732693e5298cb4",
+    "harness/harness_bridge.py": "1fb38bfb2c98d807207e146118c117d8b34fc9dd",
     "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
   },
   "evidence_digest": {
@@ -78,30 +78,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
-      "bytes": 18,
-      "head": "All checks passed!"
+      "sha256": "3dede9ece629914be46b6677ffa213361426de3ad5bf8eb2c8c8aba2b2d37484",
+      "bytes": 122,
+      "head": "$ python3 -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!\n(exit 0, 0 violations)"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "79381aaac69aa8ed2b032aecd0b96d48c62e64d086fbb5cb4b7d5146b918826e",
-      "bytes": 123,
-      "head": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.164}}"
+      "sha256": "68c5a5abb5bae2cf7a34785eddb31199cbd9834dc9b2d4de30f506a86c5dccd8",
+      "bytes": 215,
+      "head": "$ python3 -m pyright 03-development/src/ --outputjson\n{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.235}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5b29aadeacb949814b522d02596fe2b864defc9fdb966d6c7ff035ce03b274a5",
-      "bytes": 232,
-      "head": "collected 6 items\n03-development/tests/test_fr10.py ......                                 [100%]\n======================== 6 passed, 2 warnings in 0.42s =========================\nCoverage: percent=100.0 (errors.py: 13/13 statements)"
+      "sha256": "f2183ec994c9f287c862d0272a0b899b152bb13e3813bcb009e32ab74bf05b17",
+      "bytes": 502,
+      "head": "$ coverage run -m pytest test_fr01.py test_fr02.py test_fr08.py\ncollected 79 items\n03-development/tests/test_fr01.py ........ [ 10%]\n03-development/tests/test_fr02.py ................................. [ 51%]\n03-development/tests/test_fr08.py ...................................... [100%]\n79 passed, 2 warnings in 6.16s\ncoverage json --include=03-development/src/taskq_api/api/tasks.py: totals percent_covered=100.0 (53/53 statements, 0 missing). spec_cov=6/6 required tests present and passing -> 100%."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "4d3493c794d74c72e835c1027b9ca3f6a0090606c974b49aa5c11298bbbf8276",
-      "bytes": 255,
-      "head": "Analyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken."
+      "sha256": "58a3403bb715d68184aa168b79fa7bc1ff9a84c275975767912c1b487fddcdd7",
+      "bytes": 292,
+      "head": "$ PYTHONPATH=src lint-imports\nAnalyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api -> repository -> models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken. (exit 0)"
     }
   },
   "composite_score": 100.0,

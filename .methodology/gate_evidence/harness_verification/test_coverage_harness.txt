@@ -1,8 +1,8 @@
 # Harness-executed: pytest-cov
-# returncode: 0
+# returncode: 1
 # agent_score: 100.0 | threshold: 80.0
 
-........................................................................ [ 27%]
+............................................F........................... [ 27%]
 ........................................................................ [ 55%]
 ........................................................................ [ 83%]
 ...........................................                              [100%]
@@ -53,18 +53,20 @@ Coverage JSON written to file .coverage.json
 
 
 --------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                    Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+Name (time in ns)                   Min                    Max                Mean              StdDev              Median                IQR            Outliers  OPS (Mops/s)            Rounds  Iterations
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.5783 (1.0)         443.4222 (1.0)       47.4252 (1.0)       3.7933 (1.0)       47.7890 (1.0)       3.0556 (1.0)      3026;2738       21.0859 (1.0)      196695         109
-test_benchmark_refill          179.1981 (4.11)        843.7521 (1.90)     196.2834 (4.14)     16.6778 (4.40)     197.9002 (4.14)     14.5490 (4.76)     2664;2240        5.0947 (0.24)     181817          20
-test_benchmark_redact          250.0019 (5.74)     16,542.0352 (37.31)    365.3265 (7.70)     99.6885 (26.28)    374.9738 (7.85)     41.0364 (13.43)    1383;2922        2.7373 (0.13)     146349           1
-test_benchmark_hash_key        252.0974 (5.78)      1,291.7008 (2.91)     275.1578 (5.80)     19.3594 (5.10)     272.9008 (5.71)      8.3004 (2.72)     3396;4564        3.6343 (0.17)     158957          20
+test_benchmark_retry_after      43.7500 (1.0)         561.2500 (1.0)       48.1647 (1.0)        5.9772 (1.0)       46.2500 (1.0)       4.1700 (1.0)    13682;11617       20.7621 (1.0)      191976         100
+test_benchmark_refill          183.3000 (4.19)      3,050.0000 (5.43)     207.8887 (4.32)      27.6601 (4.63)     200.0000 (4.32)     16.6000 (3.98)   10555;10555        4.8103 (0.23)     198334          10
+test_benchmark_hash_key        250.0000 (5.71)     37,833.0000 (67.41)    361.7885 (7.51)     141.6579 (23.70)    334.0000 (7.22)     42.0000 (10.07)    918;9523        2.7640 (0.13)     144593           1
+test_benchmark_redact          291.0000 (6.65)     20,167.0000 (35.93)    400.6021 (8.32)     114.4362 (19.15)    375.0000 (8.11)     41.9999 (10.07)  4531;10950        2.4962 (0.12)     137137           1
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-259 passed, 3 warnings in 28.45s
+=========================== short test summary info ============================
+FAILED 03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout
+1 failed, 258 passed, 3 warnings in 27.72s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 
