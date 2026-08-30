@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-08",
+  "fr_id": "FR-09",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!\n",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788082216568\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}",
+      "tool_evidence": "{\"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.151}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 82,
+      "tests_passed": 8,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "82 passed, 2 warnings in 6.09s. Coverage for FR-08 source files (runner.py, tasks.py): 100.0% (188/188 statements covered).",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
+      "tool_evidence": "collected 8 items\n03-development/tests/test_fr09.py ........ [100%]\n8 passed, 2 warnings in 0.44s\nCoverage: health.py 100% (27/27 stmts), metrics.py 100% (12/12 stmts)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-08",
+      "coverage_scope_fr": "FR-09",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken. no_circular_dependencies KEPT. taskq_api_self_check KEPT.",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "8a059cc6f331ba41769e75426f5864b1ec44f1a02fbf9d9d3ff711d1b3a10856",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1788082216568\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.126}}"
+      "sha256": "0f44bb75fd92471e1d0885431ffe9cd87459db605460d8959d67524189292c79",
+      "bytes": 113,
+      "head": "{\"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.151}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "3b6e8ba37965c1f7150dfea24b8f72287739526d47958d6845897e51c98dda88",
-      "bytes": 123,
-      "head": "82 passed, 2 warnings in 6.09s. Coverage for FR-08 source files (runner.py, tasks.py): 100.0% (188/188 statements covered)."
+      "sha256": "4be4109e63ef058416a568453f234ef7a9bf5a8bfbf33b970a57b8d89dc279ec",
+      "bytes": 167,
+      "head": "collected 8 items\n03-development/tests/test_fr09.py ........ [100%]\n8 passed, 2 warnings in 0.44s\nCoverage: health.py 100% (27/27 stmts), metrics.py 100% (12/12 stmts)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "d4ddbfe7f1a234f6bab0f65e71644be21cc6a06162ea496a19b5dd7757cd2e2f",
-      "bytes": 122,
-      "head": "Analyzed 23 files, 17 dependencies. Contracts: 2 kept, 0 broken. no_circular_dependencies KEPT. taskq_api_self_check KEPT."
+      "sha256": "dae66c31c0cab52f6463d9e373e86345d3d7b1ab6268aa4ff42940ca9e23e6f6",
+      "bytes": 120,
+      "head": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,

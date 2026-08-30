@@ -4,7 +4,7 @@
 # scope: this FR's own modules, per fr_module_traceability
 # executed/coverable: 39/39
 # per-fr coverage: 100.0%
-# whole-project coverage: 100.0% (see .methodology/gate_evidence/harness_verification/test_coverage_harness.txt)
+# whole-project coverage: 99.0% (see .methodology/gate_evidence/harness_verification/test_coverage_harness.txt)
 #
 # files in scope:
 #   03-development/src/taskq_api/api/health.py
