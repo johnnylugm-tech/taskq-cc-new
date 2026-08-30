@@ -1,0 +1,261 @@
+{
+  "generated_at": "2026-08-26T02:57:39.637510+00:00",
+  "git_sha": "b503b590f2cb6d3683fd93689db8e09c6422a543",
+  "language": "python",
+  "high_risk": [
+    {
+      "path": "03-development/src/taskq_api/api/deps.py",
+      "name": "deps",
+      "reasons": [
+        "threat_model:T-03 elevation_of_privilege",
+        "threat_model:T-04 information_disclosure"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/api/tasks.py",
+      "name": "tasks",
+      "reasons": [
+        "threat_model:T-02 tampering"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/errors.py",
+      "name": "errors",
+      "reasons": [
+        "threat_model:T-09 repudiation"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/rate_repo.py",
+      "name": "rate_repo",
+      "reasons": [
+        "threat_model:T-10 denial_of_service"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/task_repo.py",
+      "name": "task_repo",
+      "reasons": [
+        "threat_model:T-05 tampering"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/service/auth.py",
+      "name": "auth",
+      "reasons": [
+        "threat_model:T-01 spoofing",
+        "threat_model:T-08 information_disclosure"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/service/runner.py",
+      "name": "runner",
+      "reasons": [
+        "threat_model:T-06 elevation_of_privilege",
+        "threat_model:T-07 denial_of_service"
+      ]
+    },
+    {
+      "path": "migrations.versions.v3_split_results",
+      "name": "migrations.versions",
+      "reasons": [
+        "declared"
+      ]
+    },
+    {
+      "path": "taskq_api.repository.session",
+      "name": "taskq_api.repository",
+      "reasons": [
+        "declared"
+      ]
+    },
+    {
+      "path": "taskq_api.service.auth",
+      "name": "taskq_api.service",
+      "reasons": [
+        "declared"
+      ]
+    },
+    {
+      "path": "taskq_api.service.runner",
+      "name": "taskq_api.service",
+      "reasons": [
+        "declared"
+      ]
+    }
+  ],
+  "standard": [
+    {
+      "path": "03-development/src/migrations/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/migrations/env.py",
+      "name": "env"
+    },
+    {
+      "path": "03-development/src/migrations/versions/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/migrations/versions/v1_initial.py",
+      "name": "v1_initial"
+    },
+    {
+      "path": "03-development/src/migrations/versions/v2_tags.py",
+      "name": "v2_tags"
+    },
+    {
+      "path": "03-development/src/migrations/versions/v3_split_results.py",
+      "name": "v3_split_results"
+    },
+    {
+      "path": "03-development/src/taskq_api/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/__main__.py",
+      "name": "__main__"
+    },
+    {
+      "path": "03-development/src/taskq_api/api/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/api/health.py",
+      "name": "health"
+    },
+    {
+      "path": "03-development/src/taskq_api/api/metrics.py",
+      "name": "metrics"
+    },
+    {
+      "path": "03-development/src/taskq_api/app.py",
+      "name": "app"
+    },
+    {
+      "path": "03-development/src/taskq_api/models/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/models/schemas.py",
+      "name": "schemas"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/key_repo.py",
+      "name": "key_repo"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/orm.py",
+      "name": "orm"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/session.py",
+      "name": "session"
+    },
+    {
+      "path": "03-development/src/taskq_api/service/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/service/metrics.py",
+      "name": "metrics"
+    },
+    {
+      "path": "03-development/src/taskq_api/service/ratelimit.py",
+      "name": "ratelimit"
+    },
+    {
+      "path": "03-development/src/taskq_api/service/runner_scheduler.py",
+      "name": "runner_scheduler"
+    }
+  ],
+  "mutation_survivors": [],
+  "integration_coverage": {
+    "gate": 2,
+    "score": 83.0
+  },
+  "threat_model": [
+    {
+      "threat_id": "T-01",
+      "category": "spoofing",
+      "description": "Attacker presents a forged X-API-Key header to impersonate a legitimate client.",
+      "owner_module": "taskq_api.service.auth",
+      "boundary": "TB-01"
+    },
+    {
+      "threat_id": "T-02",
+      "category": "tampering",
+      "description": "Malformed task body (oversize name, control chars, SQL fragments) corrupts persisted state or is logged unsafely.",
+      "owner_module": "taskq_api.api.tasks",
+      "boundary": "TB-01"
+    },
+    {
+      "threat_id": "T-03",
+      "category": "elevation_of_privilege",
+      "description": "Token with 'read' scope successfully invokes 'admin'-only DELETE /v1/tasks/{id}.",
+      "owner_module": "taskq_api.api.deps",
+      "boundary": "TB-02"
+    },
+    {
+      "threat_id": "T-04",
+      "category": "information_disclosure",
+      "description": "403 response body reveals whether a task id exists, enabling enumeration of internal state.",
+      "owner_module": "taskq_api.api.deps",
+      "boundary": "TB-02"
+    },
+    {
+      "threat_id": "T-05",
+      "category": "tampering",
+      "description": "SQL injection via string concatenation reaches the database.",
+      "owner_module": "taskq_api.repository.task_repo",
+      "boundary": "TB-03"
+    },
+    {
+      "threat_id": "T-06",
+      "category": "elevation_of_privilege",
+      "description": "Attacker injects shell metacharacters via the task command field, escaping the intended command.",
+      "owner_module": "taskq_api.service.runner",
+      "boundary": "TB-04"
+    },
+    {
+      "threat_id": "T-07",
+      "category": "denial_of_service",
+      "description": "Long-running task is killed by SIGKILL but the child leaves descendants running (orphan process).",
+      "owner_module": "taskq_api.service.runner",
+      "boundary": "TB-04"
+    },
+    {
+      "threat_id": "T-08",
+      "category": "information_disclosure",
+      "description": "Subprocess stdout/stderr contains an API key, bearer token, or DSN password that is then returned via /v1/tasks/{id}/runs or logged.",
+      "owner_module": "taskq_api.service.auth",
+      "boundary": "TB-04"
+    },
+    {
+      "threat_id": "T-09",
+      "category": "repudiation",
+      "description": "Operator denies issuing a destructive action because no correlation_id links the request to server logs.",
+      "owner_module": "taskq_api.errors",
+      "boundary": "TB-01"
+    },
+    {
+      "threat_id": "T-10",
+      "category": "denial_of_service",
+      "description": "Service holds a row-level lock on rate_buckets longer than the request budget, starving other workers.",
+      "owner_module": "taskq_api.repository.rate_repo",
+      "boundary": "TB-03"
+    }
+  ],
+  "sources": {
+    "declared": 4,
+    "crg_hubs": 0,
+    "mutation_survivors": 0,
+    "integration_coverage": true,
+    "threat_model": 10
+  }
+}

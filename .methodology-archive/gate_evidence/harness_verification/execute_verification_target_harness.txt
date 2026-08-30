@@ -1,0 +1,152 @@
+# Harness-executed: system-verification
+# returncode: 0
+# agent_score: 100.0 | threshold: 100.0
+
+Python 3.11.15  [/Users/johnny/projects/taskq-cc-new/.venv/bin/python]  OK
+.venv/bin/python -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003
+All checks passed!
+.venv/bin/python -m pyright 03-development/src/
+0 errors, 0 warnings, 0 informations
+WARNING: there is a new pyright version available (v1.1.409 -> v1.1.411).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+
+unset TASKQ_DB_URL && .venv/bin/python -m pytest 03-development/tests -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+........................................................................ [ 83%]
+...........................................                              [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487: UserWarning: Skipping collection of '.hypothesis' directory - this usually means you've explicitly set the `norecursedirs` pytest config option, replacing rather than extending the default ignores.
+    warnings.warn(
+
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+03-development/tests/test_benchmarks.py::test_benchmark_get_by_id
+  03-development/tests/test_benchmarks.py:43: PytestBenchmarkWarning: Benchmark fixture was not used at all in this test!
+    def test_benchmark_get_by_id(benchmark):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------- coverage: platform darwin, python 3.11.15-final-0 ----------
+Name                                                       Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                       0      0   100%
+03-development/src/taskq_api/api/__init__.py                   0      0   100%
+03-development/src/taskq_api/api/deps.py                      75      0   100%
+03-development/src/taskq_api/api/health.py                    27      0   100%
+03-development/src/taskq_api/api/metrics.py                   10      0   100%
+03-development/src/taskq_api/api/tasks.py                     53      0   100%
+03-development/src/taskq_api/app.py                           82      0   100%
+03-development/src/taskq_api/errors.py                        13      0   100%
+03-development/src/taskq_api/models/__init__.py                0      0   100%
+03-development/src/taskq_api/models/schemas.py                39      0   100%
+03-development/src/taskq_api/repository/__init__.py            0      0   100%
+03-development/src/taskq_api/repository/key_repo.py           17      0   100%
+03-development/src/taskq_api/repository/orm.py                30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py          48      0   100%
+03-development/src/taskq_api/repository/session.py            48      0   100%
+03-development/src/taskq_api/repository/task_repo.py          52      0   100%
+03-development/src/taskq_api/service/__init__.py               0      0   100%
+03-development/src/taskq_api/service/auth.py                  19      0   100%
+03-development/src/taskq_api/service/metrics.py               12      0   100%
+03-development/src/taskq_api/service/ratelimit.py             10      0   100%
+03-development/src/taskq_api/service/runner_scheduler.py      95      0   100%
+----------------------------------------------------------------------------------------
+TOTAL                                                        630      0   100%
+Coverage JSON written to file .coverage.json
+
+
+---------------------------------------------------------------------------------------------- benchmark: 4 tests ---------------------------------------------------------------------------------------------
+Name (time in ns)                   Min                    Max                Mean              StdDev              Median                IQR              Outliers  OPS (Mops/s)            Rounds  Iterations
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_retry_after      43.8757 (1.0)         215.3452 (1.0)       47.8564 (1.0)        3.2797 (1.0)       47.9291 (1.0)       0.3714 (1.0)      5010;23346       20.8959 (1.0)       95621         113
+test_benchmark_refill          177.1026 (4.04)        835.4516 (3.88)     197.9512 (4.14)      15.9738 (4.87)     197.9002 (4.13)      4.1997 (11.31)    4870;30090        5.0518 (0.24)     157904          20
+test_benchmark_hash_key        250.0019 (5.70)     15,375.0298 (71.40)    347.1461 (7.25)      96.3975 (29.39)    333.9956 (6.97)     41.9677 (113.00)    2501;2501        2.8806 (0.14)     175193           1
+test_benchmark_redact          290.9801 (6.63)     11,917.0290 (55.34)    367.0167 (7.67)     101.0306 (30.80)    374.9738 (7.82)     41.0364 (110.49)    1228;2423        2.7247 (0.13)     115381           1
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+259 passed, 3 warnings in 27.88s
+unset TASKQ_DB_URL && .venv/bin/python -m pytest 03-development/tests/integration -q --tb=short --cov=03-development/src/taskq_api --cov-report=term-missing
+..................................                                       [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/_hypothesis_pytestplugin.py:487: UserWarning: Skipping collection of '.hypothesis' directory - this usually means you've explicitly set the `norecursedirs` pytest config option, replacing rather than extending the default ignores.
+    warnings.warn(
+
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------- coverage: platform darwin, python 3.11.15-final-0 ----------
+Name                                                       Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                       0      0   100%
+03-development/src/taskq_api/api/__init__.py                   0      0   100%
+03-development/src/taskq_api/api/deps.py                      75     10    87%   103, 217, 220-222, 283-284, 322, 373, 399
+03-development/src/taskq_api/api/health.py                    27      7    74%   120-126
+03-development/src/taskq_api/api/metrics.py                   10      0   100%
+03-development/src/taskq_api/api/tasks.py                     53      4    92%   175-183
+03-development/src/taskq_api/app.py                           82     11    87%   75, 158, 163, 166-167, 171-176, 179, 181, 276, 315
+03-development/src/taskq_api/errors.py                        13      2    85%   64, 116
+03-development/src/taskq_api/models/__init__.py                0      0   100%
+03-development/src/taskq_api/models/schemas.py                39      1    97%   43
+03-development/src/taskq_api/repository/__init__.py            0      0   100%
+03-development/src/taskq_api/repository/key_repo.py           17      8    53%   50-58, 68, 78-80
+03-development/src/taskq_api/repository/orm.py                30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py          48      0   100%
+03-development/src/taskq_api/repository/session.py            48      0   100%
+03-development/src/taskq_api/repository/task_repo.py          52      4    92%   45, 81-83
+03-development/src/taskq_api/service/__init__.py               0      0   100%
+03-development/src/taskq_api/service/auth.py                  19      4    79%   63, 91-93
+03-development/src/taskq_api/service/metrics.py               12      0   100%
+03-development/src/taskq_api/service/ratelimit.py             10      0   100%
+03-development/src/taskq_api/service/runner_scheduler.py      95     73    23%   52-61, 66, 79, 97-103, 133-173, 212-217, 222, 229, 245-254, 274-282, 302-306, 322-327
+----------------------------------------------------------------------------------------
+TOTAL                                                        630    124    80%
+Coverage JSON written to file .coverage.json
+
+34 passed, 2 warnings in 1.66s
+rm -f .sessi-work/verify_system.sqlite
+.venv/bin/python -m alembic upgrade head
+.venv/bin/python -m uvicorn taskq_api.app:app --host 127.0.0.1 --port 8765 --log-level warning &
+{"status":"ok"}{"status":"ok"}smoke: PASS
+.venv/bin/python -m alembic downgrade base
+.venv/bin/python -m alembic upgrade head
+downgrade → upgrade round-trip: PASS
+
+All verification steps passed.
+verify-system: PASS
+/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+migrate: TASKQ_DB_URL=sqlite:////Users/johnny/projects/taskq-cc-new/.sessi-work/verify_system.sqlite
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> v1_initial, v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Running upgrade v1_initial -> v2_tags, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running upgrade v2_tags -> v3_split_results, v3_split_results: split tasks.result_json into task_results.
+ERROR:    [Errno 48] error while attempting to bind on address ('127.0.0.1', 8765): address already in use
+kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade v3_split_results -> v2_tags, v3_split_results: split tasks.result_json into task_results.
+INFO  [alembic.runtime.migration] Running downgrade v2_tags -> v1_initial, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running downgrade v1_initial -> , v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> v1_initial, v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Running upgrade v1_initial -> v2_tags, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running upgrade v2_tags -> v3_split_results, v3_split_results: split tasks.result_json into task_results.

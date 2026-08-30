@@ -1,0 +1,1 @@
+{"framework_owned": true, "tool": "harness-trace", "note": "framework-owned — finalize-gate runs compute_trace_dimension(gate=2) and overwrites this score. Trace 4a=100% 4b=61.5% 4c=83.3% merged=61.5%."}

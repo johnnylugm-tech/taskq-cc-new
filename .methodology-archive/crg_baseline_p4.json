@@ -1,0 +1,52 @@
+{
+  "community_cohesion": {
+    "score": 88.9,
+    "healthy": 16,
+    "total": 18,
+    "total_all": 42,
+    "excluded_test_communities": 24,
+    "unhealthy": [
+      {
+        "name": "repository-rate",
+        "cohesion": 0.1698,
+        "size": 7,
+        "issues": [
+          "low_cohesion(0.17)"
+        ]
+      },
+      {
+        "name": "api-task",
+        "cohesion": 0.1905,
+        "size": 5,
+        "issues": [
+          "low_cohesion(0.19)"
+        ]
+      }
+    ],
+    "_cohesion_threshold": 0.2,
+    "_community_oversized": 50,
+    "_community_min_size": 5,
+    "_extra_excludes": [
+      "harness/.claude/*",
+      "harness/tests/*"
+    ],
+    "excludes_matched": {
+      "harness/.claude/*": 0,
+      "harness/tests/*": 0
+    },
+    "excludes_files_matched": {
+      "harness/.claude/*": 0,
+      "harness/tests/*": 0
+    }
+  },
+  "large_functions_critical": [],
+  "large_functions_penalty": 0,
+  "architecture_score": 88.9,
+  "_source": "framework-independent",
+  "_graph_files": 47,
+  "_source_files": 47,
+  "_unparsed_files": [],
+  "_build_type": "update",
+  "_baseline_sha": "47162d986890a6352c0106ae396fcadfd3aa0ee0",
+  "_baseline_phase": 4
+}

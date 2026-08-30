@@ -1,0 +1,44 @@
+/Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..........................                                               [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== NFR-10 coverage regression: 70.7% < 80.0% ===================
+
+--------- coverage: platform darwin, python 3.11.15-final-0 ----------
+Name                                                         Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------------
+03-development/src/migrations/__init__.py                        0      0   100%
+03-development/src/migrations/versions/v3_split_results.py      18     18     0%   32-150
+03-development/src/taskq_api/__init__.py                         0      0   100%
+03-development/src/taskq_api/api/__init__.py                     0      0   100%
+03-development/src/taskq_api/api/deps.py                        75     10    87%   103, 217, 220-222, 283-284, 322, 373, 399
+03-development/src/taskq_api/api/health.py                      27      7    74%   120-126
+03-development/src/taskq_api/api/metrics.py                     10      0   100%
+03-development/src/taskq_api/api/tasks.py                       53      4    92%   175-183
+03-development/src/taskq_api/app.py                             82     11    87%   75, 158, 163, 166-167, 171-176, 179, 181, 276, 315
+03-development/src/taskq_api/errors.py                          13      2    85%   64, 116
+03-development/src/taskq_api/models/__init__.py                  0      0   100%
+03-development/src/taskq_api/models/schemas.py                  39      1    97%   43
+03-development/src/taskq_api/repository/__init__.py              0      0   100%
+03-development/src/taskq_api/repository/key_repo.py             17      8    53%   50-58, 68, 78-80
+03-development/src/taskq_api/repository/orm.py                  30      0   100%
+03-development/src/taskq_api/repository/rate_repo.py            48      0   100%
+03-development/src/taskq_api/repository/session.py              48     48     0%   30-218
+03-development/src/taskq_api/repository/task_repo.py            52      4    92%   45, 81-83
+03-development/src/taskq_api/service/__init__.py                 0      0   100%
+03-development/src/taskq_api/service/auth.py                    19      4    79%   63, 91-93
+03-development/src/taskq_api/service/metrics.py                 12      0   100%
+03-development/src/taskq_api/service/ratelimit.py               10      0   100%
+03-development/src/taskq_api/service/runner_scheduler.py        95     73    23%   52-61, 66, 79, 97-103, 133-173, 212-217, 222, 229, 245-254, 274-282, 302-306, 322-327
+------------------------------------------------------------------------------------------
+TOTAL                                                          648    190    71%
+Coverage JSON written to file .coverage.json
+
+26 passed, 1 warning in 0.62s

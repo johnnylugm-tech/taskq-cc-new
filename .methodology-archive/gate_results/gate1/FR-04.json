@@ -1,0 +1,95 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-04",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed!",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787571023186\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 15, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.599}}",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 19,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "======================== 19 passed, 7 warnings in 0.43s ======================== coverage 100% on 03-development/src/taskq_api/api/deps.py (covered_lines: 50/50, num_statements: 50, percent_covered: 100.0)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-04",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "Analyzed 349 files, 3272 dependencies. Contracts: 3 kept, 0 broken. EXIT=0",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "b03b9f753510c4167c084103b15a4da52fdf8b08",
+  "enforcer_surface": {
+    "core/quality_gate": "175b5ec151c9eebc0a2ffe48233e5a39ef4d5950",
+    "harness/harness_bridge.py": "699b72ebc056ae2529151f487a857bc953e78c29",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "5230f47bdb0cbfa8ec558dee2aae37f6d05fb8db1ffc994d37c74c44b044fedd",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787571023186\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 15, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.599}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "76b78be0b6308aeb24585ada9f5eb7d617b30d6739e395e6d85f590f989156bf",
+      "bytes": 205,
+      "head": "======================== 19 passed, 7 warnings in 0.43s ======================== coverage 100% on 03-development/src/taskq_api/api/deps.py (covered_lines: 50/50, num_statements: 50, percent_covered: 100.0)"
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f27778802886c43aee55cec83193901921818cf12d1baf854ed17212387a7728",
+      "bytes": 74,
+      "head": "Analyzed 349 files, 3272 dependencies. Contracts: 3 kept, 0 broken. EXIT=0"
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": []
+  }
+}

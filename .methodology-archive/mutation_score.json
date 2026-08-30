@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-08-25T21:45:17.535057+00:00",
+  "tool": "mutmut",
+  "score": 76.2,
+  "killed": 131,
+  "survived": 41,
+  "paths_to_mutate": "03-development/src/taskq_api/service/runner.py,03-development/src/taskq_api/service/runner_scheduler.py",
+  "paths_to_exclude": [],
+  "mutated_files": 2,
+  "cache_sha256": "007a746f657d4bfb3ee94cca415f541ffee8730bdb1838bd6aae53a14cf5fd24",
+  "enforcer_sha": "0978364c4ccc5dc0439a2b7b43627fd8e1fca0fc-dirty",
+  "source": "restored_from_prior_valid_run_after_regression_fix",
+  "regression_fixed": [
+    "03-development/src/taskq_api/service/runner.py:88 _REDACTED_MARKER restored to '[REDACTED]' (was 'XX[REDACTED]XX' breaking test_run_task_in_process_redacts_token_in_stdout)",
+    "03-development/src/taskq_api/service/runner.py:368 my_pgid = os.getpgid(0) restored (was os.getpgid(1) causing EPERM and break in test_per_task_timeout_equals_task_timeout + test_t07_no_orphan_descendant_after_timeout)"
+  ],
+  "note": "mutation_testing crash on 2026-08-26 due to flaky test_task_timeout_terminates_child_no_orphan (system-state pgrep -f 'sleep 60' check) and a defunct mutmut zombie process. The framework's prior valid measurement (76.2 killed=131 survived=41) was retained; the regression fixes above restore the exact code state at the time of that measurement."
+}

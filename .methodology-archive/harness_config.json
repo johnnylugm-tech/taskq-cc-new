@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "values": {
+    "phase_truth_threshold": 70.0
+  },
+  "features": {
+    "mutation_testing": true
+  },
+  "crg_excludes": [
+    "harness/.claude/*",
+    "harness/tests/*"
+  ],
+  "crg_cohesion_healthy": 0.19,
+  "fr_traceability": {
+    "FR-01": {
+      "scope_layers": ["api", "service", "repository", "models"],
+      "high_risk": false
+    },
+    "FR-02": {
+      "scope_layers": ["service", "repository"],
+      "high_risk": true
+    },
+    "FR-07": {
+      "scope_layers": ["repository", "models"],
+      "high_risk": true
+    }
+  },
+  "mutation_scope": {
+    "FR-08": {
+      "paths_to_mutate": [
+        "03-development/src/taskq_api/service/runner.py",
+        "03-development/src/taskq_api/service/tasks.py"
+      ],
+      "scope_layers": ["service", "repository"],
+      "justification": "FR-08 owns async subprocess execution + graceful drain — the highest-risk business-logic surface in the project."
+    }
+  },
+  "coverage_targets": {
+    "min_total_line_pct": 100,
+    "integration_min_pct": 80
+  },
+  "performance": {
+    "p95_budget_ms": 30,
+    "benchmark_seed_rows": 10000
+  }
+}

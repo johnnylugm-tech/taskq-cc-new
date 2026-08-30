@@ -1,0 +1,95 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-01",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed!",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787565340677\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 9, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.42}}",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 8,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 8 items\n\n03-development/tests/test_fr01.py ........                               [100%]\n\n======================== 8 passed, 9 warnings in 0.25s =========================\nCoverage: 100.0% for 03-development/src/taskq_api/api/tasks.py (35/35 statements)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-01",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "=============\nImport Linter\n=============\n\nContracts\n---------\n\nAnalyzed 9 files, 4 dependencies.\n---------------------------------\n\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken.",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "b03b9f753510c4167c084103b15a4da52fdf8b08",
+  "enforcer_surface": {
+    "core/quality_gate": "175b5ec151c9eebc0a2ffe48233e5a39ef4d5950",
+    "harness/harness_bridge.py": "699b72ebc056ae2529151f487a857bc953e78c29",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "aa4129849df301ce60ca2512ff112acd46f51eff419ec1056fc1cc57c60f4b8d",
+      "bytes": 184,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787565340677\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 9, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.42}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "0f55e2673c93af5aed467b868edf20f67968f223bbce079f681de253254b71e2",
+      "bytes": 405,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 8 items\n\n03-development/tests/test_fr01.py ........                               [100%]\n\n======================== 8 passed, 9 warnings in 0.25s =========================\nCoverage: 100.0% for 03-development/src/taskq_api/api/tasks.py (35/35 statements)"
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "c9279fe0ae748e478d08ca934fafa742c59c8487055dccc940d7202988ca173a",
+      "bytes": 218,
+      "head": "=============\nImport Linter\n=============\n\nContracts\n---------\n\nAnalyzed 9 files, 4 dependencies.\n---------------------------------\n\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken."
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": []
+  }
+}

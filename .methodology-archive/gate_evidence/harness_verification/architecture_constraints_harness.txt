@@ -1,0 +1,19 @@
+# Harness-executed: import-linter
+# returncode: 0
+# agent_score: 100.0 | threshold: 100.0
+
+=============
+Import Linter
+=============
+
+---------
+Contracts
+---------
+
+Analyzed 23 files, 17 dependencies.
+-----------------------------------
+
+no_circular_dependencies KEPT
+taskq_api_self_check KEPT
+
+Contracts: 2 kept, 0 broken.

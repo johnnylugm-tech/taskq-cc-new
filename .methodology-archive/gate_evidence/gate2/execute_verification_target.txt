@@ -1,0 +1,30 @@
+03-development/src/taskq_api/service/auth.py              19      4    79%   60, 88-90
+03-development/src/taskq_api/service/metrics.py           12      0   100%
+03-development/src/taskq_api/service/ratelimit.py         10      0   100%
+03-development/src/taskq_api/service/runner.py           208    117    44%   150, 154, 159, 163-169, 187-190, 233, 236-239, 251-256, 284, 296-297, 328-340, 361-373, 421, 430-440, 477-485, 494-495, 570-579, 584, 597, 615-621, 651-691, 730-735, 740, 747, 763-772, 792-800, 820-824, 840-845
+------------------------------------------------------------------------------------
+TOTAL                                                    773    223    71%
+26 passed, 1 warning in 0.50s
+python3 -m alembic upgrade head
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+python3 -m uvicorn taskq_api.app:app --host 127.0.0.1 --port 8765 --log-level warning &
+ERROR:    [Errno 48] error while attempting to bind on address ('127.0.0.1', 8765): address already in use
+{"status":"ok"}{"status":"ok"}kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
+smoke: PASS
+python3 -m alembic downgrade base
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade v3_split_results -> v2_tags, v3_split_results: split tasks.result_json into task_results.
+INFO  [alembic.runtime.migration] Running downgrade v2_tags -> v1_initial, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running downgrade v1_initial -> , v1_initial: initial schema.
+python3 -m alembic upgrade head
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> v1_initial, v1_initial: initial schema.
+INFO  [alembic.runtime.migration] Running upgrade v1_initial -> v2_tags, v2_tags: add tags + task_tags + tasks.name unique index.
+INFO  [alembic.runtime.migration] Running upgrade v2_tags -> v3_split_results, v3_split_results: split tasks.result_json into task_results.
+downgrade → upgrade round-trip: PASS
+
+All verification steps passed.
+verify-system: PASS

@@ -1,0 +1,255 @@
+{
+  "version": "1.0",
+  "created_at": "2026-08-24",
+  "phase": 2,
+  "project": "taskq-api",
+  "layers": [
+    {
+      "name": "api",
+      "modules": [
+        {
+          "name": "taskq_api.api.deps"
+        },
+        {
+          "name": "taskq_api.api.tasks"
+        },
+        {
+          "name": "taskq_api.api.health"
+        },
+        {
+          "name": "taskq_api.errors"
+        },
+        "taskq_api.api",
+        "taskq_api.api.metrics"
+      ],
+      "allowed_dependencies": [
+        "service"
+      ]
+    },
+    {
+      "name": "service",
+      "modules": [
+        {
+          "name": "taskq_api.service.runner"
+        },
+        {
+          "name": "taskq_api.service.auth"
+        },
+        {
+          "name": "taskq_api.service.ratelimit"
+        },
+        {
+          "name": "taskq_api.service.metrics"
+        },
+        "taskq_api.service",
+        "taskq_api.service.runner_scheduler"
+      ],
+      "allowed_dependencies": [
+        "repository"
+      ]
+    },
+    {
+      "name": "repository",
+      "modules": [
+        {
+          "name": "taskq_api.repository.session"
+        },
+        {
+          "name": "taskq_api.repository.task_repo"
+        },
+        {
+          "name": "taskq_api.repository.key_repo"
+        },
+        {
+          "name": "taskq_api.repository.rate_repo"
+        },
+        "taskq_api.repository",
+        "taskq_api.repository.orm"
+      ],
+      "allowed_dependencies": [
+        "models"
+      ]
+    },
+    {
+      "name": "models",
+      "modules": [
+        {
+          "name": "taskq_api.models.schemas"
+        },
+        "taskq_api",
+        "taskq_api.app",
+        "taskq_api.models",
+        "taskq_api.__main__",
+        "migrations",
+        "migrations.env",
+        "migrations.versions",
+        "migrations.versions.v1_initial",
+        "migrations.versions.v2_tags",
+        "migrations.versions.v3_split_results"
+      ],
+      "allowed_dependencies": []
+    }
+  ],
+  "dependencies": {
+    "api": [
+      "service"
+    ],
+    "service": [
+      "repository"
+    ],
+    "repository": [
+      "models"
+    ]
+  },
+  "quality_targets": {
+    "max_complexity": 10,
+    "min_coverage": 100,
+    "max_coupling": 0.3
+  },
+  "nfr_dimension_mapping": {
+    "NFR-01": "performance",
+    "NFR-02": "security",
+    "NFR-03": "error_handling",
+    "NFR-04": "security",
+    "NFR-05": "documentation",
+    "NFR-06": "architecture_constraints",
+    "NFR-07": "license_compliance",
+    "NFR-08": "mutation_testing",
+    "NFR-09": "test_assertion_quality",
+    "NFR-10": "integration_coverage",
+    "NFR-11": "readability",
+    "NFR-12": "execute_verification_target"
+  },
+  "nfr_traceability": {
+    "NFR-01": {
+      "type": "performance",
+      "dimension": "performance",
+      "target": "p95 < 30ms",
+      "module": "taskq_api.api.tasks"
+    },
+    "NFR-02": {
+      "type": "security",
+      "dimension": "security",
+      "target": "0 bandit HIGH/MEDIUM; 0 grep hits for shell=True|eval(|exec(",
+      "module": "taskq_api.service.runner"
+    },
+    "NFR-03": {
+      "type": "reliability",
+      "dimension": "error_handling",
+      "target": "0 bare except; CancelledError re-raised",
+      "module": "taskq_api.service.runner"
+    },
+    "NFR-04": {
+      "type": "security",
+      "dimension": "security",
+      "target": "0 DSN fragments in logs/metrics; redaction regex applied",
+      "module": "taskq_api.service.auth"
+    },
+    "NFR-05": {
+      "type": "documentation",
+      "dimension": "documentation",
+      "target": "100% public docstring coverage with [FR-XX] or [NFR-XX] reference",
+      "module": "taskq_api.api.tasks"
+    },
+    "NFR-06": {
+      "type": "layering",
+      "dimension": "architecture_constraints",
+      "target": "lint-imports exit 0; 0 sqlalchemy imports above repository",
+      "module": "taskq_api.repository.session"
+    },
+    "NFR-07": {
+      "type": "licensing",
+      "dimension": "license_compliance",
+      "target": "all licenses ∈ {MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, PSF}",
+      "module": "taskq_api.config"
+    },
+    "NFR-08": {
+      "type": "mutation",
+      "dimension": "mutation_testing",
+      "target": "mutation score >= 70",
+      "module": "taskq_api.service.tasks",
+      "scope_layers": []
+    },
+    "NFR-09": {
+      "type": "testability",
+      "dimension": "test_assertion_quality",
+      "target": "pytest -q reports 0 skipped; 0 zero-assertion tests",
+      "module": "taskq_api.service.runner"
+    },
+    "NFR-10": {
+      "type": "integration",
+      "dimension": "integration_coverage",
+      "target": "integration coverage >= 80%",
+      "module": "taskq_api.api.tasks"
+    },
+    "NFR-11": {
+      "type": "maintainability",
+      "dimension": "readability",
+      "target": "MI >= 80; CC <= 10; <= 400 LOC/file; <= 15 files/dir",
+      "module": "taskq_api.api.tasks"
+    },
+    "NFR-12": {
+      "type": "verifiability",
+      "dimension": "execute_verification_target",
+      "target": "make verify-system exit 0 and prints 'verify-system: PASS'",
+      "module": "taskq_api.app"
+    }
+  },
+  "advisory_only": [],
+  "gate_score_overrides": {
+    "performance": 75.0,
+    "security": 80.0,
+    "error_handling": 80.0,
+    "documentation": 75.0,
+    "architecture_constraints": 100.0,
+    "license_compliance": 100.0,
+    "mutation_testing": 70.0,
+    "test_assertion_quality": 70.0,
+    "integration_coverage": 80.0,
+    "readability": 80.0,
+    "execute_verification_target": 100.0
+  },
+  "fr_module_traceability": {
+    "FR-01": "taskq_api.api.tasks",
+    "FR-02": [
+      "taskq_api.api.tasks",
+      "taskq_api.service.runner"
+    ],
+    "FR-03": "taskq_api.api.deps",
+    "FR-04": "taskq_api.api.deps",
+    "FR-05": "taskq_api.api.deps",
+    "FR-06": "taskq_api.repository.session",
+    "FR-07": "migrations.versions.v3_split_results",
+    "FR-08": [
+      "taskq_api.service.runner",
+      "taskq_api.api.tasks"
+    ],
+    "FR-09": [
+      "taskq_api.api.health",
+      "taskq_api.service.metrics"
+    ],
+    "FR-10": "taskq_api.errors"
+  },
+  "architecture_constraints": [
+    "no_circular_dependencies",
+    "no_sqlalchemy_above_repository",
+    "models_sqlalchemy_orm_declarative_only",
+    "downward_only_layer_dependencies"
+  ],
+  "high_risk_modules": [
+    "taskq_api.service.runner",
+    "taskq_api.service.auth",
+    "taskq_api.repository.session",
+    "migrations.versions.v3_split_results"
+  ],
+  "required_artifacts": [
+    ".importlinter",
+    ".env.example",
+    "requirements.txt",
+    "requirements.lock",
+    "alembic.ini",
+    "Makefile",
+    ".methodology/harness_config.json",
+    "08-config/SBOM.json"
+  ]
+}

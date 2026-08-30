@@ -1,0 +1,107 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-06",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed!",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 19, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.046}}",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 5,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "5 passed, 0 failed in 0.31s. Coverage on 03-development/src/taskq_api/repository/session.py: 100% (48/48 statements). 5/5 required tests present.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-06.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-06",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "Analyzed 19 files, 14 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken.",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "ccb5c8421e939e2966df5760ae601b0afb823950",
+  "enforcer_surface": {
+    "core/quality_gate": "06bace19a04e56e02b229bb4ffb617ecbad82792",
+    "harness/harness_bridge.py": "a7eef4a97c82275e0ab40b2bd57985f2e27c79d0",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "1ad30882410433638ca392c227a00d10f47662251ec2fbb1aa22a472761e6a40",
+      "bytes": 135,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 19, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.046}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "b790686473fea0daa334912f1e4b3aa03bab5e96944ace6d921c8a4febcba1b4",
+      "bytes": 145,
+      "head": "5 passed, 0 failed in 0.31s. Coverage on 03-development/src/taskq_api/repository/session.py: 100% (48/48 statements). 5/5 required tests present."
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "56f76f5948f9ed07905984dfd2dc080696a127c2882cd21b578ab27f7bb99814",
+      "bytes": 122,
+      "head": "Analyzed 19 files, 14 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken."
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": [],
+    "dimensions_declared_absent": [
+      "documentation",
+      "error_handling",
+      "execute_verification_target",
+      "integration_coverage",
+      "license_compliance",
+      "mutation_testing",
+      "performance",
+      "readability",
+      "security",
+      "test_assertion_quality"
+    ]
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-07",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed! (ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 exit 0)",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787575866197\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 25, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.086}}",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 6,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "collected 6 items / 03-development/tests/test_fr07.py ...... [100%] / 6 passed in 1.62s; coverage json: 03-development/src/migrations/versions/v3_split_results.py percent_covered=100.0 (covered_lines=18, num_statements=18, missing_lines=0); spec_cov_pct=100 (0 required tests missing)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-07",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "Import Linter: Analyzed 354 files, 3297 dependencies. Contracts: 3 kept, 0 broken. (Downward-only layer dependencies KEPT; No sqlalchemy imports above repository layer KEPT; Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT)",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "ccb5c8421e939e2966df5760ae601b0afb823950",
+  "enforcer_surface": {
+    "core/quality_gate": "06bace19a04e56e02b229bb4ffb617ecbad82792",
+    "harness/harness_bridge.py": "a7eef4a97c82275e0ab40b2bd57985f2e27c79d0",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "b0a982c3819e8c4e4d9e769942a87dc7d81eba7c48bb1237ac847a349e1937a7",
+      "bytes": 95,
+      "head": "All checks passed! (ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 exit 0)"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "c53c7a499c32ec775d6c73afd35b9e12b3679b43febf88356bf0bc20d3dc0950",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787575866197\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 25, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.086}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "dc4bf600526e5145a47559280152e749e8bf72af4cd61f70b789c416d1645c9a",
+      "bytes": 284,
+      "head": "collected 6 items / 03-development/tests/test_fr07.py ...... [100%] / 6 passed in 1.62s; coverage json: 03-development/src/migrations/versions/v3_split_results.py percent_covered=100.0 (covered_lines=18, num_statements=18, missing_lines=0); spec_cov_pct=100 (0 required tests missing)"
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "e87a5a43e01470eb851dcc9a0517d99650c59419404fa60b334aa5a6d826f90c",
+      "bytes": 242,
+      "head": "Import Linter: Analyzed 354 files, 3297 dependencies. Contracts: 3 kept, 0 broken. (Downward-only layer dependencies KEPT; No sqlalchemy imports above repository layer KEPT; Models use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT)"
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": [],
+    "dimensions_declared_absent": [
+      "documentation",
+      "error_handling",
+      "execute_verification_target",
+      "integration_coverage",
+      "license_compliance",
+      "mutation_testing",
+      "performance",
+      "readability",
+      "security",
+      "test_assertion_quality"
+    ]
+  }
+}

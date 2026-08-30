@@ -1,0 +1,95 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-02",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed!",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1787566919938\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 11, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.532}}",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 41,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=1)\nrootdir: /Users/johnny/projects/taskq-cc-new\nplugins: benchmark-5.2.3, cov-7.1.0, anyio-4.14.2\ncollected 41 items\n\n03-development/tests/test_fr02.py .................................      [ 80%]\n03-development/tests/test_fr01.py ........                               [100%]\n\n======================= 41 passed, 20 warnings in 2.65s ========================\ncoverage_pct: 100.0",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-02",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "Import Linter\n=============\n\nContracts\n---------\n\nAnalyzed 11 files, 6 dependencies.\n----------------------------------\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken.",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "b03b9f753510c4167c084103b15a4da52fdf8b08",
+  "enforcer_surface": {
+    "core/quality_gate": "175b5ec151c9eebc0a2ffe48233e5a39ef4d5950",
+    "harness/harness_bridge.py": "699b72ebc056ae2529151f487a857bc953e78c29",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "66eb0397a4c57ab85611bcc9839d3df449068e67bc3e784e71826680d945cf97",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1787566919938\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 11, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.532}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "cc7a817e0ccb0cbd98897319f28aa385caa9c4d55dfe2dcd87a549d94cd40322",
+      "bytes": 657,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=1)\nrootdir: /Users/johnny/projects/taskq-cc-new\nplugins: benchmark-5.2.3, cov-7.1.0, anyio-4.14.2\ncollected 41 items\n\n03-development/tests/test_fr02.py .................................      [ 80%]\n03-development/tests/test_fr01.py ........                               [100%]\n\n======================= 41 passed, 20 warnings in 2.65s ========================\ncoverage_pct: 100.0"
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "cbb6e4b7702b8ae2d6148f7346021a86ae5e1525f2b5eef3db872b7c03092a2a",
+      "bytes": 205,
+      "head": "Import Linter\n=============\n\nContracts\n---------\n\nAnalyzed 11 files, 6 dependencies.\n----------------------------------\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\n\nContracts: 2 kept, 0 broken."
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": []
+  }
+}

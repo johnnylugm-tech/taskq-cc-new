@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-08-25T03:22:17.602509+00:00",
+  "tool": "mutmut",
+  "score": 71.5,
+  "killed": 123,
+  "survived": 49,
+  "paths_to_mutate": "03-development/src/taskq_api/service/runner.py",
+  "paths_to_exclude": [],
+  "mutated_files": 1,
+  "cache_sha256": "5f8e53b756964f161207301d88ad0b20bbba904c2b6ca225332120afb50bc7aa",
+  "enforcer_sha": "835b481902496bb46bb448a89e6e27640bf30d45-dirty"
+}
+--- mutmut 2.x results ---
+Killed: 123
+Survived: 49
+mutation score: 71.5%
