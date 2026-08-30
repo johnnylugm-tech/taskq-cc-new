@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-09",
+  "fr_id": "FR-10",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,34 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "All checks passed! (ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003; 0 violations)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.151}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.132}}",
+      "evidence_file": ".sessi-work/round_1/tools/type_safety.txt",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 8,
+      "tests_passed": 6,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 8 items\n03-development/tests/test_fr09.py ........ [100%]\n8 passed, 2 warnings in 0.44s\nCoverage: health.py 100% (27/27 stmts), metrics.py 100% (12/12 stmts)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
+      "tool_evidence": "pytest 03-development/tests/test_fr10.py: 6 passed, 0 failed, 0 skipped; coverage 03-development/src/taskq_api/errors.py = 100% (13/13 statements); spec coverage 5/5 required tests present (test_non_2xx_content_type_problem_json, test_problem_body_has_required_fields, test_detail_never_contains_internal_structure, test_correlation_id_in_header_and_log, test_error_code_mapping_matches_spec)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-09",
+      "coverage_scope_fr": "FR-10",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.",
+      "tool_evidence": "lint-imports (PYTHONPATH=src): Analyzed 356 files, 3144 dependencies; Contracts: 3 kept, 0 broken (downward-only layer dependencies, no sqlalchemy above repository, models use sqlalchemy.orm only)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,30 +79,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
-      "bytes": 18,
-      "head": "All checks passed!"
+      "sha256": "cb3539142362b37bc6d2a3a640c17d531ec3bc37c8bbcac7e739cf1892007370",
+      "bytes": 102,
+      "head": "All checks passed! (ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003; 0 violations)"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "0f44bb75fd92471e1d0885431ffe9cd87459db605460d8959d67524189292c79",
-      "bytes": 113,
-      "head": "{\"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.151}}"
+      "sha256": "9a9a466a8bd3e267228f36125d7ef081f4a6dd035863bbcfd21e454901dd4754",
+      "bytes": 161,
+      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.132}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "4be4109e63ef058416a568453f234ef7a9bf5a8bfbf33b970a57b8d89dc279ec",
-      "bytes": 167,
-      "head": "collected 8 items\n03-development/tests/test_fr09.py ........ [100%]\n8 passed, 2 warnings in 0.44s\nCoverage: health.py 100% (27/27 stmts), metrics.py 100% (12/12 stmts)"
+      "sha256": "95a4da894ebe9bff43a6e88433369ef53c460d6936f394ac0254015b9c0ad457",
+      "bytes": 392,
+      "head": "pytest 03-development/tests/test_fr10.py: 6 passed, 0 failed, 0 skipped; coverage 03-development/src/taskq_api/errors.py = 100% (13/13 statements); spec coverage 5/5 required tests present (test_non_2xx_content_type_problem_json, test_problem_body_has_required_fields, test_detail_never_contains_internal_structure, test_correlation_id_in_header_and_log, test_error_code_mapping_matches_spec)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "dae66c31c0cab52f6463d9e373e86345d3d7b1ab6268aa4ff42940ca9e23e6f6",
-      "bytes": 120,
-      "head": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken."
+      "sha256": "d2c40c50164ef6357ebeab95b2140ab2c4538fcd512d47780ac78392dff28cd7",
+      "bytes": 196,
+      "head": "lint-imports (PYTHONPATH=src): Analyzed 356 files, 3144 dependencies; Contracts: 3 kept, 0 broken (downward-only layer dependencies, no sqlalchemy above repository, models use sqlalchemy.orm only)"
     }
   },
   "composite_score": 100.0,
