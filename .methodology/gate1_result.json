@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-02",
+  "fr_id": "FR-03",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788080800147\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.179\n    }\n}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788080998844\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.15}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 77,
+      "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n03-development/src/taskq_api/service/runner.py XXX      0   100%\n---------------------------------------------------------------\nTOTAL                                          XXX      0   100%\n\ncollected 79 items\n\n03-development/tests/test_fr02.py .................................      [ 41%]\n03-development/tests/test_fr01.py ........                               [ 51%]\n03-development/tests/test_fr08.py .....................F..F............. [100%]\n\n=================== 2 failed, 77 passed, 2 warnings in 6.17s ===================",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
+      "tool_evidence": "======================== 23 passed, 2 warnings in 2.05s ========================\nName                                       Stmts   Miss  Cover\n--------------------------------------------------------------\n03-development/src/taskq_api/api/deps.py      75      0   100%\n--------------------------------------------------------------\nTOTAL                                         75      0   100%",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-02",
+      "coverage_scope_fr": "FR-03",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 354 files, 3130 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken.",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "a3589ab2bb6f8e09e7c896be97b89aeb4174a0ec217eb817c8899a3427844224",
-      "bytes": 250,
-      "head": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788080800147\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.179\n    }\n}"
+      "sha256": "7dd132c40632f5ebd231d3cdf721ff3b2a348e1f3fe4fd3ca292340695d4fd29",
+      "bytes": 185,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788080998844\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.15}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9c66721e150fa9c2ad8aa6469d4e480831bd0664e880c06f7929ec89707c96e5",
-      "bytes": 728,
-      "head": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n03-development/src/taskq_api/service/runner.py XXX      0   100%\n---------------------------------------------------------------\nTOTAL                                          XXX      0   100%\n\ncollected 79 items\n\n03-development/tests/test_fr02.py .................................      [ 41%]\n03-development/tests/test_fr01.py ........                               [ 51%]\n03-development/tests/test_fr08.py .....................F..F............. [100%]\n\n=================== 2 failed, 77 passed, 2 warnings in 6.17s ==================="
+      "sha256": "5958f732ea12bef9929dcac615f982f607d1eae2d0855405f899e2efa6753fb0",
+      "bytes": 395,
+      "head": "======================== 23 passed, 2 warnings in 2.05s ========================\nName                                       Stmts   Miss  Cover\n--------------------------------------------------------------\n03-development/src/taskq_api/api/deps.py      75      0   100%\n--------------------------------------------------------------\nTOTAL                                         75      0   100%"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "8d3aff0feb814f006aa09dbbc62d3fd6fbebfb4419d21fd88f9c534b73335bfa",
-      "bytes": 370,
-      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 354 files, 3130 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken."
+      "sha256": "a40390e624cdbeb09c28745c01eaa7736f58a06c47b43658fe2aac9b369d8022",
+      "bytes": 122,
+      "head": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
