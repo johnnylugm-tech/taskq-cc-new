@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-04",
+  "fr_id": "FR-05",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,14 +9,14 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!\nEXIT=0",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788081186617\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.135}}\nEXIT=0",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.137}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,16 @@
       "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 23 items\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.02s ========================\nEXIT=0\n[coverage] deps.py: 100% (75/75 statements), 0 missing lines",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
+      "tool_evidence": "collected 23 items; 03-development/tests/test_fr05.py .... (4 passed); 03-development/tests/test_fr03.py ......... (9 passed); 03-development/tests/test_fr04.py .......... (10 passed); 23 passed, 2 warnings in 2.02s. Coverage deps.py: 100% (75/75 statements).",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-04",
+      "coverage_scope_fr": "FR-05",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Import Linter\nContracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nAnalyzed 23 files, 17 dependencies.\nEXIT=0",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,30 +78,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "821aea98b0447901f9f5d243824d9d61c4a339243295f6d63b6834cd54e3670e",
-      "bytes": 25,
-      "head": "All checks passed!\nEXIT=0"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "18e5b062882ab48888114b523df3fc4f187beeae8205bde40ac341bb9bc07d16",
-      "bytes": 177,
-      "head": "{\"version\":\"1.1.409\",\"time\":\"1788081186617\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.135}}\nEXIT=0"
+      "sha256": "05e0c55ebc13481a8e8ae9b1c0884a183cfa7c8ccffe93f3ac316349462b989c",
+      "bytes": 135,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.137}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "a504369c1d0e82ae93592be95fc56554ebc14e27582cd59bc69f960d4f2a614f",
-      "bytes": 407,
-      "head": "collected 23 items\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.02s ========================\nEXIT=0\n[coverage] deps.py: 100% (75/75 statements), 0 missing lines"
+      "sha256": "9ffe89fd6861176cb1c06483629e103f166c42f6526ed50a3b0d4eb39fbac3bf",
+      "bytes": 259,
+      "head": "collected 23 items; 03-development/tests/test_fr05.py .... (4 passed); 03-development/tests/test_fr03.py ......... (9 passed); 03-development/tests/test_fr04.py .......... (10 passed); 23 passed, 2 warnings in 2.02s. Coverage deps.py: 100% (75/75 statements)."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "87b3f420d3feef3c1afaeee938c9f170bb90ec4b8ca90a7095213da05774693a",
-      "bytes": 141,
-      "head": "Import Linter\nContracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nAnalyzed 23 files, 17 dependencies.\nEXIT=0"
+      "sha256": "a40390e624cdbeb09c28745c01eaa7736f58a06c47b43658fe2aac9b369d8022",
+      "bytes": 122,
+      "head": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT, taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
