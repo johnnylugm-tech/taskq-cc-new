@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 8,
-  "fr_id": "FR-03",
+  "fr_id": "FR-04",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,7 +16,7 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.128}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788084481292\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.128}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,16 @@
       "tests_passed": 23,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 23 items\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.05s ========================\ncoverage: 100.0% for deps.py (75/75 statements covered)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
+      "tool_evidence": "collected 23 items\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.01s ========================\ncoverage_pct: 100.0 (deps.py: 75/75 statements)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-03",
+      "coverage_scope_fr": "FR-04",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nAnalyzed 23 files, 17 dependencies.",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "04a11f0497cf8f3eb49e0f9e64d07bac5c48dda29c50cd4781ae2c0b79a6080d",
-      "bytes": 161,
-      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.128}}"
+      "sha256": "48d84b016c2ec50875a2b407ebc7ccb872122b6a6f59d8f5d1e86a6fc455b574",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788084481292\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.128}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "64a557c0f85b678f101411a8ff7b87c0f5e4d6f9c1cbce10b1b72e532e5fb6f9",
-      "bytes": 395,
-      "head": "collected 23 items\n03-development/tests/test_fr03.py .........                              [ 39%]\n03-development/tests/test_fr04.py ..........                             [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.05s ========================\ncoverage: 100.0% for deps.py (75/75 statements covered)"
+      "sha256": "cbfb13cee8c381a97f9e94d4eb14425fdf4a8ad209a3d376d7d767e894a2ca6f",
+      "bytes": 387,
+      "head": "collected 23 items\n03-development/tests/test_fr04.py ..........                             [ 43%]\n03-development/tests/test_fr03.py .........                              [ 82%]\n03-development/tests/test_fr05.py ....                                   [100%]\n======================== 23 passed, 2 warnings in 2.01s ========================\ncoverage_pct: 100.0 (deps.py: 75/75 statements)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f2f49bbddc5ef71a8d40ba2d22f7be0157dad478cde4ecd07b90a5879753310e",
+      "sha256": "dae66c31c0cab52f6463d9e373e86345d3d7b1ab6268aa4ff42940ca9e23e6f6",
       "bytes": 120,
-      "head": "Contracts: 2 kept, 0 broken.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nAnalyzed 23 files, 17 dependencies."
+      "head": "Analyzed 23 files, 17 dependencies.\nno_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
