@@ -59,12 +59,12 @@ Coverage JSON written to file .coverage.json
 
 
 -------------------------------------------------------------------------------------------- benchmark: 4 tests --------------------------------------------------------------------------------------------
-Name (time in ns)                   Min                   Max                Mean             StdDev              Median                IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
+Name (time in ns)                   Min                    Max                Mean             StdDev              Median               IQR             Outliers  OPS (Mops/s)            Rounds  Iterations
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_retry_after      43.5268 (1.0)        216.1429 (1.0)       44.6833 (1.0)       2.0969 (1.0)       44.6429 (1.0)       0.3750 (1.0)      2602;8906       22.3797 (1.0)      198374         112
-test_benchmark_refill          181.2500 (4.16)     1,458.3000 (6.75)     192.0748 (4.30)     11.2248 (5.35)     189.6000 (4.25)      4.2000 (11.20)    4833;7241        5.2063 (0.23)     192013          20
-test_benchmark_hash_key        254.1500 (5.84)     1,122.9500 (5.20)     276.5192 (6.19)     13.5524 (6.46)     275.0000 (6.16)      6.2500 (16.67)    4757;5161        3.6164 (0.16)     163266          20
-test_benchmark_redact          290.9992 (6.69)     9,124.9995 (42.22)    360.2038 (8.06)     49.5855 (23.65)    375.0001 (8.40)     41.9996 (112.00)   5537;1507        2.7762 (0.12)     163266           1
+test_benchmark_retry_after      43.5636 (1.0)         198.4818 (1.0)       44.7066 (1.0)       1.9275 (1.0)       44.6909 (1.0)      0.3818 (inf)      2444;6941       22.3680 (1.0)      198374         110
+test_benchmark_refill          181.2500 (4.16)      3,162.5000 (15.93)    190.4653 (4.26)     13.7772 (7.15)     189.6000 (4.24)     4.1500 (inf)      1968;4510        5.2503 (0.23)     171439          20
+test_benchmark_hash_key        247.9000 (5.69)      1,308.3500 (6.59)     273.9961 (6.13)     21.7884 (11.30)    268.7500 (6.01)     6.2500 (inf)    12553;15840        3.6497 (0.16)     157879          20
+test_benchmark_redact          290.9992 (6.68)     13,291.9995 (66.97)    377.0987 (8.43)     64.0703 (33.24)    375.0001 (8.39)     0.0000 (1.0)     2112;65626        2.6518 (0.12)     162154           1
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
@@ -72,7 +72,7 @@ Legend:
   OPS: Operations Per Second, computed as 1 / Mean
 =========================== short test summary info ============================
 FAILED 03-development/tests/test_bug_hunt_resolutions.py::test_t07_no_orphan_descendant_after_timeout
-1 failed, 261 passed, 3 warnings in 28.40s
+1 failed, 261 passed, 3 warnings in 28.34s
 /Users/johnny/projects/taskq-cc-new/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
 The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
 

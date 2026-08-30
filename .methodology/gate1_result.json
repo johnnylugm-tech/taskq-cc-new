@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 8,
-  "fr_id": "FR-09",
+  "fr_id": "FR-10",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "All checks passed!\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"summary\": {\"errorCount\": 0, \"warningCount\": 0}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788085447818\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.145}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 8,
+      "tests_passed": 6,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "8 passed, 2 warnings in 0.41s. Coverage: 100% (39/39 statements, 27/27 in health.py, 12/12 in metrics.py). All 4 required tests present and passing.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
+      "tool_evidence": "collected 6 items\n03-development/tests/test_fr10.py ......                                 [100%]\n======================== 6 passed, 2 warnings in 0.41s =========================\nerrors.py: 13/13 statements, 100.0% covered",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-09",
+      "coverage_scope_fr": "FR-10",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. (Downward-only layer dependencies KEPT, No sqlalchemy imports above repository layer KEPT, Models use sqlalchemy.orm only KEPT)",
+      "tool_evidence": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT. taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -85,23 +85,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "4fe962835abc833ee68750b3b8bf965f51a2ee69d8b0a9e2bd623a6b04a1ae18",
-      "bytes": 49,
-      "head": "{\"summary\": {\"errorCount\": 0, \"warningCount\": 0}}"
+      "sha256": "5f4b872dbb8fb61b61868d257ed256c1407790d63c37e1becb87a444785da662",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788085447818\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.145}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "21ba50dc1e750a49056ce42eb1acacb0b93966458fcc00cb36be168b91422bbd",
-      "bytes": 148,
-      "head": "8 passed, 2 warnings in 0.41s. Coverage: 100% (39/39 statements, 27/27 in health.py, 12/12 in metrics.py). All 4 required tests present and passing."
+      "sha256": "5876ab0413eeaa055e24308a7a51b3cd571cbb9ade59525f7f2aa11005fedfae",
+      "bytes": 222,
+      "head": "collected 6 items\n03-development/tests/test_fr10.py ......                                 [100%]\n======================== 6 passed, 2 warnings in 0.41s =========================\nerrors.py: 13/13 statements, 100.0% covered"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "21320e62b76ebef3d19e33ceb78a5d531b15f5649bf351bd8762087b22b120a9",
-      "bytes": 195,
-      "head": "Analyzed 356 files, 3144 dependencies. Contracts: 3 kept, 0 broken. (Downward-only layer dependencies KEPT, No sqlalchemy imports above repository layer KEPT, Models use sqlalchemy.orm only KEPT)"
+      "sha256": "1a1d0c847aa86e7e7e5c9c4f2addb5a3f9e6045d90cb72a2da960b697b1066e4",
+      "bytes": 122,
+      "head": "Analyzed 23 files, 17 dependencies. no_circular_dependencies KEPT. taskq_api_self_check KEPT. Contracts: 2 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
