@@ -58,6 +58,7 @@ import asyncio
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import time as time_mod
@@ -1856,3 +1857,126 @@ def test_tasks_execute_and_record_reraises_cancelled_error(monkeypatch):
 
     with pytest.raises(asyncio.CancelledError):
         asyncio.run(_invoke())
+
+
+# ---------------------------------------------------------------------------
+# _reap_after_kill — ``os.getpgid(0)`` raises (runner.py lines 369-370).
+# The defensive ``my_pgid = None`` fallback must handle the rare case
+# where reading our own PG fails (e.g. ENOMEM under extreme load).
+# ---------------------------------------------------------------------------
+def test_reap_after_kill_handles_os_getpgid_zero_failure(monkeypatch):
+    """``_reap_after_kill`` swallows ``OSError`` from ``os.getpgid(0)``."""
+    from taskq_api.service.runner import _reap_after_kill
+
+    class _FakeProc:
+        """Stub with a real-looking ``pid`` so the function reaches ``os.getpgid(0)``."""
+
+        pid = 4242  # arbitrary PID; not a real process
+
+        def kill(self) -> None:  # not exercised — killpg branch handles cleanup
+            return None
+
+        async def wait(self) -> int:
+            return 0
+
+    def _fake_getpgid(arg: int) -> int:
+        # child_pgid lookup (line 363) returns a fake PG id so the
+        # ``if child_pgid is not None`` branch is taken.
+        if arg == 4242:
+            return 9999
+        # Runner's own PID lookup (line 368) raises — exercises 369-370.
+        raise OSError("simulated ENOMEM on getpgid(0)")
+
+    monkeypatch.setattr("taskq_api.service.runner.os.getpgid", _fake_getpgid)
+
+    async def _exercise() -> None:
+        # Must not raise — the fallback to ``my_pgid = None`` at lines
+        # 369-370 then takes the killpg branch (child_pgid != my_pgid).
+        # We don't care if killpg succeeds or fails on a fake PG.
+        await _reap_after_kill(_FakeProc())  # type: ignore[arg-type]
+
+    asyncio.run(_exercise())  # must not raise
+
+
+# ---------------------------------------------------------------------------
+# _reap_after_kill — ``os.killpg`` raises (runner.py lines 374-376).
+# When the PG is already gone (e.g. the child self-exited between the
+# pid check and the killpg call) ``killpg`` raises ``ProcessLookupError``,
+# and the function MUST swallow it rather than crash the request.
+# ---------------------------------------------------------------------------
+def test_reap_after_kill_handles_killpg_process_lookup_error(monkeypatch):
+    """``_reap_after_kill`` swallows ``ProcessLookupError`` from ``os.killpg``."""
+    from taskq_api.service.runner import _reap_after_kill
+
+    class _FakeProc:
+        """Stub whose ``pid`` lets the function reach the killpg call."""
+
+        pid = 5151
+
+        def kill(self) -> None:
+            return None
+
+        async def wait(self) -> int:
+            return 0
+
+    # ``os.getpgid`` is called twice: once for the child, once for the
+    # runner itself (line 368). Return a fresh PG for the child and a
+    # different one for the runner so we take the killpg branch (line 371).
+    monkeypatch.setattr(
+        "taskq_api.service.runner.os.getpgid",
+        lambda arg: 7777 if arg == 5151 else 8888,
+    )
+
+    killpg_calls: list[tuple[int, int]] = []
+
+    def _fake_killpg(pgid: int, sig: int) -> None:
+        killpg_calls.append((pgid, sig))
+        # Simulate the PG already being gone — exercises 374-376.
+        raise ProcessLookupError(5151)
+
+    monkeypatch.setattr("taskq_api.service.runner.os.killpg", _fake_killpg)
+
+    async def _exercise() -> None:
+        await _reap_after_kill(_FakeProc())  # type: ignore[arg-type]
+
+    asyncio.run(_exercise())  # must not raise
+    assert killpg_calls == [(7777, signal.SIGKILL)] or any(
+        sig == signal.SIGKILL for _pgid, sig in killpg_calls
+    ), f"killpg must have been called with SIGKILL; got {killpg_calls!r}"
+
+
+# ---------------------------------------------------------------------------
+# _reap_after_kill — ``proc.kill()`` raises ``ProcessLookupError`` in
+# the same-PG branch (runner.py lines 382-383). When the child shares
+# the runner's PG, the function falls back to ``proc.kill()`` instead of
+# ``os.killpg``. If the process was already reaped between the PG check
+# and the kill, ``proc.kill()`` raises ``ProcessLookupError`` and the
+# function MUST swallow it.
+# ---------------------------------------------------------------------------
+def test_reap_after_kill_handles_proc_kill_process_lookup_error(monkeypatch):
+    """``_reap_after_kill`` swallows ``ProcessLookupError`` from ``proc.kill()`` in same-PG branch."""
+    from taskq_api.service.runner import _reap_after_kill
+
+    class _FakeProc:
+        """Stub whose ``pid`` puts it in the same PG as the runner."""
+
+        pid = 6262
+
+        def kill(self) -> None:
+            # Already reaped — exercises 382-383.
+            raise ProcessLookupError(6262)
+
+        async def wait(self) -> int:
+            return 0
+
+    # Make the child's PG equal the runner's PG so we take the
+    # ``else`` branch (line 377) and call ``proc.kill()`` (line 381).
+    monkeypatch.setattr(
+        "taskq_api.service.runner.os.getpgid",
+        lambda _arg: 1234,
+    )
+
+    async def _exercise() -> None:
+        await _reap_after_kill(_FakeProc())  # type: ignore[arg-type]
+
+    asyncio.run(_exercise())  # must not raise
