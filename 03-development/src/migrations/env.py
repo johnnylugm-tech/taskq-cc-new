@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import os
 from logging.config import fileConfig
+from typing import cast
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool, text as sa_text
@@ -163,16 +164,10 @@ def run_migrations_online() -> None:
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
-    head_rev = context.script.get_current_head()  # ``v3_split_results``
     # FR-07's migration chain always defines at least v1 / v2 / v3, so
-    # ``get_current_head`` cannot return ``None`` here. Narrow the type
-    # explicitly (pyright / mypy both reject ``str | None`` flowing into
-    # the helpers below).
-    if head_rev is None:
-        raise RuntimeError(  # alembic's offline() guard; unreachable under the project's always-head migration chain (v1→v2→v3)
-            "alembic script has no current head revision; the FR-07 "
-            "migration chain must define at least one revision."
-        )
+    # ``get_current_head`` cannot return ``None`` here; mypy/pyright
+    # accept the ``str`` type via the ``cast`` below.
+    head_rev = cast(str, context.script.get_current_head())
     with connectable.connect() as connection:
         _reset_head_token_if_present(connection, head_rev)
 

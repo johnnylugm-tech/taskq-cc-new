@@ -64,8 +64,9 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.flush()
         return 0
 
-    parser.error(f"unknown subcommand: {args.command!r} {args.key_action!r}")
-    return 2  # unreachable: parser.error() raises SystemExit(2) above
+    # Unreachable: ``required=True`` on both subparsers forces
+    # ``parser.parse_args`` to reject any unknown command/action
+    # before main() runs, so this fallback is dead code.
 
 
 if __name__ == "__main__":
