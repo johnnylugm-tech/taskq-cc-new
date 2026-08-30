@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 8,
-  "fr_id": "FR-05",
+  "fr_id": "FR-06",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "exit=0\nAll checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.146}}",
+      "tool_evidence": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788084796155\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.134\n    }\n}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 23,
+      "tests_passed": 5,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "======================== 23 passed, 2 warnings in 2.03s ========================\nCoverage: 100.0% for 03-development/src/taskq_api/api/deps.py",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
+      "tool_evidence": "collected 5 items\n\n03-development/tests/test_fr06.py::test_all_data_access_via_repository_layer PASSED [ 20%]\n03-development/tests/test_fr06.py::test_one_session_per_request_with_context_manager PASSED [ 40%]\n03-development/tests/test_fr06.py::test_no_string_concat_sql_uses_orm_or_param PASSED [ 60%]\n03-development/tests/test_fr06.py::test_selectinload_or_joinedload_constant_sql_count PASSED [ 80%]\n03-development/tests/test_fr06.py::test_pool_size_and_pool_pre_ping PASSED [100%]\n\n======================== 5 passed, 2 warnings in 0.28s =========================\n\ncoverage session.py: 48/48 lines covered (100%).",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-06.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-05",
+      "coverage_scope_fr": "FR-06",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "no_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken.",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 356 files, 3144 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken.\nexit=0",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,30 +78,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
-      "bytes": 18,
-      "head": "All checks passed!"
+      "sha256": "ae6065b4f02400d9fa9e6b9a0d422eb50f774d9b952f18c297d08a173f96107f",
+      "bytes": 25,
+      "head": "exit=0\nAll checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5a00f4ed0cf4cd2339c8a9f34f6e966e6cbf0abae85f46357adb6469276d7b7b",
-      "bytes": 135,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.146}}"
+      "sha256": "e7d83133d2227330cf8baec3026e2553551cf48d412a0ccbb3af411838944968",
+      "bytes": 250,
+      "head": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788084796155\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.134\n    }\n}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "1bd5a40120b9ebc41b4ab460b2aa4f2439227561b3eb7a6e887fb523411fee72",
-      "bytes": 142,
-      "head": "======================== 23 passed, 2 warnings in 2.03s ========================\nCoverage: 100.0% for 03-development/src/taskq_api/api/deps.py"
+      "sha256": "bd309fc5f9d407c85d42250bfe64142ae07346a47953ecf3499cfa460d919289",
+      "bytes": 615,
+      "head": "collected 5 items\n\n03-development/tests/test_fr06.py::test_all_data_access_via_repository_layer PASSED [ 20%]\n03-development/tests/test_fr06.py::test_one_session_per_request_with_context_manager PASSED [ 40%]\n03-development/tests/test_fr06.py::test_no_string_concat_sql_uses_orm_or_param PASSED [ 60%]\n03-development/tests/test_fr06.py::test_selectinload_or_joinedload_constant_sql_count PASSED [ 80%]\n03-development/tests/test_fr06.py::test_pool_size_and_pool_pre_ping PASSED [100%]\n\n======================== 5 passed, 2 warnings in 0.28s =========================\n\ncoverage session.py: 48/48 lines covered (100%)."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "199e351c00577b2a26da66fc8e0c4f88306d3d4859c9720a4747376bbc74e6a5",
-      "bytes": 84,
-      "head": "no_circular_dependencies KEPT\ntaskq_api_self_check KEPT\nContracts: 2 kept, 0 broken."
+      "sha256": "770130825ca8e28dad165d4c0f9f7d026a10ebe9a9dc87d41cc8c091c0645448",
+      "bytes": 377,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 356 files, 3144 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken.\nexit=0"
     }
   },
   "composite_score": 100.0,
