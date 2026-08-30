@@ -57,16 +57,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 
-    if args.command == "key" and args.key_action == "create":
-        plaintext = create_key(scope=args.scope)
-        # AC-3.4: print the plaintext to stdout exactly once.
-        sys.stdout.write(plaintext + "\n")
-        sys.stdout.flush()
-        return 0
-
-    # Unreachable: ``required=True`` on both subparsers forces
-    # ``parser.parse_args`` to reject any unknown command/action
-    # before main() runs, so this fallback is dead code.
+    # ``required=True`` on both subparsers guarantees ``args.command ==
+    # "key"`` and ``args.key_action == "create"`` at this point; any
+    # other value is rejected by argparse before main() runs.
+    plaintext = create_key(scope=args.scope)
+    # AC-3.4: print the plaintext to stdout exactly once.
+    sys.stdout.write(plaintext + "\n")
+    sys.stdout.flush()
+    return 0
 
 
 if __name__ == "__main__":
