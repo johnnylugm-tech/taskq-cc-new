@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-01",
+  "fr_id": "FR-02",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "$ python3 -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!\n(exit 0, 0 violations)",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "$ python3 -m pyright 03-development/src/ --outputjson\n{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.235}}",
+      "tool_evidence": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788080800147\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.179\n    }\n}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 79,
+      "tests_passed": 77,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "$ coverage run -m pytest test_fr01.py test_fr02.py test_fr08.py\ncollected 79 items\n03-development/tests/test_fr01.py ........ [ 10%]\n03-development/tests/test_fr02.py ................................. [ 51%]\n03-development/tests/test_fr08.py ...................................... [100%]\n79 passed, 2 warnings in 6.16s\ncoverage json --include=03-development/src/taskq_api/api/tasks.py: totals percent_covered=100.0 (53/53 statements, 0 missing). spec_cov=6/6 required tests present and passing -> 100%.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
+      "tool_evidence": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n03-development/src/taskq_api/service/runner.py XXX      0   100%\n---------------------------------------------------------------\nTOTAL                                          XXX      0   100%\n\ncollected 79 items\n\n03-development/tests/test_fr02.py .................................      [ 41%]\n03-development/tests/test_fr01.py ........                               [ 51%]\n03-development/tests/test_fr08.py .....................F..F............. [100%]\n\n=================== 2 failed, 77 passed, 2 warnings in 6.17s ===================",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-01",
+      "coverage_scope_fr": "FR-02",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "$ PYTHONPATH=src lint-imports\nAnalyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api -> repository -> models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken. (exit 0)",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 354 files, 3130 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -78,30 +78,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "3dede9ece629914be46b6677ffa213361426de3ad5bf8eb2c8c8aba2b2d37484",
-      "bytes": 122,
-      "head": "$ python3 -m ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!\n(exit 0, 0 violations)"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "68c5a5abb5bae2cf7a34785eddb31199cbd9834dc9b2d4de30f506a86c5dccd8",
-      "bytes": 215,
-      "head": "$ python3 -m pyright 03-development/src/ --outputjson\n{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.235}}"
+      "sha256": "a3589ab2bb6f8e09e7c896be97b89aeb4174a0ec217eb817c8899a3427844224",
+      "bytes": 250,
+      "head": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788080800147\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 29,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.179\n    }\n}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f2183ec994c9f287c862d0272a0b899b152bb13e3813bcb009e32ab74bf05b17",
-      "bytes": 502,
-      "head": "$ coverage run -m pytest test_fr01.py test_fr02.py test_fr08.py\ncollected 79 items\n03-development/tests/test_fr01.py ........ [ 10%]\n03-development/tests/test_fr02.py ................................. [ 51%]\n03-development/tests/test_fr08.py ...................................... [100%]\n79 passed, 2 warnings in 6.16s\ncoverage json --include=03-development/src/taskq_api/api/tasks.py: totals percent_covered=100.0 (53/53 statements, 0 missing). spec_cov=6/6 required tests present and passing -> 100%."
+      "sha256": "9c66721e150fa9c2ad8aa6469d4e480831bd0664e880c06f7929ec89707c96e5",
+      "bytes": 728,
+      "head": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n03-development/src/taskq_api/service/runner.py XXX      0   100%\n---------------------------------------------------------------\nTOTAL                                          XXX      0   100%\n\ncollected 79 items\n\n03-development/tests/test_fr02.py .................................      [ 41%]\n03-development/tests/test_fr01.py ........                               [ 51%]\n03-development/tests/test_fr08.py .....................F..F............. [100%]\n\n=================== 2 failed, 77 passed, 2 warnings in 6.17s ==================="
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "58a3403bb715d68184aa168b79fa7bc1ff9a84c275975767912c1b487fddcdd7",
-      "bytes": 292,
-      "head": "$ PYTHONPATH=src lint-imports\nAnalyzed 356 files, 3144 dependencies.\nDownward-only layer dependencies (api -> repository -> models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\nContracts: 3 kept, 0 broken. (exit 0)"
+      "sha256": "8d3aff0feb814f006aa09dbbc62d3fd6fbebfb4419d21fd88f9c534b73335bfa",
+      "bytes": 370,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 354 files, 3130 dependencies.\n--------------------------------------\n\nDownward-only layer dependencies (api → repository → models) KEPT\nNo sqlalchemy imports above repository layer KEPT\nModels use sqlalchemy.orm only, never sqlalchemy.sql / .schema KEPT\n\nContracts: 3 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
