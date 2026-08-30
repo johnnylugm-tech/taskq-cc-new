@@ -1,0 +1,33 @@
+{
+  "acceptance_criteria": {
+    "parse_gap": 0,
+    "uncited_by_test_spec": 34,
+    "unnumbered": 0
+  },
+  "architecture": {
+    "declared_only": [
+      "no_sqlalchemy_above_repository",
+      "models_sqlalchemy_orm_declarative_only",
+      "downward_only_layer_dependencies"
+    ],
+    "modules_outside_every_contract": []
+  },
+  "coverage": {
+    "omit": [],
+    "statements_measured": 13,
+    "statements_omitted": 0
+  },
+  "gate": 1,
+  "phase": 8,
+  "stubbed_boundaries": {
+    "count": 0,
+    "modules": []
+  },
+  "verify_system": {
+    "obligations_unmet": [],
+    "reach_status": "measured",
+    "status": "expanded",
+    "swallowed": 0,
+    "tautological": false
+  }
+}

@@ -1,7 +1,7 @@
 {
   "gate": 1,
-  "phase": 7,
-  "fr_id": "FR-10",
+  "phase": 8,
+  "fr_id": "FR-01",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,34 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed! (ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003; 0 violations)",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.132}}",
-      "evidence_file": ".sessi-work/round_1/tools/type_safety.txt",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.141}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 6,
+      "tests_passed": 82,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "pytest 03-development/tests/test_fr10.py: 6 passed, 0 failed, 0 skipped; coverage 03-development/src/taskq_api/errors.py = 100% (13/13 statements); spec coverage 5/5 required tests present (test_non_2xx_content_type_problem_json, test_problem_body_has_required_fields, test_detail_never_contains_internal_structure, test_correlation_id_in_header_and_log, test_error_code_mapping_matches_spec)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_evidence": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n---------------------------------------------------------------\nTOTAL                                          53      0   100%\n\npytest summary: 82 passed, 2 warnings in 6.16s (test_fr01: 8, test_fr02: 33, test_fr08: 41)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-01",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "lint-imports (PYTHONPATH=src): Analyzed 356 files, 3144 dependencies; Contracts: 3 kept, 0 broken (downward-only layer dependencies, no sqlalchemy above repository, models use sqlalchemy.orm only)",
+      "tool_evidence": "Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -79,30 +78,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "cb3539142362b37bc6d2a3a640c17d531ec3bc37c8bbcac7e739cf1892007370",
-      "bytes": 102,
-      "head": "All checks passed! (ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003; 0 violations)"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9a9a466a8bd3e267228f36125d7ef081f4a6dd035863bbcfd21e454901dd4754",
-      "bytes": 161,
-      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 29, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.132}}"
+      "sha256": "23a7eea6c8365b4927a63a94ee7778e1521e21dc96b06e5f850eb4b82f22072a",
+      "bytes": 123,
+      "head": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":29,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.141}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "95a4da894ebe9bff43a6e88433369ef53c460d6936f394ac0254015b9c0ad457",
-      "bytes": 392,
-      "head": "pytest 03-development/tests/test_fr10.py: 6 passed, 0 failed, 0 skipped; coverage 03-development/src/taskq_api/errors.py = 100% (13/13 statements); spec coverage 5/5 required tests present (test_non_2xx_content_type_problem_json, test_problem_body_has_required_fields, test_detail_never_contains_internal_structure, test_correlation_id_in_header_and_log, test_error_code_mapping_matches_spec)"
+      "sha256": "ca82f9f31b6242778488af48527837ee4f5d4fc98dc7c0fd4c2d37796885f75c",
+      "bytes": 412,
+      "head": "Name                                        Stmts   Miss  Cover\n---------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py      53      0   100%\n---------------------------------------------------------------\nTOTAL                                          53      0   100%\n\npytest summary: 82 passed, 2 warnings in 6.16s (test_fr01: 8, test_fr02: 33, test_fr08: 41)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "d2c40c50164ef6357ebeab95b2140ab2c4538fcd512d47780ac78392dff28cd7",
-      "bytes": 196,
-      "head": "lint-imports (PYTHONPATH=src): Analyzed 356 files, 3144 dependencies; Contracts: 3 kept, 0 broken (downward-only layer dependencies, no sqlalchemy above repository, models use sqlalchemy.orm only)"
+      "sha256": "f4bf1805cdcaeaa443e9bcf12e7f8094db98cd1103f0e0dbca12c53cea6e395a",
+      "bytes": 87,
+      "head": "Contracts: 2 kept, 0 broken. (no_circular_dependencies KEPT, taskq_api_self_check KEPT)"
     }
   },
   "composite_score": 100.0,
